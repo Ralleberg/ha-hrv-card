@@ -120,10 +120,25 @@ class HRVCard extends HTMLElement {
 
   _temperatureColor(value) {
     if (!Number.isFinite(value)) return "var(--secondary-text-color)";
-    const clamped = Math.max(-10, Math.min(35, value));
-    const ratio = (clamped + 10) / 45;
-    const hue = 215 - ratio * 205;
-    return `hsl(${hue}, 78%, 56%)`;
+    const points = [
+      { temp: -10, color: [255, 255, 255] },
+      { temp: 0, color: [38, 149, 255] },
+      { temp: 15, color: [72, 222, 73] },
+      { temp: 21, color: [255, 211, 64] },
+      { temp: 30, color: [255, 64, 64] }
+    ];
+    const clamped = Math.max(points[0].temp, Math.min(points[points.length - 1].temp, value));
+    const upperIndex = points.findIndex((point) => clamped <= point.temp);
+    const upper = points[Math.max(upperIndex, 1)];
+    const lower = points[Math.max(upperIndex - 1, 0)];
+    const ratio = upper.temp === lower.temp ? 0 : (clamped - lower.temp) / (upper.temp - lower.temp);
+    const color = lower.color.map((channel, index) => Math.round(channel + (upper.color[index] - channel) * ratio));
+    return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  }
+
+  _particleColor(value) {
+    if (!Number.isFinite(value)) return "white";
+    return value <= -7 ? "#111" : "white";
   }
 
   _animationDuration() {
@@ -261,25 +276,9 @@ class HRVCard extends HTMLElement {
         }
 
         .particle {
-          fill: color-mix(in srgb, white 88%, var(--primary-text-color) 12%);
-          opacity: .88;
+          fill: var(--particle-color, white);
+          opacity: .9;
           filter: drop-shadow(0 0 5px currentColor);
-        }
-
-        .particle.hot {
-          fill: #ffd166;
-        }
-
-        .particle.warm {
-          fill: #ff8a65;
-        }
-
-        .particle.cool {
-          fill: #64d8ff;
-        }
-
-        .particle.fresh {
-          fill: #9cff57;
         }
 
         .no-animation .particle {
@@ -383,43 +382,43 @@ class HRVCard extends HTMLElement {
             <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 162 C190 192 155 192 55 192"></path>
 
             <g class="particles">
-              <circle r="3.2" class="particle cool">
+              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
                 <animateMotion dur="${duration}" begin="0s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
               </circle>
-              <circle r="2.4" class="particle cool">
+              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
                 <animateMotion dur="${duration}" begin="-.9s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
               </circle>
-              <circle r="2.8" class="particle fresh">
+              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
                 <animateMotion dur="${duration}" begin="-1.8s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
               </circle>
 
-              <circle r="3.2" class="particle hot">
+              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(supply)}">
                 <animateMotion dur="${duration}" begin="-.35s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
               </circle>
-              <circle r="2.4" class="particle fresh">
+              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(supply)}">
                 <animateMotion dur="${duration}" begin="-1.25s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
               </circle>
-              <circle r="2.8" class="particle warm">
+              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(supply)}">
                 <animateMotion dur="${duration}" begin="-2.15s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
               </circle>
 
-              <circle r="3.2" class="particle warm">
+              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(extract)}">
                 <animateMotion dur="${duration}" begin="-.15s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
               </circle>
-              <circle r="2.4" class="particle hot">
+              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(extract)}">
                 <animateMotion dur="${duration}" begin="-1.05s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
               </circle>
-              <circle r="2.8" class="particle warm">
+              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(extract)}">
                 <animateMotion dur="${duration}" begin="-1.95s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
               </circle>
 
-              <circle r="3.2" class="particle cool">
+              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
                 <animateMotion dur="${duration}" begin="-.5s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
               </circle>
-              <circle r="2.4" class="particle fresh">
+              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
                 <animateMotion dur="${duration}" begin="-1.4s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
               </circle>
-              <circle r="2.8" class="particle cool">
+              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
                 <animateMotion dur="${duration}" begin="-2.3s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
               </circle>
             </g>
