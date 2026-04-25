@@ -284,8 +284,15 @@ class HRVCard extends HTMLElement {
 
         .particle {
           fill: var(--particle-color, white);
-          opacity: .9;
+          opacity: 0;
           filter: drop-shadow(0 0 5px currentColor);
+          transform-box: fill-box;
+          transform-origin: center;
+        }
+
+        .particle.soft {
+          opacity: 0;
+          filter: blur(.2px) drop-shadow(0 0 7px currentColor);
         }
 
         .no-animation .particle {
@@ -404,44 +411,68 @@ class HRVCard extends HTMLElement {
             <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 118 C198 96 150 88 55 88"></path>
 
             <g class="particles">
-              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
-                <animateMotion dur="${duration}" begin="0s" repeatCount="indefinite"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
+              <circle r="2.7" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
+                <animateMotion dur="${duration}" begin="-.15s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="${duration}" begin="-.15s" repeatCount="indefinite" values="0;.92;.72;0" keyTimes="0;.18;.78;1"></animate>
+                <animate attributeName="r" dur="${duration}" begin="-.15s" repeatCount="indefinite" values="1.7;3.0;2.2;1.2" keyTimes="0;.25;.72;1"></animate>
               </circle>
-              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
-                <animateMotion dur="${duration}" begin="-.9s" repeatCount="indefinite"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
+              <circle r="1.8" class="particle soft" style="--particle-color:${this._particleColor(outdoor)}">
+                <animateMotion dur="calc(${duration} * 1.17)" begin="-1.05s" repeatCount="indefinite" calcMode="spline" keySplines=".37 0 .63 1"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * 1.17)" begin="-1.05s" repeatCount="indefinite" values="0;.58;.46;0" keyTimes="0;.22;.76;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * 1.17)" begin="-1.05s" repeatCount="indefinite" values="1.1;2.2;1.7;1.0" keyTimes="0;.28;.74;1"></animate>
               </circle>
-              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
-                <animateMotion dur="${duration}" begin="-1.8s" repeatCount="indefinite"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
-              </circle>
-
-              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(supply)}">
-                <animateMotion dur="${duration}" begin="-.35s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
-              </circle>
-              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(supply)}">
-                <animateMotion dur="${duration}" begin="-1.25s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
-              </circle>
-              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(supply)}">
-                <animateMotion dur="${duration}" begin="-2.15s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+              <circle r="2.2" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
+                <animateMotion dur="calc(${duration} * .91)" begin="-2.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * .91)" begin="-2.2s" repeatCount="indefinite" values="0;.8;.65;0" keyTimes="0;.16;.8;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * .91)" begin="-2.2s" repeatCount="indefinite" values="1.3;2.6;2.0;1.1" keyTimes="0;.24;.76;1"></animate>
               </circle>
 
-              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(extract)}">
-                <animateMotion dur="${duration}" begin="-.15s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+              <circle r="2.7" class="particle" style="--particle-color:${this._particleColor(supply)}">
+                <animateMotion dur="calc(${duration} * 1.04)" begin="-.55s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * 1.04)" begin="-.55s" repeatCount="indefinite" values="0;.92;.72;0" keyTimes="0;.18;.78;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * 1.04)" begin="-.55s" repeatCount="indefinite" values="1.7;3.0;2.2;1.2" keyTimes="0;.25;.72;1"></animate>
               </circle>
-              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(extract)}">
-                <animateMotion dur="${duration}" begin="-1.05s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+              <circle r="1.8" class="particle soft" style="--particle-color:${this._particleColor(supply)}">
+                <animateMotion dur="calc(${duration} * .88)" begin="-1.65s" repeatCount="indefinite" calcMode="spline" keySplines=".37 0 .63 1"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * .88)" begin="-1.65s" repeatCount="indefinite" values="0;.58;.46;0" keyTimes="0;.22;.76;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * .88)" begin="-1.65s" repeatCount="indefinite" values="1.1;2.2;1.7;1.0" keyTimes="0;.28;.74;1"></animate>
               </circle>
-              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(extract)}">
-                <animateMotion dur="${duration}" begin="-1.95s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+              <circle r="2.2" class="particle" style="--particle-color:${this._particleColor(supply)}">
+                <animateMotion dur="calc(${duration} * 1.23)" begin="-2.75s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * 1.23)" begin="-2.75s" repeatCount="indefinite" values="0;.8;.65;0" keyTimes="0;.16;.8;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * 1.23)" begin="-2.75s" repeatCount="indefinite" values="1.3;2.6;2.0;1.1" keyTimes="0;.24;.76;1"></animate>
               </circle>
 
-              <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
-                <animateMotion dur="${duration}" begin="-.5s" repeatCount="indefinite"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
+              <circle r="2.7" class="particle" style="--particle-color:${this._particleColor(extract)}">
+                <animateMotion dur="calc(${duration} * .97)" begin="-.35s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * .97)" begin="-.35s" repeatCount="indefinite" values="0;.92;.72;0" keyTimes="0;.18;.78;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * .97)" begin="-.35s" repeatCount="indefinite" values="1.7;3.0;2.2;1.2" keyTimes="0;.25;.72;1"></animate>
               </circle>
-              <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
-                <animateMotion dur="${duration}" begin="-1.4s" repeatCount="indefinite"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
+              <circle r="1.8" class="particle soft" style="--particle-color:${this._particleColor(extract)}">
+                <animateMotion dur="calc(${duration} * 1.13)" begin="-1.45s" repeatCount="indefinite" calcMode="spline" keySplines=".37 0 .63 1"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * 1.13)" begin="-1.45s" repeatCount="indefinite" values="0;.58;.46;0" keyTimes="0;.22;.76;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * 1.13)" begin="-1.45s" repeatCount="indefinite" values="1.1;2.2;1.7;1.0" keyTimes="0;.28;.74;1"></animate>
               </circle>
-              <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
-                <animateMotion dur="${duration}" begin="-2.3s" repeatCount="indefinite"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
+              <circle r="2.2" class="particle" style="--particle-color:${this._particleColor(extract)}">
+                <animateMotion dur="calc(${duration} * .84)" begin="-2.55s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * .84)" begin="-2.55s" repeatCount="indefinite" values="0;.8;.65;0" keyTimes="0;.16;.8;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * .84)" begin="-2.55s" repeatCount="indefinite" values="1.3;2.6;2.0;1.1" keyTimes="0;.24;.76;1"></animate>
+              </circle>
+
+              <circle r="2.7" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
+                <animateMotion dur="calc(${duration} * 1.08)" begin="-.8s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * 1.08)" begin="-.8s" repeatCount="indefinite" values="0;.92;.72;0" keyTimes="0;.18;.78;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * 1.08)" begin="-.8s" repeatCount="indefinite" values="1.7;3.0;2.2;1.2" keyTimes="0;.25;.72;1"></animate>
+              </circle>
+              <circle r="1.8" class="particle soft" style="--particle-color:${this._particleColor(exhaust)}">
+                <animateMotion dur="calc(${duration} * .93)" begin="-1.9s" repeatCount="indefinite" calcMode="spline" keySplines=".37 0 .63 1"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * .93)" begin="-1.9s" repeatCount="indefinite" values="0;.58;.46;0" keyTimes="0;.22;.76;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * .93)" begin="-1.9s" repeatCount="indefinite" values="1.1;2.2;1.7;1.0" keyTimes="0;.28;.74;1"></animate>
+              </circle>
+              <circle r="2.2" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
+                <animateMotion dur="calc(${duration} * 1.29)" begin="-3.0s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="calc(${duration} * 1.29)" begin="-3.0s" repeatCount="indefinite" values="0;.8;.65;0" keyTimes="0;.16;.8;1"></animate>
+                <animate attributeName="r" dur="calc(${duration} * 1.29)" begin="-3.0s" repeatCount="indefinite" values="1.3;2.6;2.0;1.1" keyTimes="0;.24;.76;1"></animate>
               </circle>
             </g>
 
