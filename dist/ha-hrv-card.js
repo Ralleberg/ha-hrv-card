@@ -575,12 +575,3 @@ if (!window.customCards.some((card) => card.type === "hrv-card")) {
     preview: true
   });
 }
-
-if (!window.customCards.some((card) => card.type === "ha-hrv-card")) {
-  window.customCards.push({
-    type: "ha-hrv-card",
-    name: "HA HRV Card",
-    description: "Animated heat recovery ventilation card with temperature gradients",
-    preview: true
-  });
-}

@@ -572,7 +572,6 @@ if (!window.customCards.some((card) => card.type === "hrv-card")) {
     type: "hrv-card",
     name: "HRV Card",
     description: "Animated heat recovery ventilation card with temperature gradients",
-    documentationURL: "https://github.com/custom-cards/ha-hrv-card",
     preview: true
   });
 }
