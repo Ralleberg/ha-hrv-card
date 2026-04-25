@@ -134,9 +134,9 @@ class HRVCard extends HTMLElement {
     return `${5.2 - normalized * 0.035}s`;
   }
 
-  _gradient(id, from, to) {
+  _gradient(id, from, to, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "0%") {
     return `
-      <linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
         <stop offset="0%" stop-color="${this._temperatureColor(from)}"></stop>
         <stop offset="100%" stop-color="${this._temperatureColor(to)}"></stop>
       </linearGradient>
@@ -175,6 +175,10 @@ class HRVCard extends HTMLElement {
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
+    const pOutdoorSupply = `${this._id}-path-outdoor-supply`;
+    const pSupplyExit = `${this._id}-path-supply-exit`;
+    const pExtractCore = `${this._id}-path-extract-core`;
+    const pExhaustExit = `${this._id}-path-exhaust-exit`;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -182,7 +186,7 @@ class HRVCard extends HTMLElement {
           display: block;
           --hrv-core-fill: var(--card-background-color, #fff);
           --hrv-core-stroke: color-mix(in srgb, var(--primary-text-color) 20%, transparent);
-          --hrv-flow-width: 12;
+          --hrv-flow-width: 16;
           --hrv-muted: var(--secondary-text-color);
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
@@ -253,29 +257,40 @@ class HRVCard extends HTMLElement {
           fill: none;
           stroke-width: var(--hrv-flow-width);
           stroke-linecap: round;
-          stroke-dasharray: 20 18;
-          animation: flow var(--duration) linear infinite;
-          filter: drop-shadow(0 0 5px color-mix(in srgb, var(--primary-text-color) 12%, transparent));
+          filter: drop-shadow(0 0 6px color-mix(in srgb, var(--primary-text-color) 14%, transparent));
         }
 
-        .flow.reverse {
-          animation-direction: reverse;
+        .particle {
+          fill: color-mix(in srgb, white 88%, var(--primary-text-color) 12%);
+          opacity: .88;
+          filter: drop-shadow(0 0 5px currentColor);
         }
 
-        .no-animation .flow {
-          animation: none;
-          stroke-dasharray: none;
+        .particle.hot {
+          fill: #ffd166;
         }
 
-        @keyframes flow {
-          from { stroke-dashoffset: 0; }
-          to { stroke-dashoffset: -76; }
+        .particle.warm {
+          fill: #ff8a65;
+        }
+
+        .particle.cool {
+          fill: #64d8ff;
+        }
+
+        .particle.fresh {
+          fill: #9cff57;
+        }
+
+        .no-animation .particle {
+          display: none;
         }
 
         .core {
           fill: var(--hrv-core-fill);
           stroke: var(--hrv-core-stroke);
           stroke-width: 1.5;
+          filter: drop-shadow(0 2px 7px color-mix(in srgb, black 14%, transparent));
         }
 
         .core-line {
@@ -353,23 +368,65 @@ class HRVCard extends HTMLElement {
 
           <svg viewBox="0 0 620 280" role="img" aria-label="HRV airflow diagram">
             <defs>
-              ${this._gradient(gOutdoorSupply, outdoor, supply)}
-              ${this._gradient(gExtractExhaust, exhaust, extract)}
+              ${this._gradient(gOutdoorSupply, outdoor, supply, "0%", "0%", "100%", "0%")}
+              ${this._gradient(gExtractExhaust, extract, exhaust, "100%", "0%", "0%", "0%")}
             </defs>
 
-            <path class="duct-bg" d="M55 86 C165 86 188 86 250 118"></path>
-            <path class="duct-bg" d="M370 118 C432 86 455 86 565 86"></path>
-            <path class="duct-bg" d="M565 194 C455 194 432 194 370 162"></path>
-            <path class="duct-bg" d="M250 162 C188 194 165 194 55 194"></path>
+            <path id="${pOutdoorSupply}" class="duct-bg" d="M55 88 C155 88 190 88 264 118"></path>
+            <path id="${pSupplyExit}" class="duct-bg" d="M356 118 C430 88 465 88 565 88"></path>
+            <path id="${pExtractCore}" class="duct-bg" d="M565 192 C465 192 430 192 356 162"></path>
+            <path id="${pExhaustExit}" class="duct-bg" d="M264 162 C190 192 155 192 55 192"></path>
 
-            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M55 86 C165 86 188 86 250 118"></path>
-            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M370 118 C432 86 455 86 565 86"></path>
-            <path class="flow reverse" stroke="url(#${gExtractExhaust})" d="M565 194 C455 194 432 194 370 162"></path>
-            <path class="flow reverse" stroke="url(#${gExtractExhaust})" d="M250 162 C188 194 165 194 55 194"></path>
+            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M55 88 C155 88 190 88 264 118"></path>
+            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M356 118 C430 88 465 88 565 88"></path>
+            <path class="flow" stroke="url(#${gExtractExhaust})" d="M565 192 C465 192 430 192 356 162"></path>
+            <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 162 C190 192 155 192 55 192"></path>
 
-            <rect class="core" x="250" y="82" width="120" height="116" rx="18"></rect>
-            <line class="core-line" x1="270" y1="100" x2="350" y2="180"></line>
-            <line class="core-line" x1="350" y1="100" x2="270" y2="180"></line>
+            <g class="particles">
+              <circle r="3.2" class="particle cool">
+                <animateMotion dur="${duration}" begin="0s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.4" class="particle cool">
+                <animateMotion dur="${duration}" begin="-.9s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.8" class="particle fresh">
+                <animateMotion dur="${duration}" begin="-1.8s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
+              </circle>
+
+              <circle r="3.2" class="particle hot">
+                <animateMotion dur="${duration}" begin="-.35s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.4" class="particle fresh">
+                <animateMotion dur="${duration}" begin="-1.25s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.8" class="particle warm">
+                <animateMotion dur="${duration}" begin="-2.15s" repeatCount="indefinite"><mpath href="#${pSupplyExit}"></mpath></animateMotion>
+              </circle>
+
+              <circle r="3.2" class="particle warm">
+                <animateMotion dur="${duration}" begin="-.15s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.4" class="particle hot">
+                <animateMotion dur="${duration}" begin="-1.05s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.8" class="particle warm">
+                <animateMotion dur="${duration}" begin="-1.95s" repeatCount="indefinite"><mpath href="#${pExtractCore}"></mpath></animateMotion>
+              </circle>
+
+              <circle r="3.2" class="particle cool">
+                <animateMotion dur="${duration}" begin="-.5s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.4" class="particle fresh">
+                <animateMotion dur="${duration}" begin="-1.4s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
+              </circle>
+              <circle r="2.8" class="particle cool">
+                <animateMotion dur="${duration}" begin="-2.3s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
+              </circle>
+            </g>
+
+            <rect class="core" x="264" y="90" width="92" height="100" rx="17"></rect>
+            <line class="core-line" x1="280" y1="108" x2="340" y2="172"></line>
+            <line class="core-line" x1="340" y1="108" x2="280" y2="172"></line>
             <text x="310" y="146" text-anchor="middle" class="temperature">HRV</text>
 
             ${hasLabels ? `<text x="55" y="52" text-anchor="middle" class="label">Outdoor</text>` : ""}
