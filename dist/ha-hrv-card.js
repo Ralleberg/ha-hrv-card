@@ -11,7 +11,9 @@ class HRVCard extends HTMLElement {
         humidity: "sensor.humidity",
         bypass: "sensor.bypass",
         mode: "sensor.mode",
-        fan_speed: "sensor.fan_speed"
+        fan_speed: "sensor.fan_speed",
+        fan1_rpm: "sensor.dantherm_fan1_rpm",
+        fan2_rpm: "sensor.dantherm_fan2_rpm"
       },
       appearance: {
         animation: true,
@@ -147,6 +149,71 @@ class HRVCard extends HTMLElement {
     if (!Number.isFinite(speed)) return "3.6s";
     const normalized = Math.max(0, Math.min(100, speed));
     return `${5.2 - normalized * 0.035}s`;
+  }
+
+  _rpm(key) {
+    const value = this._number(key);
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  _rpmPercent(key) {
+    const rpm = this._rpm(key);
+    if (!Number.isFinite(rpm)) return 0;
+    return Math.max(0, Math.min(100, (rpm / 3000) * 100));
+  }
+
+  _flowDuration(key) {
+    if (this._config?.appearance?.animation === false) return "0s";
+    const rpm = this._rpm(key);
+    if (!Number.isFinite(rpm)) return this._animationDuration();
+    const normalized = Math.max(0, Math.min(3000, rpm)) / 3000;
+    return `${5.4 - normalized * 3.1}s`;
+  }
+
+  _particleCount(key) {
+    const rpm = this._rpm(key);
+    if (!Number.isFinite(rpm)) return 3;
+    if (rpm < 500) return 2;
+    if (rpm < 1200) return 3;
+    if (rpm < 1800) return 4;
+    if (rpm < 2300) return 5;
+    return 6;
+  }
+
+  _particleGroup(pathId, color, duration, count, seed = 0) {
+    if (duration === "0s") return "";
+    const particles = [];
+    const sizes = [2.7, 1.9, 2.3, 1.6, 2.1, 1.4];
+    for (let index = 0; index < count; index += 1) {
+      const size = sizes[index % sizes.length];
+      const soft = index % 2 === 1 ? " soft" : "";
+      const delay = -((index * 0.72) + seed).toFixed(2);
+      const opacityPeak = index % 2 === 1 ? ".58" : ".88";
+      particles.push(`
+              <circle r="${size}" class="particle${soft}" style="--particle-color:${color}">
+                <animateMotion dur="${duration}" begin="${delay}s" repeatCount="indefinite" calcMode="spline" keySplines=".42 0 .58 1"><mpath href="#${pathId}"></mpath></animateMotion>
+                <animate attributeName="opacity" dur="${duration}" begin="${delay}s" repeatCount="indefinite" values="0;${opacityPeak};.45;0" keyTimes="0;.18;.76;1"></animate>
+                <animate attributeName="r" dur="${duration}" begin="${delay}s" repeatCount="indefinite" values="${Math.max(1, size - 1)};${size + .45};${size};${Math.max(.8, size - 1.2)}" keyTimes="0;.25;.72;1"></animate>
+              </circle>`);
+    }
+    return particles.join("");
+  }
+
+  _fanGauge(label, key) {
+    const rpm = this._rpm(key);
+    const percent = this._rpmPercent(key);
+    const value = Number.isFinite(rpm) ? `${Math.round(rpm)}` : "—";
+    return `
+      <div class="fan-gauge" style="--fan-percent:${percent}%">
+        <div class="fan-label">${label}</div>
+        <div class="fan-ring">
+          <div class="fan-center">
+            <strong>${value}</strong>
+            <span>RPM</span>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   _gradient(id, from, to, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "0%") {
