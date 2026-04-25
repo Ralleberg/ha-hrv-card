@@ -158,6 +158,26 @@ class HRVCard extends HTMLElement {
     `;
   }
 
+  _particles(path, duration, stopped) {
+    const variants = [
+      { offset: -10, width: 3.6, gap: 34, alpha: .72, delay: 0 },
+      { offset: -4, width: 2.4, gap: 27, alpha: .62, delay: -1.1 },
+      { offset: 3, width: 3.1, gap: 41, alpha: .78, delay: -.55 },
+      { offset: 9, width: 1.8, gap: 23, alpha: .48, delay: -1.75 },
+      { offset: 0, width: 1.4, gap: 19, alpha: .38, delay: -2.25 }
+    ];
+
+    return variants.map((variant) => `
+            <path
+              class="flow-particles ${stopped ? "stopped" : ""}"
+              style="--flow-duration:${duration}; --particle-alpha:${variant.alpha}; animation-delay:${variant.delay}s;"
+              stroke-width="${variant.width}"
+              stroke-dasharray="1 ${variant.gap}"
+              transform="translate(0 ${variant.offset})"
+              d="${path}"
+            ></path>`).join("");
+  }
+
   _badge(label, value, entityKey) {
     const entityId = this._entityId(entityKey);
     const clickable = entityId ? `data-entity="${entityId}"` : "";
@@ -192,6 +212,8 @@ class HRVCard extends HTMLElement {
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
+    const outdoorSupplyPath = "M70 118 L160 118 L260 160 L360 202 L460 244 L550 244";
+    const extractExhaustPath = "M550 118 L460 118 L360 160 L260 202 L160 244 L70 244";
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -205,10 +227,16 @@ class HRVCard extends HTMLElement {
         ha-card {
           overflow: hidden;
           border-radius: var(--hrv-radius);
+          background: var(--ha-card-background, var(--card-background-color));
+          box-shadow: var(--ha-card-box-shadow, none);
+          border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color));
+          opacity: 1;
         }
 
         .card {
           padding: ${compact ? "12px" : "16px"};
+          background: transparent;
+          color: var(--primary-text-color);
         }
 
         .header {
@@ -272,28 +300,25 @@ class HRVCard extends HTMLElement {
           stroke-linejoin: round;
         }
 
-        .flow-dots {
+        .flow-particles {
           fill: none;
-          stroke: rgba(255, 255, 255, .78);
-          stroke-width: 5;
+          stroke: rgba(255, 255, 255, var(--particle-alpha, .65));
           stroke-linecap: round;
-          stroke-dasharray: 1 24;
           animation: flow var(--flow-duration, 3.6s) linear infinite;
-          filter: drop-shadow(0 0 5px color-mix(in srgb, var(--primary-text-color) 12%, transparent));
+          filter: drop-shadow(0 0 4px rgba(255, 255, 255, .25));
         }
 
-        .flow-dots.reverse {
+        .flow-particles.reverse {
           animation-direction: reverse;
         }
 
-        .no-animation .flow-dots {
+        .no-animation .flow-particles {
           animation: none;
-          stroke-dasharray: none;
         }
 
-        .flow-dots.stopped {
+        .flow-particles.stopped {
           animation: none;
-          stroke-dasharray: none;
+          opacity: .18;
         }
 
         @keyframes flow {
@@ -357,13 +382,14 @@ class HRVCard extends HTMLElement {
           appearance: none;
           border: 0;
           border-radius: 10px;
-          background: color-mix(in srgb, var(--primary-text-color) 7%, transparent);
+          background: var(--ha-card-background, var(--card-background-color));
           color: var(--primary-text-color);
           padding: 9px 10px;
           text-align: left;
           min-width: 0;
           cursor: pointer;
           font: inherit;
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 8%, transparent);
         }
 
         .badge:not([data-entity]) {
@@ -403,51 +429,51 @@ class HRVCard extends HTMLElement {
             </div>
           </div>
 
-          <svg viewBox="0 0 620 280" role="img" aria-label="HRV airflow diagram">
+          <svg viewBox="0 0 620 340" role="img" aria-label="HRV airflow diagram">
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, extract, exhaust)}
             </defs>
 
-            <path class="duct-bg" d="M46 88 L142 88 L250 132 L370 178 L478 220 L574 220"></path>
-            <path class="duct-bg" d="M574 88 L478 88 L370 132 L250 178 L142 220 L46 220"></path>
+            <path class="duct-bg" d="${outdoorSupplyPath}"></path>
+            <path class="duct-bg" d="${extractExhaustPath}"></path>
 
-            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M46 88 L142 88 L250 132 L370 178 L478 220 L574 220"></path>
-            <path class="flow" stroke="url(#${gExtractExhaust})" d="M574 88 L478 88 L370 132 L250 178 L142 220 L46 220"></path>
-            <path class="flow-dots ${fan1Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan1Duration}" d="M46 88 L142 88 L250 132 L370 178 L478 220 L574 220"></path>
-            <path class="flow-dots ${fan2Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan2Duration}" d="M574 88 L478 88 L370 132 L250 178 L142 220 L46 220"></path>
+            <path class="flow" stroke="url(#${gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
+            <path class="flow" stroke="url(#${gExtractExhaust})" d="${extractExhaustPath}"></path>
+            ${this._particles(outdoorSupplyPath, fan1Duration, fan1Duration === "0s")}
+            ${this._particles(extractExhaustPath, fan2Duration, fan2Duration === "0s")}
 
             <g fill="rgba(255, 255, 255, .92)">
-              <path d="M70 83 H110 V75 L128 88 L110 101 V93 H70 Z"></path>
-              <path d="M550 83 H510 V75 L492 88 L510 101 V93 H550 Z"></path>
-              <path d="M116 215 H76 V207 L58 220 L76 233 V225 H116 Z"></path>
-              <path d="M504 215 H544 V207 L562 220 L544 233 V225 H504 Z"></path>
+              <path d="M88 113 H128 V105 L146 118 L128 131 V123 H88 Z"></path>
+              <path d="M532 113 H492 V105 L474 118 L492 131 V123 H532 Z"></path>
+              <path d="M140 239 H100 V231 L82 244 L100 257 V249 H140 Z"></path>
+              <path d="M480 239 H520 V231 L538 244 L520 257 V249 H480 Z"></path>
             </g>
 
-            ${hasLabels ? `<text x="55" y="52" text-anchor="middle" class="label">Outdoor</text>` : ""}
-            ${hasLabels ? `<text x="565" y="52" text-anchor="middle" class="label">Extract</text>` : ""}
-            ${hasLabels ? `<text x="565" y="174" text-anchor="middle" class="label">Supply</text>` : ""}
-            ${hasLabels ? `<text x="55" y="174" text-anchor="middle" class="label">Exhaust</text>` : ""}
+            ${hasLabels ? `<text x="70" y="52" text-anchor="middle" class="label">Outdoor</text>` : ""}
+            ${hasLabels ? `<text x="550" y="52" text-anchor="middle" class="label">Extract</text>` : ""}
+            ${hasLabels ? `<text x="550" y="286" text-anchor="middle" class="label">Supply</text>` : ""}
+            ${hasLabels ? `<text x="70" y="286" text-anchor="middle" class="label">Exhaust</text>` : ""}
 
-            ${hasTemps ? `<text x="55" y="72" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="565" y="72" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="565" y="196" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="55" y="196" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="70" y="74" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="550" y="74" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="550" y="308" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="70" y="308" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
 
-            <g transform="translate(18 102)">
+            <g transform="translate(28 145)">
               <path class="icon" d="M20 2 A18 18 0 0 0 3 20 H8 A13 13 0 0 1 20 7 Z M5 24 A18 18 0 0 0 35 33 L31 30 A13 13 0 0 1 10 24 Z M33 7 L24 26 L20 22 L15 38 L28 20 L24 24 Z"></path>
               <text x="42" y="24" class="side-value">${this._formatRpm("fan1_rpm")}</text>
             </g>
-            <g transform="translate(18 234)">
+            <g transform="translate(28 312)">
               <path class="icon" d="M20 2 A18 18 0 0 0 3 20 H8 A13 13 0 0 1 20 7 Z M5 24 A18 18 0 0 0 35 33 L31 30 A13 13 0 0 1 10 24 Z M33 7 L24 26 L20 22 L15 38 L28 20 L24 24 Z"></path>
               <text x="42" y="24" class="side-value">${this._formatRpm("fan2_rpm")}</text>
             </g>
-            <g class="fan-on ${fan1Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan1Duration}" transform="translate(532 102)">
+            <g class="fan-on ${fan1Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan1Duration}" transform="translate(520 145)">
               <path class="fan-blade" d="M12 20 C4 15 4 6 12 4 C18 2 22 8 19 14 C25 11 33 15 34 23 C35 31 26 34 21 29 C22 36 16 42 8 39 C1 36 1 27 8 24 C11 23 12 22 12 20 Z"></path>
               <circle cx="18" cy="22" r="4" fill="var(--card-background-color, #fff)"></circle>
               <text x="42" y="27" class="side-value">${this._formatNumber("fan_speed", 0, "%")}</text>
             </g>
-            <g class="fan-on ${fan2Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan2Duration}" transform="translate(532 234)">
+            <g class="fan-on ${fan2Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan2Duration}" transform="translate(520 312)">
               <path class="fan-blade" d="M12 20 C4 15 4 6 12 4 C18 2 22 8 19 14 C25 11 33 15 34 23 C35 31 26 34 21 29 C22 36 16 42 8 39 C1 36 1 27 8 24 C11 23 12 22 12 20 Z"></path>
               <circle cx="18" cy="22" r="4" fill="var(--card-background-color, #fff)"></circle>
               <text x="42" y="27" class="side-value">${this._formatNumber("fan_speed", 0, "%")}</text>
