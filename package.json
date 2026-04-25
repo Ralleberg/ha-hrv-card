@@ -1,0 +1,26 @@
+{
+  "name": "lovelace-hrv-card",
+  "version": "0.1.0",
+  "description": "Animated Home Assistant Lovelace card for heat recovery ventilation systems.",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "check": "tsc --noEmit"
+  },
+  "keywords": [
+    "home-assistant",
+    "lovelace",
+    "hacs",
+    "hrv",
+    "ventilation",
+    "heat-recovery"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitejs/plugin-legacy": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  }
+}
