@@ -146,9 +146,9 @@ class HRVCard extends HTMLElement {
     return `${5.2 - normalized * 3.5}s`;
   }
 
-  _gradient(id, from, to) {
+  _gradient(id, from, to, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "0%") {
     return `
-      <linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
         <stop offset="0%" stop-color="${this._temperatureColor(from)}"></stop>
         <stop offset="100%" stop-color="${this._temperatureColor(to)}"></stop>
       </linearGradient>
@@ -157,11 +157,11 @@ class HRVCard extends HTMLElement {
 
   _particles(path, duration, stopped) {
     const variants = [
-      { offset: -10, width: 3.6, gap: 34, alpha: .72, delay: 0 },
-      { offset: -4, width: 2.4, gap: 27, alpha: .62, delay: -1.1 },
-      { offset: 3, width: 3.1, gap: 41, alpha: .78, delay: -.55 },
-      { offset: 9, width: 1.8, gap: 23, alpha: .48, delay: -1.75 },
-      { offset: 0, width: 1.4, gap: 19, alpha: .38, delay: -2.25 }
+      { offset: -13, width: 2.8, gap: 30, alpha: .66, delay: 0 },
+      { offset: -7, width: 1.7, gap: 21, alpha: .44, delay: -1.15 },
+      { offset: -1, width: 3.4, gap: 38, alpha: .78, delay: -.55 },
+      { offset: 6, width: 2.2, gap: 26, alpha: .52, delay: -1.9 },
+      { offset: 13, width: 1.5, gap: 18, alpha: .34, delay: -2.45 }
     ];
 
     return variants.map((variant) => `
@@ -209,14 +209,14 @@ class HRVCard extends HTMLElement {
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
-    const outdoorSupplyPath = "M70 82 L160 82 L260 120 L360 158 L460 196 L550 196";
-    const extractExhaustPath = "M550 82 L460 82 L360 120 L260 158 L160 196 L70 196";
+    const outdoorSupplyPath = "M56 82 H192 C246 82 256 132 310 132 C364 132 374 182 428 182 H564";
+    const extractExhaustPath = "M564 82 H428 C374 82 364 132 310 132 C256 132 246 182 192 182 H56";
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: block;
-          --hrv-flow-width: 32;
+          --hrv-flow-width: 38;
           --hrv-muted: var(--secondary-text-color);
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
@@ -224,16 +224,20 @@ class HRVCard extends HTMLElement {
         ha-card {
           overflow: hidden;
           border-radius: var(--hrv-radius);
-          background: var(--ha-card-background, var(--card-background-color));
-          background: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 68%, transparent);
-          box-shadow: var(--ha-card-box-shadow, none);
-          border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color));
+          background: transparent !important;
+          box-shadow: none;
+          border: 0;
           backdrop-filter: blur(8px);
         }
 
         .card {
-          padding: ${compact ? "8px" : "10px"};
-          background: transparent;
+          padding: ${compact ? "8px" : "12px"};
+          border-radius: var(--hrv-radius);
+          background:
+            radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
+            radial-gradient(circle at 84% 32%, color-mix(in srgb, #ff5a4f 16%, transparent), transparent 34%),
+            color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 24%, transparent);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 14%, transparent);
           color: var(--primary-text-color);
         }
 
@@ -245,8 +249,8 @@ class HRVCard extends HTMLElement {
 
         .duct-bg {
           fill: none;
-          stroke: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
-          stroke-width: var(--hrv-flow-width);
+          stroke: color-mix(in srgb, var(--primary-text-color) 8%, transparent);
+          stroke-width: calc(var(--hrv-flow-width) + 10px);
           stroke-linecap: butt;
           stroke-linejoin: round;
         }
@@ -256,6 +260,17 @@ class HRVCard extends HTMLElement {
           stroke-width: var(--hrv-flow-width);
           stroke-linecap: butt;
           stroke-linejoin: round;
+          opacity: .88;
+          filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary-text-color) 18%, transparent));
+        }
+
+        .flow-glow {
+          fill: none;
+          stroke-width: calc(var(--hrv-flow-width) + 14px);
+          stroke-linecap: butt;
+          stroke-linejoin: round;
+          opacity: .28;
+          filter: blur(7px);
         }
 
         .flow-particles {
@@ -285,70 +300,42 @@ class HRVCard extends HTMLElement {
         }
 
         .label {
-          font-size: 11px;
+          font-size: 12px;
           fill: var(--secondary-text-color);
         }
 
         .temperature {
-          font-size: 13px;
+          font-size: 19px;
           font-weight: 600;
           fill: var(--primary-text-color);
         }
 
         .side-value {
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
           fill: var(--primary-text-color);
-        }
-
-        .icon {
-          fill: var(--primary-text-color);
-          opacity: .9;
-        }
-
-        .fan-blade {
-          fill: var(--primary-text-color);
-          opacity: .9;
-          transform-box: fill-box;
-          transform-origin: center;
-        }
-
-        .fan-on .fan-blade {
-          animation: fanSpin var(--flow-duration, 3.6s) linear infinite;
-        }
-
-        .no-animation .fan-blade {
-          animation: none;
-        }
-
-        .fan-on.stopped .fan-blade {
-          animation: none;
-        }
-
-        @keyframes fanSpin {
-          to { transform: rotate(360deg); }
         }
 
         .badges {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
           gap: 6px;
-          margin-top: 6px;
+          margin-top: 8px;
         }
 
         .badge {
           appearance: none;
           border: 0;
           border-radius: 8px;
-          background: var(--ha-card-background, var(--card-background-color));
-          background: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 54%, transparent);
+          background: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 20%, transparent);
           color: var(--primary-text-color);
           padding: 6px 8px;
           text-align: left;
           min-width: 0;
           cursor: pointer;
           font: inherit;
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 8%, transparent);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+          backdrop-filter: blur(6px);
         }
 
         .badge:not([data-entity]) {
@@ -381,50 +368,35 @@ class HRVCard extends HTMLElement {
           <svg viewBox="0 0 620 260" role="img" aria-label="HRV airflow diagram">
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
-              ${this._gradient(gExtractExhaust, extract, exhaust)}
+              ${this._gradient(gExtractExhaust, exhaust, extract)}
             </defs>
 
             <path class="duct-bg" d="${outdoorSupplyPath}"></path>
             <path class="duct-bg" d="${extractExhaustPath}"></path>
 
+            <path class="flow-glow" stroke="url(#${gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
+            <path class="flow-glow" stroke="url(#${gExtractExhaust})" d="${extractExhaustPath}"></path>
             <path class="flow" stroke="url(#${gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
             <path class="flow" stroke="url(#${gExtractExhaust})" d="${extractExhaustPath}"></path>
             ${this._particles(outdoorSupplyPath, fan1Duration, fan1Duration === "0s")}
             ${this._particles(extractExhaustPath, fan2Duration, fan2Duration === "0s")}
 
             <g fill="rgba(255, 255, 255, .92)">
-              <path d="M88 77 H128 V69 L146 82 L128 95 V87 H88 Z"></path>
-              <path d="M532 77 H492 V69 L474 82 L492 95 V87 H532 Z"></path>
-              <path d="M140 191 H100 V183 L82 196 L100 209 V201 H140 Z"></path>
-              <path d="M480 191 H520 V183 L538 196 L520 209 V201 H480 Z"></path>
+              <path d="M88 75 H124 V67 L142 82 L124 97 V89 H88 Z"></path>
+              <path d="M532 75 H496 V67 L478 82 L496 97 V89 H532 Z"></path>
+              <path d="M136 175 H100 V167 L82 182 L100 197 V189 H136 Z"></path>
+              <path d="M484 175 H520 V167 L538 182 L520 197 V189 H484 Z"></path>
             </g>
 
-            ${hasLabels ? `<text x="70" y="20" text-anchor="middle" class="label">Outdoor</text>` : ""}
-            ${hasLabels ? `<text x="550" y="20" text-anchor="middle" class="label">Extract</text>` : ""}
-            ${hasLabels ? `<text x="550" y="222" text-anchor="middle" class="label">Supply</text>` : ""}
-            ${hasLabels ? `<text x="70" y="222" text-anchor="middle" class="label">Exhaust</text>` : ""}
+            ${hasLabels ? `<text x="68" y="28" text-anchor="middle" class="label">Outdoor</text>` : ""}
+            ${hasLabels ? `<text x="552" y="28" text-anchor="middle" class="label">Extract</text>` : ""}
+            ${hasLabels ? `<text x="552" y="226" text-anchor="middle" class="label">Supply</text>` : ""}
+            ${hasLabels ? `<text x="68" y="226" text-anchor="middle" class="label">Exhaust</text>` : ""}
 
-            ${hasTemps ? `<text x="70" y="39" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="550" y="39" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="550" y="241" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="70" y="241" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
-
-            <g transform="translate(28 108)">
-              <path class="icon" d="M20 2 A18 18 0 0 0 3 20 H8 A13 13 0 0 1 20 7 Z M5 24 A18 18 0 0 0 35 33 L31 30 A13 13 0 0 1 10 24 Z M33 7 L24 26 L20 22 L15 38 L28 20 L24 24 Z"></path>
-              <text x="42" y="24" class="side-value">${this._formatRpm("fan1_rpm")}</text>
-            </g>
-            <g transform="translate(28 206)">
-              <path class="icon" d="M20 2 A18 18 0 0 0 3 20 H8 A13 13 0 0 1 20 7 Z M5 24 A18 18 0 0 0 35 33 L31 30 A13 13 0 0 1 10 24 Z M33 7 L24 26 L20 22 L15 38 L28 20 L24 24 Z"></path>
-              <text x="42" y="24" class="side-value">${this._formatRpm("fan2_rpm")}</text>
-            </g>
-            <g class="fan-on ${fan1Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan1Duration}" transform="translate(520 108)">
-              <path class="fan-blade" d="M12 20 C4 15 4 6 12 4 C18 2 22 8 19 14 C25 11 33 15 34 23 C35 31 26 34 21 29 C22 36 16 42 8 39 C1 36 1 27 8 24 C11 23 12 22 12 20 Z"></path>
-              <circle cx="18" cy="22" r="4" fill="var(--card-background-color, #fff)"></circle>
-            </g>
-            <g class="fan-on ${fan2Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan2Duration}" transform="translate(520 206)">
-              <path class="fan-blade" d="M12 20 C4 15 4 6 12 4 C18 2 22 8 19 14 C25 11 33 15 34 23 C35 31 26 34 21 29 C22 36 16 42 8 39 C1 36 1 27 8 24 C11 23 12 22 12 20 Z"></path>
-              <circle cx="18" cy="22" r="4" fill="var(--card-background-color, #fff)"></circle>
-            </g>
+            ${hasTemps ? `<text x="68" y="54" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="552" y="54" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="552" y="252" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
           </svg>
 
           ${hasBadges ? `
