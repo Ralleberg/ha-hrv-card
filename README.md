@@ -93,9 +93,9 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | `humidity` | Humidity sensor |
 | `bypass` | Bypass state/text sensor |
 | `mode` | Operation mode/text sensor |
-| `fan_speed` | Fan speed/state. Numeric 0-100 values affect animation speed |
-| `fan1_rpm` | Fan 1 RPM sensor shown beside the upper flow |
-| `fan2_rpm` | Fan 2 RPM sensor shown beside the lower flow |
+| `fan_speed` | Fan speed/state shown as a percentage/value on the right side |
+| `fan1_rpm` | Fan 1 RPM sensor shown beside the upper flow. This controls the upper flow animation speed |
+| `fan2_rpm` | Fan 2 RPM sensor shown beside the lower flow. This controls the lower flow animation speed |
 
 ### Appearance
 
@@ -106,6 +106,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | `show_badges` | `true` | Show optional state badges |
 | `show_temperatures` | `true` | Show temperature values in the diagram |
 | `compact` | `false` | Slightly smaller padding/card size |
+| `max_rpm` | `3000` | RPM value treated as full speed for animation scaling. Values from 0-100 are treated as percent-like fan levels |
 
 ## Development
 

@@ -134,12 +134,19 @@ class HRVCard extends HTMLElement {
     return `hsl(${hue}, 78%, 56%)`;
   }
 
-  _animationDuration() {
+  _flowDuration(key) {
     if (this._config?.appearance?.animation === false) return "0s";
-    const speed = this._number("fan_speed");
+    const speed = this._number(key);
     if (!Number.isFinite(speed)) return "3.6s";
-    const normalized = Math.max(0, Math.min(100, speed));
-    return `${5.2 - normalized * 0.035}s`;
+    if (speed <= 0) return "0s";
+
+    const maxRpm = Number.parseFloat(this._config?.appearance?.max_rpm);
+    const rpmCeiling = Number.isFinite(maxRpm) && maxRpm > 0 ? maxRpm : 3000;
+    const normalized = speed <= 100
+      ? Math.max(0, Math.min(100, speed)) / 100
+      : Math.max(0, Math.min(rpmCeiling, speed)) / rpmCeiling;
+
+    return `${5.2 - normalized * 3.5}s`;
   }
 
   _gradient(id, from, to) {
@@ -175,7 +182,9 @@ class HRVCard extends HTMLElement {
     const supply = this._number("supply_temperature");
     const extract = this._number("extract_temperature");
     const exhaust = this._number("exhaust_temperature");
-    const duration = this._animationDuration();
+    const fan1Duration = this._flowDuration("fan1_rpm");
+    const fan2Duration = this._flowDuration("fan2_rpm");
+    const animationOff = this._config?.appearance?.animation === false;
     const hasBadges = this._config.appearance.show_badges !== false;
     const hasLabels = this._config.appearance.show_labels !== false;
     const hasTemps = this._config.appearance.show_temperatures !== false;
@@ -269,7 +278,7 @@ class HRVCard extends HTMLElement {
           stroke-width: 5;
           stroke-linecap: round;
           stroke-dasharray: 1 24;
-          animation: flow var(--duration) linear infinite;
+          animation: flow var(--flow-duration, 3.6s) linear infinite;
           filter: drop-shadow(0 0 5px color-mix(in srgb, var(--primary-text-color) 12%, transparent));
         }
 
@@ -278,6 +287,11 @@ class HRVCard extends HTMLElement {
         }
 
         .no-animation .flow-dots {
+          animation: none;
+          stroke-dasharray: none;
+        }
+
+        .flow-dots.stopped {
           animation: none;
           stroke-dasharray: none;
         }
@@ -317,10 +331,14 @@ class HRVCard extends HTMLElement {
         }
 
         .fan-on .fan-blade {
-          animation: fanSpin var(--duration) linear infinite;
+          animation: fanSpin var(--flow-duration, 3.6s) linear infinite;
         }
 
         .no-animation .fan-blade {
+          animation: none;
+        }
+
+        .fan-on.stopped .fan-blade {
           animation: none;
         }
 
@@ -373,7 +391,7 @@ class HRVCard extends HTMLElement {
       </style>
 
       <ha-card>
-        <div class="card ${duration === "0s" ? "no-animation" : ""}" style="--duration:${duration}">
+        <div class="card ${animationOff ? "no-animation" : ""}">
           <div class="header">
             <div>
               <h2>${this._config.title || "HRV"}</h2>
@@ -396,8 +414,8 @@ class HRVCard extends HTMLElement {
 
             <path class="flow" stroke="url(#${gOutdoorSupply})" d="M46 88 L142 88 L250 132 L370 178 L478 220 L574 220"></path>
             <path class="flow" stroke="url(#${gExtractExhaust})" d="M574 88 L478 88 L370 132 L250 178 L142 220 L46 220"></path>
-            <path class="flow-dots" d="M46 88 L142 88 L250 132 L370 178 L478 220 L574 220"></path>
-            <path class="flow-dots" d="M574 88 L478 88 L370 132 L250 178 L142 220 L46 220"></path>
+            <path class="flow-dots ${fan1Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan1Duration}" d="M46 88 L142 88 L250 132 L370 178 L478 220 L574 220"></path>
+            <path class="flow-dots ${fan2Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan2Duration}" d="M574 88 L478 88 L370 132 L250 178 L142 220 L46 220"></path>
 
             <g fill="rgba(255, 255, 255, .92)">
               <path d="M70 83 H110 V75 L128 88 L110 101 V93 H70 Z"></path>
@@ -424,12 +442,12 @@ class HRVCard extends HTMLElement {
               <path class="icon" d="M20 2 A18 18 0 0 0 3 20 H8 A13 13 0 0 1 20 7 Z M5 24 A18 18 0 0 0 35 33 L31 30 A13 13 0 0 1 10 24 Z M33 7 L24 26 L20 22 L15 38 L28 20 L24 24 Z"></path>
               <text x="42" y="24" class="side-value">${this._formatRpm("fan2_rpm")}</text>
             </g>
-            <g class="fan-on" transform="translate(532 102)">
+            <g class="fan-on ${fan1Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan1Duration}" transform="translate(532 102)">
               <path class="fan-blade" d="M12 20 C4 15 4 6 12 4 C18 2 22 8 19 14 C25 11 33 15 34 23 C35 31 26 34 21 29 C22 36 16 42 8 39 C1 36 1 27 8 24 C11 23 12 22 12 20 Z"></path>
               <circle cx="18" cy="22" r="4" fill="var(--card-background-color, #fff)"></circle>
               <text x="42" y="27" class="side-value">${this._formatNumber("fan_speed", 0, "%")}</text>
             </g>
-            <g class="fan-on" transform="translate(532 234)">
+            <g class="fan-on ${fan2Duration === "0s" ? "stopped" : ""}" style="--flow-duration:${fan2Duration}" transform="translate(532 234)">
               <path class="fan-blade" d="M12 20 C4 15 4 6 12 4 C18 2 22 8 19 14 C25 11 33 15 34 23 C35 31 26 34 21 29 C22 36 16 42 8 39 C1 36 1 27 8 24 C11 23 12 22 12 20 Z"></path>
               <circle cx="18" cy="22" r="4" fill="var(--card-background-color, #fff)"></circle>
               <text x="42" y="27" class="side-value">${this._formatNumber("fan_speed", 0, "%")}</text>
