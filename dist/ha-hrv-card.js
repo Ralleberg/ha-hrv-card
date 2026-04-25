@@ -371,15 +371,18 @@ class HRVCard extends HTMLElement {
               ${this._gradient(gExtractExhaust, extract, exhaust, "100%", "0%", "0%", "0%")}
             </defs>
 
-            <path id="${pOutdoorCore}" class="duct-bg" d="M55 192 C155 192 190 192 264 162"></path>
-            <path id="${pSupplyExit}" class="duct-bg" d="M356 118 C430 88 465 88 565 88"></path>
-            <path id="${pExtractCore}" class="duct-bg" d="M565 192 C465 192 430 192 356 162"></path>
-            <path id="${pCoreExhaust}" class="duct-bg" d="M264 118 C190 88 155 88 55 88"></path>
+            <path id="${pOutdoorCore}" class="duct-bg" d="M55 192 C150 192 198 184 264 162"></path>
+            <path id="${pSupplyExit}" class="duct-bg" d="M356 118 C422 96 470 88 565 88"></path>
+            <path id="${pExtractCore}" class="duct-bg" d="M565 192 C470 192 422 184 356 162"></path>
+            <path id="${pCoreExhaust}" class="duct-bg" d="M264 118 C198 96 150 88 55 88"></path>
 
-            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M55 192 C155 192 190 192 264 162"></path>
-            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M356 118 C430 88 465 88 565 88"></path>
-            <path class="flow" stroke="url(#${gExtractExhaust})" d="M565 192 C465 192 430 192 356 162"></path>
-            <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 118 C190 88 155 88 55 88"></path>
+            <!-- Fresh air: Outdoor bottom-left -> HRV -> Supply top-right -->
+            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M55 192 C150 192 198 184 264 162"></path>
+            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M356 118 C422 96 470 88 565 88"></path>
+
+            <!-- Stale air: Extract bottom-right -> HRV -> Exhaust top-left -->
+            <path class="flow" stroke="url(#${gExtractExhaust})" d="M565 192 C470 192 422 184 356 162"></path>
+            <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 118 C198 96 150 88 55 88"></path>
 
             <g class="particles">
               <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
@@ -577,7 +580,7 @@ if (!window.customCards.some((card) => card.type === "ha-hrv-card")) {
 }
 
 console.info(
-  "%c HRV Card %c loaded ",
+  "%c HRV Card %c loaded - airflow layout v2: Exhaust top-left, Outdoor bottom-left ",
   "color: white; background: #03a9f4; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;",
   "color: white; background: #4caf50; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;"
 );
