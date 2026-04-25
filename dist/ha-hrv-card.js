@@ -190,10 +190,10 @@ class HRVCard extends HTMLElement {
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
-    const pOutdoorSupply = `${this._id}-path-outdoor-supply`;
+    const pOutdoorCore = `${this._id}-path-outdoor-core`;
     const pSupplyExit = `${this._id}-path-supply-exit`;
     const pExtractCore = `${this._id}-path-extract-core`;
-    const pExhaustExit = `${this._id}-path-exhaust-exit`;
+    const pCoreExhaust = `${this._id}-path-core-exhaust`;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -371,25 +371,25 @@ class HRVCard extends HTMLElement {
               ${this._gradient(gExtractExhaust, extract, exhaust, "100%", "0%", "0%", "0%")}
             </defs>
 
-            <path id="${pOutdoorSupply}" class="duct-bg" d="M55 88 C155 88 190 88 264 118"></path>
+            <path id="${pOutdoorCore}" class="duct-bg" d="M55 192 C155 192 190 192 264 162"></path>
             <path id="${pSupplyExit}" class="duct-bg" d="M356 118 C430 88 465 88 565 88"></path>
             <path id="${pExtractCore}" class="duct-bg" d="M565 192 C465 192 430 192 356 162"></path>
-            <path id="${pExhaustExit}" class="duct-bg" d="M264 162 C190 192 155 192 55 192"></path>
+            <path id="${pCoreExhaust}" class="duct-bg" d="M264 118 C190 88 155 88 55 88"></path>
 
-            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M55 88 C155 88 190 88 264 118"></path>
+            <path class="flow" stroke="url(#${gOutdoorSupply})" d="M55 192 C155 192 190 192 264 162"></path>
             <path class="flow" stroke="url(#${gOutdoorSupply})" d="M356 118 C430 88 465 88 565 88"></path>
             <path class="flow" stroke="url(#${gExtractExhaust})" d="M565 192 C465 192 430 192 356 162"></path>
-            <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 162 C190 192 155 192 55 192"></path>
+            <path class="flow" stroke="url(#${gExtractExhaust})" d="M264 118 C190 88 155 88 55 88"></path>
 
             <g class="particles">
               <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
-                <animateMotion dur="${duration}" begin="0s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
+                <animateMotion dur="${duration}" begin="0s" repeatCount="indefinite"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
               </circle>
               <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
-                <animateMotion dur="${duration}" begin="-.9s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
+                <animateMotion dur="${duration}" begin="-.9s" repeatCount="indefinite"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
               </circle>
               <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(outdoor)}">
-                <animateMotion dur="${duration}" begin="-1.8s" repeatCount="indefinite"><mpath href="#${pOutdoorSupply}"></mpath></animateMotion>
+                <animateMotion dur="${duration}" begin="-1.8s" repeatCount="indefinite"><mpath href="#${pOutdoorCore}"></mpath></animateMotion>
               </circle>
 
               <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(supply)}">
@@ -413,13 +413,13 @@ class HRVCard extends HTMLElement {
               </circle>
 
               <circle r="3.2" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
-                <animateMotion dur="${duration}" begin="-.5s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
+                <animateMotion dur="${duration}" begin="-.5s" repeatCount="indefinite"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
               </circle>
               <circle r="2.4" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
-                <animateMotion dur="${duration}" begin="-1.4s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
+                <animateMotion dur="${duration}" begin="-1.4s" repeatCount="indefinite"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
               </circle>
               <circle r="2.8" class="particle" style="--particle-color:${this._particleColor(exhaust)}">
-                <animateMotion dur="${duration}" begin="-2.3s" repeatCount="indefinite"><mpath href="#${pExhaustExit}"></mpath></animateMotion>
+                <animateMotion dur="${duration}" begin="-2.3s" repeatCount="indefinite"><mpath href="#${pCoreExhaust}"></mpath></animateMotion>
               </circle>
             </g>
 
@@ -428,15 +428,15 @@ class HRVCard extends HTMLElement {
             <line class="core-line" x1="340" y1="108" x2="280" y2="172"></line>
             <text x="310" y="146" text-anchor="middle" class="temperature">HRV</text>
 
-            ${hasLabels ? `<text x="55" y="52" text-anchor="middle" class="label">Outdoor</text>` : ""}
+            ${hasLabels ? `<text x="55" y="52" text-anchor="middle" class="label">Exhaust</text>` : ""}
             ${hasLabels ? `<text x="565" y="52" text-anchor="middle" class="label">Supply</text>` : ""}
             ${hasLabels ? `<text x="565" y="236" text-anchor="middle" class="label">Extract</text>` : ""}
-            ${hasLabels ? `<text x="55" y="236" text-anchor="middle" class="label">Exhaust</text>` : ""}
+            ${hasLabels ? `<text x="55" y="236" text-anchor="middle" class="label">Outdoor</text>` : ""}
 
-            ${hasTemps ? `<text x="55" y="72" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="55" y="72" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
             ${hasTemps ? `<text x="565" y="72" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
             ${hasTemps ? `<text x="565" y="258" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="55" y="258" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+            ${hasTemps ? `<text x="55" y="258" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
           </svg>
 
           ${hasBadges ? `
