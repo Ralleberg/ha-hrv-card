@@ -6,7 +6,7 @@ export default defineConfig({
       entry: "src/hrv-card.ts",
       name: "HRVCard",
       formats: ["es"],
-      fileName: () => "hrv-card.js"
+      fileName: () => "ha-hrv-card.js"
     },
     outDir: "dist",
     emptyOutDir: true,

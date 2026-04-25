@@ -11,7 +11,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 - Animated airflow diagram
 - Temperature-based airflow gradients
-- Optional fan RPM display
+- Optional heat recovery and fan RPM display
 - Optional mode, bypass, humidity, and fan state badges
 - Works with partial configs: missing entities show as `—`
 - HACS-ready repository layout
@@ -54,6 +54,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
    supply_temperature: sensor.dantherm_supply_temperature
    extract_temperature: sensor.dantherm_extract_temperature
    exhaust_temperature: sensor.dantherm_exhaust_temperature
+   heat_recovery: sensor.dantherm_heat_recovery_efficiency
    humidity: sensor.dantherm_humidity
    bypass: sensor.dantherm_bypass_template
    mode: sensor.dantherm_op_mode_template
@@ -86,6 +87,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | `supply_temperature` | Supply air temperature after HRV |
 | `extract_temperature` | Extract air temperature from rooms |
 | `exhaust_temperature` | Exhaust air temperature after HRV |
+| `heat_recovery` | Heat recovery efficiency in percent, shown as a compact center indicator |
 | `humidity` | Humidity sensor |
 | `bypass` | Bypass state/text sensor |
 | `mode` | Operation mode/text sensor |

@@ -6,6 +6,7 @@ class HRVCard extends HTMLElement {
         supply_temperature: "sensor.supply_temperature",
         extract_temperature: "sensor.extract_temperature",
         exhaust_temperature: "sensor.exhaust_temperature",
+        heat_recovery: "sensor.heat_recovery_efficiency",
         humidity: "sensor.humidity",
         bypass: "sensor.bypass",
         mode: "sensor.mode",
@@ -199,6 +200,8 @@ class HRVCard extends HTMLElement {
     const supply = this._number("supply_temperature");
     const extract = this._number("extract_temperature");
     const exhaust = this._number("exhaust_temperature");
+    const heatRecovery = this._number("heat_recovery");
+    const recoveryProgress = Number.isFinite(heatRecovery) ? Math.max(0, Math.min(100, heatRecovery)) : 0;
     const fan1Duration = this._flowDuration("fan1_rpm");
     const fan2Duration = this._flowDuration("fan2_rpm");
     const animationOff = this._config?.appearance?.animation === false;
@@ -317,6 +320,40 @@ class HRVCard extends HTMLElement {
           fill: var(--hrv-text);
         }
 
+        .recovery-chip {
+          fill: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 34%, transparent);
+          stroke: color-mix(in srgb, var(--hrv-text) 14%, transparent);
+          stroke-width: 1;
+          filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .22));
+        }
+
+        .recovery-ring-bg {
+          fill: none;
+          stroke: color-mix(in srgb, var(--hrv-text) 16%, transparent);
+          stroke-width: 4;
+        }
+
+        .recovery-ring {
+          fill: none;
+          stroke: color-mix(in srgb, #43e683 82%, var(--hrv-text) 18%);
+          stroke-width: 4;
+          stroke-linecap: round;
+        }
+
+        .recovery-value {
+          font-size: 17px;
+          font-weight: 700;
+          fill: var(--hrv-text);
+        }
+
+        .recovery-label {
+          font-size: 8px;
+          font-weight: 600;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          fill: var(--hrv-muted);
+        }
+
         .badges {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
@@ -398,6 +435,14 @@ class HRVCard extends HTMLElement {
             ${hasTemps ? `<text x="552" y="54" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
             ${hasTemps ? `<text x="552" y="252" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
             ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+
+            <g transform="translate(310 46)">
+              <rect class="recovery-chip" x="-54" y="-24" width="108" height="48" rx="18"></rect>
+              <circle class="recovery-ring-bg" cx="-28" cy="0" r="14"></circle>
+              <circle class="recovery-ring" cx="-28" cy="0" r="14" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 -28 0)"></circle>
+              <text x="10" y="-2" text-anchor="middle" class="recovery-value">${this._formatNumber("heat_recovery", 0, "%")}</text>
+              <text x="10" y="13" text-anchor="middle" class="recovery-label">Recovery</text>
+            </g>
           </svg>
 
           ${hasBadges ? `
@@ -492,6 +537,7 @@ class HRVCardEditor extends HTMLElement {
         <label>Extract temperature<input data-path="entities.extract_temperature" value="${this._value("entities.extract_temperature")}"></label>
         <label>Exhaust temperature<input data-path="entities.exhaust_temperature" value="${this._value("entities.exhaust_temperature")}"></label>
         <h3>Optional entities</h3>
+        <label>Heat recovery<input data-path="entities.heat_recovery" value="${this._value("entities.heat_recovery")}"></label>
         <label>Humidity<input data-path="entities.humidity" value="${this._value("entities.humidity")}"></label>
         <label>Bypass<input data-path="entities.bypass" value="${this._value("entities.bypass")}"></label>
         <label>Mode<input data-path="entities.mode" value="${this._value("entities.mode")}"></label>
