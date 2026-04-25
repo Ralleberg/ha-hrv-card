@@ -15,14 +15,14 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 - Optional mode, bypass, humidity, and fan state badges
 - Works with partial configs: missing entities show as `—`
 - HACS-ready repository layout
-- No runtime dependencies in `dist/hrv-card.js`
+- No runtime dependencies in `dist/ha-hrv-card.js`
 
 ## Installation
 
 ### HACS custom repository
 
 1. Create a public GitHub repository from this project.
-2. Create a release containing `dist/hrv-card.js`.
+2. Create a release containing `dist/ha-hrv-card.js`.
 3. In Home Assistant, go to **HACS → three dots menu → Custom repositories**.
 4. Add your repository URL.
 5. Select category **Dashboard**.
@@ -30,16 +30,16 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 ### Manual installation
 
-1. Copy `dist/hrv-card.js` to:
+1. Copy `dist/ha-hrv-card.js` to:
 
    ```text
-   /config/www/community/lovelace-hrv-card/hrv-card.js
+   /config/www/community/lovelace-hrv-card/ha-hrv-card.js
    ```
 
 2. Add a dashboard resource:
 
    ```yaml
-   url: /local/community/lovelace-hrv-card/hrv-card.js
+   url: /local/community/lovelace-hrv-card/ha-hrv-card.js
    type: module
    ```
 
@@ -122,7 +122,7 @@ npm run build
 The distributable file is written to:
 
 ```text
-dist/hrv-card.js
+dist/ha-hrv-card.js
 ```
 
 ## Roadmap
