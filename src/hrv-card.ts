@@ -124,7 +124,7 @@ class HRVCard extends HTMLElement {
   }
 
   _temperatureColor(value) {
-    if (!Number.isFinite(value)) return "var(--secondary-text-color)";
+    if (!Number.isFinite(value)) return "var(--secondary-text-color, rgba(255, 255, 255, .72))";
     const clamped = Math.max(-10, Math.min(35, value));
     const ratio = (clamped + 10) / 45;
     const hue = 215 - ratio * 205;
@@ -217,7 +217,8 @@ class HRVCard extends HTMLElement {
         :host {
           display: block;
           --hrv-flow-width: 38;
-          --hrv-muted: var(--secondary-text-color);
+          --hrv-text: var(--primary-text-color, #ffffff);
+          --hrv-muted: var(--secondary-text-color, rgba(255, 255, 255, .72));
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
 
@@ -237,8 +238,8 @@ class HRVCard extends HTMLElement {
             radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
             radial-gradient(circle at 84% 32%, color-mix(in srgb, #ff5a4f 16%, transparent), transparent 34%),
             color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 24%, transparent);
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 14%, transparent);
-          color: var(--primary-text-color);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 14%, transparent);
+          color: var(--hrv-text);
         }
 
         svg {
@@ -249,7 +250,7 @@ class HRVCard extends HTMLElement {
 
         .duct-bg {
           fill: none;
-          stroke: color-mix(in srgb, var(--primary-text-color) 8%, transparent);
+          stroke: color-mix(in srgb, var(--hrv-text) 8%, transparent);
           stroke-width: calc(var(--hrv-flow-width) + 10px);
           stroke-linecap: butt;
           stroke-linejoin: round;
@@ -261,7 +262,7 @@ class HRVCard extends HTMLElement {
           stroke-linecap: butt;
           stroke-linejoin: round;
           opacity: .88;
-          filter: drop-shadow(0 0 10px color-mix(in srgb, var(--primary-text-color) 18%, transparent));
+          filter: drop-shadow(0 0 10px color-mix(in srgb, var(--hrv-text) 18%, transparent));
         }
 
         .flow-glow {
@@ -301,19 +302,19 @@ class HRVCard extends HTMLElement {
 
         .label {
           font-size: 12px;
-          fill: var(--secondary-text-color);
+          fill: var(--hrv-muted);
         }
 
         .temperature {
           font-size: 19px;
           font-weight: 600;
-          fill: var(--primary-text-color);
+          fill: var(--hrv-text);
         }
 
         .side-value {
           font-size: 11px;
           font-weight: 500;
-          fill: var(--primary-text-color);
+          fill: var(--hrv-text);
         }
 
         .badges {
@@ -328,13 +329,13 @@ class HRVCard extends HTMLElement {
           border: 0;
           border-radius: 8px;
           background: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 20%, transparent);
-          color: var(--primary-text-color);
+          color: var(--hrv-text);
           padding: 6px 8px;
           text-align: left;
           min-width: 0;
           cursor: pointer;
           font: inherit;
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 10%, transparent);
           backdrop-filter: blur(6px);
         }
 
@@ -344,7 +345,7 @@ class HRVCard extends HTMLElement {
 
         .badge span {
           display: block;
-          color: var(--secondary-text-color);
+          color: var(--hrv-muted);
           font-size: 10px;
           line-height: 1.2;
           white-space: nowrap;
