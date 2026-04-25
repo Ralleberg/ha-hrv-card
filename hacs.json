@@ -1,5 +1,5 @@
 {
   "name": "HRV Card",
-  "filename": "dist/hrv-card.js",
-  "render_readme": true
+  "render_readme": true,
+  "filename": "ha-hrv-card.js"
 }

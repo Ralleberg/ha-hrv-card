@@ -492,14 +492,36 @@ if (!customElements.get("hrv-card")) {
   customElements.define("hrv-card", HRVCard);
 }
 
+if (!customElements.get("ha-hrv-card")) {
+  customElements.define("ha-hrv-card", HRVCard);
+}
+
 if (!customElements.get("hrv-card-editor")) {
   customElements.define("hrv-card-editor", HRVCardEditor);
 }
 
 window.customCards = window.customCards || [];
-window.customCards.push({
-  type: "hrv-card",
-  name: "HRV Card",
-  description: "Animated heat recovery ventilation card with temperature gradients",
-  preview: true
-});
+
+if (!window.customCards.some((card) => card.type === "hrv-card")) {
+  window.customCards.push({
+    type: "hrv-card",
+    name: "HRV Card",
+    description: "Animated heat recovery ventilation card with temperature gradients",
+    preview: true
+  });
+}
+
+if (!window.customCards.some((card) => card.type === "ha-hrv-card")) {
+  window.customCards.push({
+    type: "ha-hrv-card",
+    name: "HA HRV Card",
+    description: "Animated heat recovery ventilation card with temperature gradients",
+    preview: true
+  });
+}
+
+console.info(
+  "%c HRV Card %c loaded ",
+  "color: white; background: #03a9f4; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;",
+  "color: white; background: #4caf50; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;"
+);
