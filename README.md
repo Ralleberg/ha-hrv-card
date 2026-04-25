@@ -11,7 +11,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 - Animated airflow diagram
 - Temperature-based airflow gradients
-- Optional heat recovery efficiency and fan RPM display
+- Optional fan RPM display
 - Optional mode, bypass, humidity, and fan state badges
 - Works with partial configs: missing entities show as `—`
 - HACS-ready repository layout
@@ -49,13 +49,11 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 ```yaml
  type: custom:hrv-card
- title: Ventilation
  entities:
    outdoor_temperature: sensor.dantherm_outdoor_temperature
    supply_temperature: sensor.dantherm_supply_temperature
    extract_temperature: sensor.dantherm_extract_temperature
    exhaust_temperature: sensor.dantherm_exhaust_temperature
-   heat_recovery: sensor.dantherm_heat_recovery_efficiency
    humidity: sensor.dantherm_humidity
    bypass: sensor.dantherm_bypass_template
    mode: sensor.dantherm_op_mode_template
@@ -77,7 +75,6 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | Option | Type | Required | Description |
 | --- | --- | --- | --- |
 | `type` | string | yes | Must be `custom:hrv-card` |
-| `title` | string | no | Card title |
 | `entities` | object | no | Entity mapping |
 | `appearance` | object | no | Visual options |
 
@@ -89,11 +86,10 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | `supply_temperature` | Supply air temperature after HRV |
 | `extract_temperature` | Extract air temperature from rooms |
 | `exhaust_temperature` | Exhaust air temperature after HRV |
-| `heat_recovery` | Heat recovery efficiency in percent |
 | `humidity` | Humidity sensor |
 | `bypass` | Bypass state/text sensor |
 | `mode` | Operation mode/text sensor |
-| `fan_speed` | Fan speed/state shown as a percentage/value on the right side |
+| `fan_speed` | Optional fan speed/state badge |
 | `fan1_rpm` | Fan 1 RPM sensor shown beside the upper flow. This controls the upper flow animation speed |
 | `fan2_rpm` | Fan 2 RPM sensor shown beside the lower flow. This controls the lower flow animation speed |
 
