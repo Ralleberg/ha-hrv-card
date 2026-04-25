@@ -220,8 +220,8 @@ class HRVCard extends HTMLElement {
         :host {
           display: block;
           --hrv-flow-width: 38;
-          --hrv-text: var(--primary-text-color, #ffffff);
-          --hrv-muted: var(--secondary-text-color, rgba(255, 255, 255, .72));
+          --hrv-text: var(--primary-text-color, var(--text-primary-color, #ffffff));
+          --hrv-muted: var(--secondary-text-color, rgba(255, 255, 255, .78));
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
 
@@ -242,7 +242,7 @@ class HRVCard extends HTMLElement {
             radial-gradient(circle at 84% 32%, color-mix(in srgb, #ff5a4f 16%, transparent), transparent 34%),
             color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 24%, transparent);
           box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 14%, transparent);
-          color: var(--hrv-text);
+          color: var(--hrv-text) !important;
         }
 
         svg {
@@ -305,13 +305,13 @@ class HRVCard extends HTMLElement {
 
         .label {
           font-size: 12px;
-          fill: var(--hrv-muted);
+          fill: var(--hrv-muted) !important;
         }
 
         .temperature {
           font-size: 19px;
           font-weight: 600;
-          fill: var(--hrv-text);
+          fill: var(--hrv-text) !important;
         }
 
         .side-value {
@@ -320,38 +320,30 @@ class HRVCard extends HTMLElement {
           fill: var(--hrv-text);
         }
 
-        .recovery-chip {
-          fill: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 34%, transparent);
-          stroke: color-mix(in srgb, var(--hrv-text) 14%, transparent);
+        .recovery-circle {
+          fill: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 22%, transparent);
+          stroke: color-mix(in srgb, var(--hrv-text) 18%, transparent);
           stroke-width: 1;
-          filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .22));
+          filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .24));
         }
 
         .recovery-ring-bg {
           fill: none;
-          stroke: color-mix(in srgb, var(--hrv-text) 16%, transparent);
-          stroke-width: 4;
+          stroke: color-mix(in srgb, var(--hrv-text) 18%, transparent);
+          stroke-width: 3;
         }
 
         .recovery-ring {
           fill: none;
           stroke: color-mix(in srgb, #43e683 82%, var(--hrv-text) 18%);
-          stroke-width: 4;
+          stroke-width: 3;
           stroke-linecap: round;
         }
 
         .recovery-value {
-          font-size: 17px;
+          font-size: 18px;
           font-weight: 700;
-          fill: var(--hrv-text);
-        }
-
-        .recovery-label {
-          font-size: 8px;
-          font-weight: 600;
-          letter-spacing: .08em;
-          text-transform: uppercase;
-          fill: var(--hrv-muted);
+          fill: var(--hrv-text) !important;
         }
 
         .badges {
@@ -366,7 +358,7 @@ class HRVCard extends HTMLElement {
           border: 0;
           border-radius: 8px;
           background: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 20%, transparent);
-          color: var(--hrv-text);
+          color: var(--hrv-text) !important;
           padding: 6px 8px;
           text-align: left;
           min-width: 0;
@@ -382,7 +374,7 @@ class HRVCard extends HTMLElement {
 
         .badge span {
           display: block;
-          color: var(--hrv-muted);
+          color: var(--hrv-muted) !important;
           font-size: 10px;
           line-height: 1.2;
           white-space: nowrap;
@@ -437,11 +429,10 @@ class HRVCard extends HTMLElement {
             ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
 
             <g transform="translate(310 46)">
-              <rect class="recovery-chip" x="-54" y="-24" width="108" height="48" rx="18"></rect>
-              <circle class="recovery-ring-bg" cx="-28" cy="0" r="14"></circle>
-              <circle class="recovery-ring" cx="-28" cy="0" r="14" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 -28 0)"></circle>
-              <text x="10" y="-2" text-anchor="middle" class="recovery-value">${this._formatNumber("heat_recovery", 0, "%")}</text>
-              <text x="10" y="13" text-anchor="middle" class="recovery-label">Recovery</text>
+              <circle class="recovery-circle" cx="0" cy="0" r="25"></circle>
+              <circle class="recovery-ring-bg" cx="0" cy="0" r="20"></circle>
+              <circle class="recovery-ring" cx="0" cy="0" r="20" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 0 0)"></circle>
+              <text x="0" y="6" text-anchor="middle" class="recovery-value">${this._formatNumber("heat_recovery", 0, "%")}</text>
             </g>
           </svg>
 
