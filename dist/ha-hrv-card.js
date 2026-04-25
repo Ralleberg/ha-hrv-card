@@ -209,10 +209,17 @@ class HRVCard extends HTMLElement {
         ha-card {
           overflow: hidden;
           border-radius: var(--hrv-radius);
+          background: var(--ha-card-background, var(--card-background-color));
+          box-shadow: var(--ha-card-box-shadow, none);
+          border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color));
         }
 
         .card {
+          position: relative;
           padding: ${compact ? "12px" : "16px"};
+          background:
+            radial-gradient(circle at 18% 35%, color-mix(in srgb, var(--info-color, #039be5) 10%, transparent), transparent 34%),
+            radial-gradient(circle at 82% 42%, color-mix(in srgb, var(--error-color, #db4437) 9%, transparent), transparent 36%);
         }
 
         .header {
@@ -263,8 +270,8 @@ class HRVCard extends HTMLElement {
 
         .duct-bg {
           fill: none;
-          stroke: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
-          stroke-width: var(--hrv-flow-width);
+          stroke: color-mix(in srgb, var(--primary-text-color) 9%, transparent);
+          stroke-width: calc(var(--hrv-flow-width) + 6px);
           stroke-linecap: round;
         }
 
@@ -286,15 +293,22 @@ class HRVCard extends HTMLElement {
         }
 
         .core {
-          fill: var(--hrv-core-fill);
-          stroke: var(--hrv-core-stroke);
-          stroke-width: 1.5;
-          filter: drop-shadow(0 2px 7px color-mix(in srgb, black 14%, transparent));
+          fill: url(#${this._id}-core-gradient);
+          stroke: color-mix(in srgb, var(--primary-text-color) 16%, transparent);
+          stroke-width: 1.3;
+          filter: drop-shadow(0 4px 10px color-mix(in srgb, black 18%, transparent));
         }
 
         .core-line {
-          stroke: color-mix(in srgb, var(--primary-text-color) 18%, transparent);
-          stroke-width: 1;
+          stroke: color-mix(in srgb, var(--primary-text-color) 22%, transparent);
+          stroke-width: 1.4;
+          stroke-linecap: round;
+        }
+
+        .core-plate {
+          fill: none;
+          stroke: color-mix(in srgb, var(--primary-text-color) 10%, transparent);
+          stroke-width: .9;
         }
 
         .label {
@@ -317,15 +331,16 @@ class HRVCard extends HTMLElement {
 
         .badge {
           appearance: none;
-          border: 0;
+          border: 1px solid color-mix(in srgb, var(--primary-text-color) 7%, transparent);
           border-radius: 10px;
-          background: color-mix(in srgb, var(--primary-text-color) 7%, transparent);
+          background: color-mix(in srgb, var(--card-background-color) 72%, transparent);
           color: var(--primary-text-color);
           padding: 9px 10px;
           text-align: left;
           min-width: 0;
           cursor: pointer;
           font: inherit;
+          backdrop-filter: blur(8px);
         }
 
         .badge:not([data-entity]) {
@@ -369,6 +384,10 @@ class HRVCard extends HTMLElement {
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply, "0%", "0%", "100%", "0%")}
               ${this._gradient(gExtractExhaust, extract, exhaust, "100%", "0%", "0%", "0%")}
+              <linearGradient id="${this._id}-core-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="color-mix(in srgb, var(--card-background-color) 96%, white 4%)"></stop>
+                <stop offset="100%" stop-color="color-mix(in srgb, var(--card-background-color) 78%, var(--primary-text-color) 6%)"></stop>
+              </linearGradient>
             </defs>
 
             <path id="${pOutdoorCore}" class="duct-bg" d="M55 192 C150 192 198 184 264 162"></path>
@@ -426,9 +445,11 @@ class HRVCard extends HTMLElement {
               </circle>
             </g>
 
-            <rect class="core" x="264" y="90" width="92" height="100" rx="17"></rect>
-            <line class="core-line" x1="280" y1="108" x2="340" y2="172"></line>
-            <line class="core-line" x1="340" y1="108" x2="280" y2="172"></line>
+            <rect class="core" x="270" y="94" width="80" height="92" rx="16"></rect>
+            <path class="core-plate" d="M284 111 L310 137 L336 111"></path>
+            <path class="core-plate" d="M284 169 L310 143 L336 169"></path>
+            <line class="core-line" x1="286" y1="114" x2="334" y2="166"></line>
+            <line class="core-line" x1="334" y1="114" x2="286" y2="166"></line>
             <text x="310" y="146" text-anchor="middle" class="temperature">HRV</text>
 
             ${hasLabels ? `<text x="55" y="52" text-anchor="middle" class="label">Exhaust</text>` : ""}
