@@ -8,8 +8,8 @@ export default defineConfig({
       formats: ["es"],
       fileName: () => "ha-hrv-card.js"
     },
-    outDir: "dist",
-    emptyOutDir: true,
+    outDir: ".",
+    emptyOutDir: false,
     minify: false,
     rollupOptions: {
       output: {
