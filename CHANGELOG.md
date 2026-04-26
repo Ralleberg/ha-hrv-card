@@ -1,8 +1,8 @@
 # Changelog
 
-## v1.0.9b - Theme Surface and Airflow Visibility Beta
+## v2.0.0 - Theme Surface and Airflow Visibility
 
-This beta improves theme integration and makes the animated airflow easier to see.
+This release improves theme integration and makes the animated airflow easier to see.
 
 ### Changed
 
@@ -21,6 +21,7 @@ This beta improves theme integration and makes the animated airflow easier to se
 - Repositions Fan 1 and Fan 2 RPM next to the Outdoor and Exhaust value groups.
 - Uses a non-transparent Home Assistant card background fallback so the card follows light and dark themes more consistently.
 - Increases airflow particle and stroke contrast while slightly softening the temperature flow channels.
+- Adds a README preview image for the card.
 - Keeps package naming aligned as `ha-hrv-card`.
 - Aligns card picker registration more closely with `vacuum-card`: simple `window.customCards.push`, async editor creation, and entity-aware stub config.
 
