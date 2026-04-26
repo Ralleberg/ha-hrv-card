@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.0.1 - Card Picker and Bypass Flow Fixes
+
+This release fixes the card picker registration problem and updates the HRV layout behavior.
+
+### Fixed
+
+- Fixes Home Assistant card picker registration by removing duplicate custom element registration.
+- Ensures the card module reaches `window.customCards.push(...)` without failing during load.
+- Uses a proper `CustomEvent` for Home Assistant more-info popups.
+
+### Changed
+
+- Moves bypass from the bottom badge row into the airflow diagram.
+- Shows bypass as a simple status circle with the current open/closed state.
+- Switches to direct non-crossing airflow when bypass is closed/lukket.
+- Hides heat recovery from the layout when bypass is closed/lukket.
+- Removes the unused Fan badge.
+- Adds a Level badge for sensors such as `sensor.dantherm_op_mode`.
+- Moves Fan 1 and Fan 2 RPM values into the flow layout as smaller italic text.
+
 ## v1.0.0 - First Stable Release
 
 HRV Card v1.0.0 is the first stable release of the custom Home Assistant Lovelace card for heat recovery ventilation systems.
