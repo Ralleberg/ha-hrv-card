@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.0.3b - Card Picker and Flow Refinement Beta
+
+This beta refines the Home Assistant card picker setup and adjusts the flow layout.
+
+### Changed
+
+- Keeps README on the latest stable version while beta builds continue in package and runtime metadata.
+- Keeps `getStubConfig()` free of a `type` field for Home Assistant card picker compatibility.
+- Moves Fan 1 and Fan 2 RPM labels into the flow header/footer area.
+- Enlarges the flow strokes to better use the card space.
+- Uses direct non-crossing airflow when bypass reports open/åben/on/255.
+
 ## v1.0.2b - Layout Follow-up
 
 This beta follow-up keeps the `custom:hrv-card` registration and adjusts the airflow layout after the bypass changes.
@@ -7,10 +19,12 @@ This beta follow-up keeps the `custom:hrv-card` registration and adjusts the air
 ### Changed
 
 - Keeps the card registered for Lovelace as `custom:hrv-card`.
+- Removes `type` from the card picker stub config so Home Assistant can inject the selected custom card type.
 - Fixes the Exhaust arrow direction.
 - Moves Fan 1 RPM next to Outdoor.
 - Moves Fan 2 RPM next to Exhaust.
 - Moves the lower Exhaust and Supply temperature values back closer to the flow.
+- Switches to direct non-crossing airflow when bypass is open/åben/on/255.
 
 ## v1.0.1 - Card Picker and Bypass Flow Fixes
 
@@ -27,7 +41,7 @@ This release fixes the card picker registration problem and updates the HRV layo
 
 - Moves bypass from the bottom badge row into the airflow diagram.
 - Shows bypass as a simple status circle with the current open/closed state.
-- Switches to direct non-crossing airflow when bypass is closed/lukket.
+- Switches to direct non-crossing airflow when bypass is open/åben/on/255.
 - Keeps heat recovery above the flow when bypass is open/on and hides it when bypass is closed/lukket.
 - Removes the unused Fan badge.
 - Adds a Level badge for sensors such as `sensor.dantherm_op_mode`.

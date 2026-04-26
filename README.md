@@ -4,7 +4,7 @@ Animated Home Assistant Lovelace card for heat recovery ventilation systems.
 
 The card is intentionally vendor-neutral. You choose the entities you have, regardless of whether the system is Dantherm, Zehnder/ComfoAir, Nilan, Genvex, Brink, or another HRV/ERV unit.
 
-![Version](https://img.shields.io/badge/version-v1.0.1-blue)
+![Version](https://img.shields.io/badge/version-v1.0.0-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 
 ## Features
@@ -93,7 +93,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | `exhaust_temperature` | Exhaust air temperature after HRV |
 | `heat_recovery` | Heat recovery efficiency in percent, shown as a compact flow indicator when bypass is not closed |
 | `humidity` | Humidity sensor |
-| `bypass` | Bypass state/text sensor. Closed/lukket switches the diagram to direct non-crossing airflow |
+| `bypass` | Bypass state/text sensor. Open/åben/on/255 switches the diagram to direct non-crossing airflow |
 | `mode` | Operation mode/text sensor |
 | `level` | Ventilation level sensor, for example `sensor.dantherm_op_mode` |
 | `fan1_rpm` | Fan 1 RPM sensor shown as small italic text beside the upper flow. This controls the upper flow animation speed |

@@ -1,7 +1,6 @@
 class HRVCard extends HTMLElement {
   static getStubConfig() {
     return {
-      type: "custom:hrv-card",
       entities: {
         outdoor_temperature: "sensor.outdoor_temperature",
         supply_temperature: "sensor.supply_temperature",
@@ -25,7 +24,7 @@ class HRVCard extends HTMLElement {
     };
   }
 
-  static async getConfigElement() {
+  static getConfigElement() {
     return document.createElement("hrv-card-editor");
   }
 
@@ -130,8 +129,8 @@ class HRVCard extends HTMLElement {
     return state ? state.toString().trim().toLowerCase() : "";
   }
 
-  _isBypassClosed() {
-    return ["closed", "lukket", "off", "false", "0", "no", "nej"].includes(this._normalizedBypassState());
+  _isBypassOpen() {
+    return ["open", "åben", "aaben", "on", "true", "1", "yes", "ja", "255"].includes(this._normalizedBypassState());
   }
 
   _formatBypassState() {
@@ -227,7 +226,7 @@ class HRVCard extends HTMLElement {
     const recoveryProgress = Number.isFinite(heatRecovery) ? Math.max(0, Math.min(100, heatRecovery)) : 0;
     const fan1Duration = this._flowDuration("fan1_rpm");
     const fan2Duration = this._flowDuration("fan2_rpm");
-    const bypassClosed = this._isBypassClosed();
+    const bypassOpen = this._isBypassOpen();
     const animationOff = this._config?.appearance?.animation === false;
     const hasBadges = this._config.appearance.show_badges !== false;
     const hasLabels = this._config.appearance.show_labels !== false;
@@ -236,22 +235,22 @@ class HRVCard extends HTMLElement {
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
-    const outdoorSupplyPath = bypassClosed
+    const outdoorSupplyPath = bypassOpen
       ? "M56 100 H564"
       : "M56 92 H192 C246 92 256 138 310 138 C364 138 374 184 428 184 H564";
-    const extractExhaustPath = bypassClosed
+    const extractExhaustPath = bypassOpen
       ? "M564 184 H56"
       : "M564 92 H428 C374 92 364 138 310 138 C256 138 246 184 192 184 H56";
-    const rightTopKey = bypassClosed ? "supply_temperature" : "extract_temperature";
-    const rightTopLabel = bypassClosed ? "Supply" : "Extract";
-    const rightBottomKey = bypassClosed ? "extract_temperature" : "supply_temperature";
-    const rightBottomLabel = bypassClosed ? "Extract" : "Supply";
+    const rightTopKey = bypassOpen ? "supply_temperature" : "extract_temperature";
+    const rightTopLabel = bypassOpen ? "Supply" : "Extract";
+    const rightBottomKey = bypassOpen ? "extract_temperature" : "supply_temperature";
+    const rightBottomLabel = bypassOpen ? "Extract" : "Supply";
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: block;
-          --hrv-flow-width: 38;
+          --hrv-flow-width: 42;
           --hrv-text: var(--hrv-card-text-color, var(--text-primary-color, var(--primary-text-color, #ffffff)));
           --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, rgba(255, 255, 255, .78)));
           --hrv-radius: var(--ha-card-border-radius, 12px);
@@ -493,19 +492,19 @@ class HRVCard extends HTMLElement {
             ${this._particles(extractExhaustPath, fan2Duration, fan2Duration === "0s")}
 
             <g fill="rgba(255, 255, 255, .92)">
-              <path d="M96 94 H119 V87 L134 100 L119 113 V106 H96 Z"></path>
-              <path d="${bypassClosed ? "M486 94 H509 V87 L524 100 L509 113 V106 H486 Z" : "M524 86 H501 V79 L486 92 L501 105 V98 H524 Z"}"></path>
-              <path d="${bypassClosed ? "M524 178 H501 V171 L486 184 L501 197 V190 H524 Z" : "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z"}"></path>
-              <path d="${bypassClosed ? "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z" : "M486 178 H509 V171 L524 184 L509 197 V190 H486 Z"}"></path>
+              <path d="${bypassOpen ? "M96 94 H119 V87 L134 100 L119 113 V106 H96 Z" : "M96 86 H119 V79 L134 92 L119 105 V98 H96 Z"}"></path>
+              <path d="${bypassOpen ? "M486 94 H509 V87 L524 100 L509 113 V106 H486 Z" : "M524 86 H501 V79 L486 92 L501 105 V98 H524 Z"}"></path>
+              <path d="${bypassOpen ? "M524 178 H501 V171 L486 184 L501 197 V190 H524 Z" : "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z"}"></path>
+              <path d="${bypassOpen ? "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z" : "M486 178 H509 V171 L524 184 L509 197 V190 H486 Z"}"></path>
             </g>
 
             <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
-              <rect x="20" y="66" width="96" height="18" rx="8" fill="transparent"></rect>
-              <text x="68" y="78" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+              <rect x="116" y="38" width="96" height="18" rx="8" fill="transparent"></rect>
+              <text x="164" y="50" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
             </g>
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="20" y="206" width="96" height="18" rx="8" fill="transparent"></rect>
-              <text x="68" y="218" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <rect x="116" y="240" width="96" height="18" rx="8" fill="transparent"></rect>
+              <text x="164" y="252" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
             </g>
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
@@ -524,12 +523,12 @@ class HRVCard extends HTMLElement {
               ${hasTemps ? `<text x="552" y="252" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
-              <rect x="18" y="226" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="246" text-anchor="middle" class="label">Exhaust</text>` : ""}
-              ${hasTemps ? `<text x="68" y="272" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+              <rect x="18" y="206" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="226" text-anchor="middle" class="label">Exhaust</text>` : ""}
+              ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
             </g>
 
-            ${bypassClosed ? "" : `
+            ${bypassOpen ? "" : `
               <g ${this._svgEntityAttrs("heat_recovery")} tabindex="0" transform="translate(310 46)">
                 <circle class="recovery-circle" cx="0" cy="0" r="32"></circle>
                 <circle class="recovery-ring-bg" cx="0" cy="0" r="26"></circle>
@@ -768,5 +767,5 @@ if (existingCardIndex >= 0) {
   window.customCards.push(hrvCardPickerEntry);
 }
 
-window.__HRV_CARD_VERSION__ = "1.0.2b";
-console.info("%c HRV Card %c loaded v1.0.2b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "1.0.3b";
+console.info("%c HRV Card %c loaded v1.0.3b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
