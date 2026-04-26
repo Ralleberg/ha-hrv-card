@@ -1,6 +1,7 @@
 class HRVCard extends HTMLElement {
   static getStubConfig() {
     return {
+      type: "custom:ha-hrv-card",
       entities: {
         outdoor_temperature: "sensor.outdoor_temperature",
         supply_temperature: "sensor.supply_temperature",
@@ -24,8 +25,8 @@ class HRVCard extends HTMLElement {
     };
   }
 
-  static getConfigElement() {
-    return document.createElement("hrv-card-editor");
+  static async getConfigElement() {
+    return document.createElement("ha-hrv-card-editor");
   }
 
   constructor() {
@@ -611,6 +612,7 @@ class HRVCardEditor extends HTMLElement {
   }
 
   _valueChanged(event) {
+    event.stopPropagation();
     const value = event.detail.value || {};
     const next = structuredClone(this._config || {});
     next.entities = {
@@ -636,6 +638,12 @@ class HRVCardEditor extends HTMLElement {
       compact: value.compact === true,
       max_rpm: value.max_rpm || undefined
     };
+    Object.keys(next.entities).forEach((key) => {
+      if (next.entities[key] === undefined) delete next.entities[key];
+    });
+    Object.keys(next.appearance).forEach((key) => {
+      if (next.appearance[key] === undefined) delete next.appearance[key];
+    });
     this.dispatchEvent(new CustomEvent("config-changed", {
       detail: { config: next },
       bubbles: true,
@@ -675,16 +683,20 @@ if (!customElements.get("hrv-card-editor")) {
   customElements.define("hrv-card-editor", HRVCardEditor);
 }
 
+if (!customElements.get("ha-hrv-card-editor")) {
+  customElements.define("ha-hrv-card-editor", HRVCardEditor);
+}
+
 window.customCards = window.customCards || [];
 
 const hrvCardPickerEntry = {
-  type: "custom:ha-hrv-card",
+  type: "ha-hrv-card",
   name: "HRV Card",
   description: "Animated heat recovery ventilation card with temperature gradients",
   preview: true
 };
 
-window.customCards = window.customCards.filter((card) => !["hrv-card", "ha-hrv-card"].includes(card.type));
+window.customCards = window.customCards.filter((card) => !["hrv-card", "custom:ha-hrv-card"].includes(card.type));
 
 const existingCardIndex = window.customCards.findIndex((card) => card.type === hrvCardPickerEntry.type);
 
