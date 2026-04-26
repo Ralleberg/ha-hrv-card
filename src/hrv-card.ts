@@ -1,18 +1,23 @@
 class HRVCard extends HTMLElement {
-  static getStubConfig() {
+  static getStubConfig(_hass, entities = []) {
+    const entityIds = Array.isArray(entities)
+      ? entities.map((entity) => typeof entity === "string" ? entity : entity?.entity_id).filter(Boolean)
+      : [];
+    const findEntity = (patterns, fallback) => entityIds.find((entityId) => patterns.some((pattern) => entityId.includes(pattern))) || fallback;
+
     return {
       entities: {
-        outdoor_temperature: "sensor.outdoor_temperature",
-        supply_temperature: "sensor.supply_temperature",
-        extract_temperature: "sensor.extract_temperature",
-        exhaust_temperature: "sensor.exhaust_temperature",
-        heat_recovery: "sensor.heat_recovery_efficiency",
-        humidity: "sensor.humidity",
-        bypass: "sensor.bypass",
-        mode: "sensor.mode",
-        level: "sensor.dantherm_op_mode",
-        fan1_rpm: "sensor.dantherm_fan1_rpm",
-        fan2_rpm: "sensor.dantherm_fan2_rpm"
+        outdoor_temperature: findEntity(["outdoor", "outside", "ude"], "sensor.outdoor_temperature"),
+        supply_temperature: findEntity(["supply", "indblaes", "indblæs"], "sensor.supply_temperature"),
+        extract_temperature: findEntity(["extract", "udsug"], "sensor.extract_temperature"),
+        exhaust_temperature: findEntity(["exhaust", "afkast"], "sensor.exhaust_temperature"),
+        heat_recovery: findEntity(["heat_recovery", "recovery", "genvinding"], "sensor.heat_recovery_efficiency"),
+        humidity: findEntity(["humidity", "fugt"], "sensor.humidity"),
+        bypass: findEntity(["bypass"], "sensor.bypass"),
+        mode: findEntity(["op_mode", "mode"], "sensor.mode"),
+        level: findEntity(["op_mode", "level"], "sensor.dantherm_op_mode"),
+        fan1_rpm: findEntity(["fan1_rpm", "fan_1_rpm"], "sensor.dantherm_fan1_rpm"),
+        fan2_rpm: findEntity(["fan2_rpm", "fan_2_rpm"], "sensor.dantherm_fan2_rpm")
       },
       appearance: {
         animation: true,
@@ -24,7 +29,7 @@ class HRVCard extends HTMLElement {
     };
   }
 
-  static getConfigElement() {
+  static async getConfigElement() {
     return document.createElement("hrv-card-editor");
   }
 
@@ -148,7 +153,7 @@ class HRVCard extends HTMLElement {
   }
 
   _temperatureColor(value) {
-    if (!Number.isFinite(value)) return "var(--secondary-text-color, rgba(255, 255, 255, .72))";
+    if (!Number.isFinite(value)) return "var(--secondary-text-color, currentColor)";
     const clamped = Math.max(-10, Math.min(35, value));
     const ratio = (clamped + 10) / 45;
     const hue = 215 - ratio * 205;
@@ -183,10 +188,10 @@ class HRVCard extends HTMLElement {
 
   _airLines(path, duration, stopped) {
     const variants = [
-      { offset: -12, width: 1.7, alpha: .26, dash: 48, gap: 190, flowDelay: -.2, waveDelay: -.7, pulseDelay: -1.1, wave: 2.4, pulse: 6.8 },
-      { offset: -4, width: 1.2, alpha: .18, dash: 34, gap: 165, flowDelay: -1.35, waveDelay: -2.2, pulseDelay: -3.8, wave: 3.2, pulse: 8.6 },
-      { offset: 5, width: 1.5, alpha: .22, dash: 42, gap: 205, flowDelay: -2.1, waveDelay: -1.4, pulseDelay: -5.1, wave: 2.8, pulse: 7.7 },
-      { offset: 13, width: 1.0, alpha: .14, dash: 28, gap: 150, flowDelay: -2.85, waveDelay: -3.6, pulseDelay: -2.4, wave: 3.6, pulse: 9.4 }
+      { offset: -12, width: 2.1, alpha: .48, dash: 24, gap: 122, flowDelay: -.2, waveDelay: -.7, pulseDelay: -1.1, wave: 2.4, pulse: 6.8 },
+      { offset: -4, width: 1.7, alpha: .36, dash: 18, gap: 104, flowDelay: -1.35, waveDelay: -2.2, pulseDelay: -3.8, wave: 3.2, pulse: 8.6 },
+      { offset: 5, width: 2.0, alpha: .42, dash: 22, gap: 138, flowDelay: -2.1, waveDelay: -1.4, pulseDelay: -5.1, wave: 2.8, pulse: 7.7 },
+      { offset: 13, width: 1.4, alpha: .3, dash: 16, gap: 96, flowDelay: -2.85, waveDelay: -3.6, pulseDelay: -2.4, wave: 3.6, pulse: 9.4 }
     ];
 
     return variants.map((variant) => `
@@ -200,6 +205,7 @@ class HRVCard extends HTMLElement {
                 stroke-width="${variant.width}"
                 stroke-dasharray="${variant.dash} ${variant.gap}"
                 transform="translate(0 ${variant.offset})"
+                filter="url(#${this._id}-air-wobble)"
                 d="${path}"
               ></path>
             </g>`).join("");
@@ -207,9 +213,9 @@ class HRVCard extends HTMLElement {
 
   _particles(path, duration, stopped) {
     const variants = [
-      { offset: -8, width: 2.2, gap: 46, alpha: .42, flowDelay: 0, waveDelay: -.8, pulseDelay: -2.3, wave: 1.8, pulse: 7.2 },
-      { offset: 0, width: 1.6, gap: 38, alpha: .3, flowDelay: -1.15, waveDelay: -2.8, pulseDelay: -4.6, wave: 2.5, pulse: 8.9 },
-      { offset: 9, width: 2.8, gap: 58, alpha: .36, flowDelay: -2.2, waveDelay: -1.6, pulseDelay: -1.5, wave: 2.1, pulse: 7.9 }
+      { offset: -8, width: 2.4, gap: 46, alpha: .56, flowDelay: 0, waveDelay: -.8, pulseDelay: -2.3, wave: 1.8, pulse: 7.2 },
+      { offset: 0, width: 1.8, gap: 38, alpha: .44, flowDelay: -1.15, waveDelay: -2.8, pulseDelay: -4.6, wave: 2.5, pulse: 8.9 },
+      { offset: 9, width: 3.0, gap: 58, alpha: .48, flowDelay: -2.2, waveDelay: -1.6, pulseDelay: -1.5, wave: 2.1, pulse: 7.9 }
     ];
 
     return variants.map((variant) => `
@@ -292,18 +298,19 @@ class HRVCard extends HTMLElement {
         :host {
           display: block;
           --hrv-flow-width: 42;
-          --hrv-text: var(--hrv-card-text-color, var(--text-primary-color, var(--primary-text-color, #ffffff)));
-          --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, rgba(255, 255, 255, .78)));
+          --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, transparent)));
+          --hrv-text: var(--hrv-card-text-color, var(--primary-text-color, var(--text-primary-color, currentColor)));
+          --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, var(--hrv-text)));
+          --hrv-flow-detail: var(--hrv-card-flow-detail-color, var(--secondary-text-color, var(--hrv-text)));
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
 
         ha-card {
           overflow: hidden;
           border-radius: var(--hrv-radius);
-          background: transparent !important;
-          box-shadow: none;
-          border: 0;
-          backdrop-filter: blur(8px);
+          background: var(--hrv-background) !important;
+          box-shadow: var(--ha-card-box-shadow, none);
+          border: var(--ha-card-border-width, 0) solid var(--ha-card-border-color, transparent);
         }
 
         .card {
@@ -312,7 +319,7 @@ class HRVCard extends HTMLElement {
           background:
             radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
             radial-gradient(circle at 84% 32%, color-mix(in srgb, #ff5a4f 16%, transparent), transparent 34%),
-            color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 24%, transparent);
+            transparent;
           box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 14%, transparent);
           color: var(--hrv-text) !important;
         }
@@ -368,13 +375,13 @@ class HRVCard extends HTMLElement {
 
         .air-line {
           fill: none;
-          stroke: rgba(205, 234, 255, var(--air-alpha, .18));
+          stroke: var(--hrv-flow-detail);
           stroke-linecap: round;
           animation:
             airflow var(--flow-duration, 3.6s) linear infinite,
             air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
           animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
-          filter: drop-shadow(0 0 5px rgba(150, 215, 255, .16));
+          filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hrv-flow-detail) 28%, transparent));
         }
 
         .air-line.stopped {
@@ -384,13 +391,13 @@ class HRVCard extends HTMLElement {
 
         .flow-particles {
           fill: none;
-          stroke: rgba(255, 255, 255, var(--particle-alpha, .65));
+          stroke: var(--hrv-flow-detail);
           stroke-linecap: round;
           animation:
             airflow var(--flow-duration, 3.6s) linear infinite,
             air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
           animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
-          filter: drop-shadow(0 0 4px rgba(205, 234, 255, .18));
+          filter: drop-shadow(0 0 5px color-mix(in srgb, var(--hrv-flow-detail) 32%, transparent));
         }
 
         .flow-particles.reverse {
@@ -417,12 +424,12 @@ class HRVCard extends HTMLElement {
         }
 
         @keyframes air-pulse {
-          0% { opacity: .08; }
-          18% { opacity: calc(var(--air-alpha, var(--particle-alpha, .28)) * .38); }
+          0% { opacity: .16; }
+          18% { opacity: calc(var(--air-alpha, var(--particle-alpha, .38)) * .48); }
           43% { opacity: var(--air-alpha, var(--particle-alpha, .28)); }
-          61% { opacity: calc(var(--air-alpha, var(--particle-alpha, .28)) * .52); }
-          78% { opacity: calc(var(--air-alpha, var(--particle-alpha, .28)) * .9); }
-          100% { opacity: .1; }
+          61% { opacity: calc(var(--air-alpha, var(--particle-alpha, .38)) * .62); }
+          78% { opacity: calc(var(--air-alpha, var(--particle-alpha, .38)) * .95); }
+          100% { opacity: .18; }
         }
 
         .label {
@@ -453,7 +460,7 @@ class HRVCard extends HTMLElement {
         }
 
         .recovery-circle {
-          fill: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 22%, transparent);
+          fill: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           stroke: color-mix(in srgb, var(--hrv-text) 18%, transparent);
           stroke-width: 1;
           filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .24));
@@ -467,7 +474,7 @@ class HRVCard extends HTMLElement {
 
         .recovery-ring {
           fill: none;
-          stroke: color-mix(in srgb, #43e683 82%, var(--hrv-text) 18%);
+          stroke: color-mix(in srgb, var(--success-color, #43e683) 82%, var(--hrv-text) 18%);
           stroke-width: 3;
           stroke-linecap: round;
         }
@@ -480,7 +487,7 @@ class HRVCard extends HTMLElement {
         }
 
         .status-circle {
-          fill: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 22%, transparent);
+          fill: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           stroke: color-mix(in srgb, var(--hrv-text) 18%, transparent);
           stroke-width: 1;
           filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .22));
@@ -512,7 +519,7 @@ class HRVCard extends HTMLElement {
           appearance: none;
           border: 0;
           border-radius: 8px;
-          background: color-mix(in srgb, var(--ha-card-background, var(--card-background-color)) 20%, transparent);
+          background: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           color: var(--hrv-text) !important;
           padding: 6px 8px;
           text-align: left;
@@ -575,6 +582,12 @@ class HRVCard extends HTMLElement {
               <mask id="${flowMask}" maskUnits="userSpaceOnUse" x="36" y="58" width="548" height="160">
                 <rect x="36" y="58" width="548" height="160" fill="url(#${gFlowFade})"></rect>
               </mask>
+              <filter id="${this._id}-air-wobble" x="-12%" y="-70%" width="124%" height="240%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.018 0.09" numOctaves="1" seed="8" result="airNoise">
+                  <animate attributeName="baseFrequency" values="0.014 0.075;0.022 0.11;0.017 0.085" dur="7.6s" repeatCount="indefinite"></animate>
+                </feTurbulence>
+                <feDisplacementMap in="SourceGraphic" in2="airNoise" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+              </filter>
             </defs>
 
             <g mask="url(#${flowMask})">
@@ -591,7 +604,7 @@ class HRVCard extends HTMLElement {
               ${this._particles(extractExhaustPath, fan2Duration, fan2Duration === "0s")}
             </g>
 
-            <g fill="rgba(255, 255, 255, .92)">
+            <g fill="var(--hrv-text)" opacity=".92">
               <path d="${bypassOpen ? "M96 94 H119 V87 L134 100 L119 113 V106 H96 Z" : "M96 86 H119 V79 L134 92 L119 105 V98 H96 Z"}"></path>
               <path d="${bypassOpen ? "M486 94 H509 V87 L524 100 L509 113 V106 H486 Z" : "M524 86 H501 V79 L486 92 L501 105 V98 H524 Z"}"></path>
               <path d="${bypassOpen ? "M524 178 H501 V171 L486 184 L501 197 V190 H524 Z" : "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z"}"></path>
@@ -850,24 +863,12 @@ if (!customElements.get("hrv-card-editor")) {
 
 window.customCards = window.customCards || [];
 
-const hrvCardPickerEntry = {
+window.customCards.push({
   type: "hrv-card",
   name: "HRV Card",
   description: "Animated heat recovery ventilation card with temperature gradients",
-  preview: false,
-  documentationURL: "https://github.com/Ralleberg/ha-hrv-card",
-  version: "1.0.7b"
-};
+  preview: true
+});
 
-window.customCards = window.customCards.filter((card) => !["custom:hrv-card", "ha-hrv-card", "custom:ha-hrv-card"].includes(card.type));
-
-const existingCardIndex = window.customCards.findIndex((card) => card.type === hrvCardPickerEntry.type);
-
-if (existingCardIndex >= 0) {
-  window.customCards[existingCardIndex] = hrvCardPickerEntry;
-} else {
-  window.customCards.push(hrvCardPickerEntry);
-}
-
-window.__HRV_CARD_VERSION__ = "1.0.7b";
-console.info("%c HRV Card %c loaded v1.0.7b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "1.0.8b";
+console.info("%c HRV Card %c loaded v1.0.8b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

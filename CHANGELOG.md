@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.0.8b - Theme Surface and Airflow Visibility Beta
+
+This beta improves theme integration and makes the animated airflow easier to see.
+
+### Changed
+
+- Uses the Home Assistant theme card background as the actual card surface.
+- Aligns background handling with the `vacuum-card` pattern using a single card background CSS variable.
+- Keeps only subtle blue/red overlays on top of the theme background.
+- Increases airflow line and particle visibility.
+- Adds an SVG displacement filter so short airflow strokes render with a soft wavy shape.
+- Uses theme-driven text, symbol, arrow, particle, and outline colors for light and dark themes.
+- Keeps package naming aligned as `ha-hrv-card`.
+- Aligns card picker registration more closely with `vacuum-card`: simple `window.customCards.push`, async editor creation, and entity-aware stub config.
+
 ## v1.0.7b - Straight Bypass Flow Gradient Fix Beta
 
 This beta fixes the straight bypass-open flow so it renders the same wide temperature-colored channels as the crossing layout.
