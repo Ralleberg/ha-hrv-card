@@ -1,6 +1,6 @@
 {
   "name": "ha-hrv-card",
-  "version": "1.0.8b",
+  "version": "1.0.9b",
   "description": "Animated Home Assistant Lovelace card for heat recovery ventilation systems.",
   "type": "module",
   "scripts": {
@@ -10,11 +10,28 @@
   },
   "keywords": [
     "home-assistant",
+    "home-assistant-card",
+    "custom-card",
     "lovelace",
+    "lovelace-card",
+    "dashboard",
     "hacs",
     "hrv",
+    "erv",
     "ventilation",
-    "heat-recovery"
+    "ventilation-card",
+    "heat-recovery",
+    "heat-recovery-ventilation",
+    "air-exchanger",
+    "airflow",
+    "fan-speed",
+    "bypass",
+    "dantherm",
+    "nilan",
+    "genvex",
+    "zehnder",
+    "comfoair",
+    "brink"
   ],
   "author": "",
   "license": "MIT",

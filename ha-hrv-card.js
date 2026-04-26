@@ -76,14 +76,14 @@ class HRVCard extends HTMLElement {
   }
 
   getCardSize() {
-    return this._config?.appearance?.compact ? 2 : 3;
+    return this._config?.appearance?.compact ? 4 : 5;
   }
 
   getGridOptions() {
     return {
-      rows: this._config?.appearance?.compact ? 3 : 4,
+      rows: this._config?.appearance?.compact ? 4 : 5,
       columns: 12,
-      min_rows: 3
+      min_rows: 4
     };
   }
 
@@ -188,16 +188,18 @@ class HRVCard extends HTMLElement {
 
   _airLines(path, duration, stopped) {
     const variants = [
-      { offset: -12, width: 2.1, alpha: .48, dash: 24, gap: 122, flowDelay: -.2, waveDelay: -.7, pulseDelay: -1.1, wave: 2.4, pulse: 6.8 },
-      { offset: -4, width: 1.7, alpha: .36, dash: 18, gap: 104, flowDelay: -1.35, waveDelay: -2.2, pulseDelay: -3.8, wave: 3.2, pulse: 8.6 },
-      { offset: 5, width: 2.0, alpha: .42, dash: 22, gap: 138, flowDelay: -2.1, waveDelay: -1.4, pulseDelay: -5.1, wave: 2.8, pulse: 7.7 },
-      { offset: 13, width: 1.4, alpha: .3, dash: 16, gap: 96, flowDelay: -2.85, waveDelay: -3.6, pulseDelay: -2.4, wave: 3.6, pulse: 9.4 }
+      { offset: -14, width: 2.4, alpha: .82, dash: 28, gap: 112, flowDelay: -.2, waveDelay: -.7, pulseDelay: -1.1, wave: 4.2, pulse: 6.8 },
+      { offset: -6, width: 1.8, alpha: .66, dash: 16, gap: 82, flowDelay: -1.35, waveDelay: -2.2, pulseDelay: -3.8, wave: 5.2, pulse: 8.6 },
+      { offset: 4, width: 2.1, alpha: .74, dash: 22, gap: 126, flowDelay: -2.1, waveDelay: -1.4, pulseDelay: -5.1, wave: 4.8, pulse: 7.7 },
+      { offset: 13, width: 1.5, alpha: .58, dash: 12, gap: 68, flowDelay: -2.85, waveDelay: -3.6, pulseDelay: -2.4, wave: 5.8, pulse: 9.4 },
+      { offset: 0, width: 1.4, alpha: .5, dash: 36, gap: 152, flowDelay: -3.55, waveDelay: -4.4, pulseDelay: -6.2, wave: 3.6, pulse: 10.2 }
     ];
 
     return variants.map((variant) => `
             <g
               class="air-band ${stopped ? "stopped" : ""}"
               style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
+              filter="url(#${this._id}-air-wobble)"
             >
               <path
                 class="air-line ${stopped ? "stopped" : ""}"
@@ -205,7 +207,6 @@ class HRVCard extends HTMLElement {
                 stroke-width="${variant.width}"
                 stroke-dasharray="${variant.dash} ${variant.gap}"
                 transform="translate(0 ${variant.offset})"
-                filter="url(#${this._id}-air-wobble)"
                 d="${path}"
               ></path>
             </g>`).join("");
@@ -213,15 +214,16 @@ class HRVCard extends HTMLElement {
 
   _particles(path, duration, stopped) {
     const variants = [
-      { offset: -8, width: 2.4, gap: 46, alpha: .56, flowDelay: 0, waveDelay: -.8, pulseDelay: -2.3, wave: 1.8, pulse: 7.2 },
-      { offset: 0, width: 1.8, gap: 38, alpha: .44, flowDelay: -1.15, waveDelay: -2.8, pulseDelay: -4.6, wave: 2.5, pulse: 8.9 },
-      { offset: 9, width: 3.0, gap: 58, alpha: .48, flowDelay: -2.2, waveDelay: -1.6, pulseDelay: -1.5, wave: 2.1, pulse: 7.9 }
+      { offset: -8, width: 3.2, gap: 42, alpha: .82, flowDelay: 0, waveDelay: -.8, pulseDelay: -2.3, wave: 2.4, pulse: 7.2 },
+      { offset: 0, width: 2.4, gap: 34, alpha: .68, flowDelay: -1.15, waveDelay: -2.8, pulseDelay: -4.6, wave: 3.2, pulse: 8.9 },
+      { offset: 9, width: 3.8, gap: 54, alpha: .72, flowDelay: -2.2, waveDelay: -1.6, pulseDelay: -1.5, wave: 2.8, pulse: 7.9 }
     ];
 
     return variants.map((variant) => `
           <g
             class="air-band ${stopped ? "stopped" : ""}"
             style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
+            filter="url(#${this._id}-air-wobble)"
           >
             <path
               class="flow-particles ${stopped ? "stopped" : ""}"
@@ -298,19 +300,20 @@ class HRVCard extends HTMLElement {
         :host {
           display: block;
           --hrv-flow-width: 42;
-          --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, transparent)));
+          --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, var(--paper-card-background-color, var(--primary-background-color, #1c1c1c)))));
           --hrv-text: var(--hrv-card-text-color, var(--primary-text-color, var(--text-primary-color, currentColor)));
           --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, var(--hrv-text)));
-          --hrv-flow-detail: var(--hrv-card-flow-detail-color, var(--secondary-text-color, var(--hrv-text)));
+          --hrv-flow-detail: var(--hrv-card-flow-detail-color, rgba(255, 255, 255, .96));
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
 
         ha-card {
+          display: block;
           overflow: hidden;
           border-radius: var(--hrv-radius);
           background: var(--hrv-background) !important;
           box-shadow: var(--ha-card-box-shadow, none);
-          border: var(--ha-card-border-width, 0) solid var(--ha-card-border-color, transparent);
+          border: 0;
         }
 
         .card {
@@ -320,7 +323,7 @@ class HRVCard extends HTMLElement {
             radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
             radial-gradient(circle at 84% 32%, color-mix(in srgb, #ff5a4f 16%, transparent), transparent 34%),
             transparent;
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 14%, transparent);
+          box-shadow: none;
           color: var(--hrv-text) !important;
         }
 
@@ -349,7 +352,7 @@ class HRVCard extends HTMLElement {
           stroke-width: var(--hrv-flow-width);
           stroke-linecap: round;
           stroke-linejoin: round;
-          opacity: .94;
+          opacity: .78;
           filter: drop-shadow(0 0 12px color-mix(in srgb, var(--hrv-text) 16%, transparent));
         }
 
@@ -358,7 +361,7 @@ class HRVCard extends HTMLElement {
           stroke-width: calc(var(--hrv-flow-width) + 14px);
           stroke-linecap: round;
           stroke-linejoin: round;
-          opacity: .28;
+          opacity: .16;
           filter: blur(7px);
         }
 
@@ -381,7 +384,7 @@ class HRVCard extends HTMLElement {
             airflow var(--flow-duration, 3.6s) linear infinite,
             air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
           animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
-          filter: drop-shadow(0 0 6px color-mix(in srgb, var(--hrv-flow-detail) 28%, transparent));
+          filter: drop-shadow(0 0 8px rgba(255, 255, 255, .46));
         }
 
         .air-line.stopped {
@@ -397,7 +400,7 @@ class HRVCard extends HTMLElement {
             airflow var(--flow-duration, 3.6s) linear infinite,
             air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
           animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
-          filter: drop-shadow(0 0 5px color-mix(in srgb, var(--hrv-flow-detail) 32%, transparent));
+          filter: drop-shadow(0 0 7px rgba(255, 255, 255, .52));
         }
 
         .flow-particles.reverse {
@@ -424,12 +427,12 @@ class HRVCard extends HTMLElement {
         }
 
         @keyframes air-pulse {
-          0% { opacity: .16; }
-          18% { opacity: calc(var(--air-alpha, var(--particle-alpha, .38)) * .48); }
+          0% { opacity: .28; }
+          18% { opacity: calc(var(--air-alpha, var(--particle-alpha, .5)) * .58); }
           43% { opacity: var(--air-alpha, var(--particle-alpha, .28)); }
-          61% { opacity: calc(var(--air-alpha, var(--particle-alpha, .38)) * .62); }
-          78% { opacity: calc(var(--air-alpha, var(--particle-alpha, .38)) * .95); }
-          100% { opacity: .18; }
+          61% { opacity: calc(var(--air-alpha, var(--particle-alpha, .5)) * .72); }
+          78% { opacity: calc(var(--air-alpha, var(--particle-alpha, .5)) * 1.05); }
+          100% { opacity: .3; }
         }
 
         .label {
@@ -583,10 +586,10 @@ class HRVCard extends HTMLElement {
                 <rect x="36" y="58" width="548" height="160" fill="url(#${gFlowFade})"></rect>
               </mask>
               <filter id="${this._id}-air-wobble" x="-12%" y="-70%" width="124%" height="240%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.018 0.09" numOctaves="1" seed="8" result="airNoise">
-                  <animate attributeName="baseFrequency" values="0.014 0.075;0.022 0.11;0.017 0.085" dur="7.6s" repeatCount="indefinite"></animate>
+                <feTurbulence type="fractalNoise" baseFrequency="0.018 0.12" numOctaves="1" seed="8" result="airNoise">
+                  <animate attributeName="baseFrequency" values="0.014 0.09;0.026 0.16;0.017 0.11" dur="7.6s" repeatCount="indefinite"></animate>
                 </feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="airNoise" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+                <feDisplacementMap in="SourceGraphic" in2="airNoise" scale="5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
               </filter>
             </defs>
 
@@ -612,12 +615,12 @@ class HRVCard extends HTMLElement {
             </g>
 
             <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
-              <rect x="126" y="68" width="96" height="18" rx="8" fill="transparent"></rect>
-              <text x="174" y="80" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+              <rect x="118" y="31" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="44" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
             </g>
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="126" y="216" width="96" height="18" rx="8" fill="transparent"></rect>
-              <text x="174" y="228" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <rect x="118" y="229" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="242" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
             </g>
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
@@ -685,6 +688,7 @@ class HRVCardEditor extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this._config = {};
+    this._schemaCache = undefined;
   }
 
   setConfig(config) {
@@ -835,21 +839,24 @@ class HRVCardEditor extends HTMLElement {
 
   _render() {
     if (!this.shadowRoot) return;
-    this.shadowRoot.innerHTML = `
-      <style>
-        ha-form {
-          display: block;
-        }
-      </style>
-      <ha-form></ha-form>
-    `;
+    let form = this.shadowRoot.querySelector("ha-form");
+    if (!form) {
+      this.shadowRoot.innerHTML = `
+        <style>
+          ha-form {
+            display: block;
+          }
+        </style>
+        <ha-form></ha-form>
+      `;
+      form = this.shadowRoot.querySelector("ha-form");
+      form.schema = this._schemaCache || (this._schemaCache = this._schema());
+      form.computeLabel = this._computeLabel;
+      form.addEventListener("value-changed", (event) => this._valueChanged(event));
+    }
 
-    const form = this.shadowRoot.querySelector("ha-form");
     form.hass = this._hass;
     form.data = this._formData();
-    form.schema = this._schema();
-    form.computeLabel = this._computeLabel;
-    form.addEventListener("value-changed", (event) => this._valueChanged(event));
   }
 }
 
@@ -870,5 +877,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "1.0.8b";
-console.info("%c HRV Card %c loaded v1.0.8b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "1.0.9b";
+console.info("%c HRV Card %c loaded v1.0.9b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

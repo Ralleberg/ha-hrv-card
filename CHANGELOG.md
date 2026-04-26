@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.8b - Theme Surface and Airflow Visibility Beta
+## v1.0.9b - Theme Surface and Airflow Visibility Beta
 
 This beta improves theme integration and makes the animated airflow easier to see.
 
@@ -12,6 +12,15 @@ This beta improves theme integration and makes the animated airflow easier to se
 - Increases airflow line and particle visibility.
 - Adds an SVG displacement filter so short airflow strokes render with a soft wavy shape.
 - Uses theme-driven text, symbol, arrow, particle, and outline colors for light and dark themes.
+- Keeps airflow particles and strokes light on both light and dark themes while other text and symbols follow the active theme.
+- Keeps the card editor open while changing values by preserving the existing editor form between updates.
+- Reports a larger card/grid size to prevent Lovelace edit mode overlap.
+- Removes the extra custom card outline so the card surface matches standard Home Assistant cards.
+- Moves inline RPM values further away from the straight bypass flow.
+- Adds broader project keywords and README search terms for ventilation, ERV, fan speed, bypass, and common HRV vendors.
+- Repositions Fan 1 and Fan 2 RPM next to the Outdoor and Exhaust value groups.
+- Uses a non-transparent Home Assistant card background fallback so the card follows light and dark themes more consistently.
+- Increases airflow particle and stroke contrast while slightly softening the temperature flow channels.
 - Keeps package naming aligned as `ha-hrv-card`.
 - Aligns card picker registration more closely with `vacuum-card`: simple `window.customCards.push`, async editor creation, and entity-aware stub config.
 

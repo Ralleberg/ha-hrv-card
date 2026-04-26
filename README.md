@@ -7,6 +7,8 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 ![Version](https://img.shields.io/badge/version-v1.0.0-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 
+Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat recovery ventilation, ERV card, airflow dashboard, fan speed card, bypass ventilation, Dantherm, Nilan, Genvex, Zehnder ComfoAir, Brink.
+
 ## Features
 
 - Animated airflow diagram
