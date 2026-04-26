@@ -182,19 +182,20 @@ class HRVCard extends HTMLElement {
 
   _airLines(path, duration, stopped) {
     const variants = [
-      { offset: -12, width: 1.7, alpha: .26, dash: 48, gap: 190, delay: -.2, wave: 2.4 },
-      { offset: -4, width: 1.2, alpha: .18, dash: 34, gap: 165, delay: -1.35, wave: 3.2 },
-      { offset: 5, width: 1.5, alpha: .22, dash: 42, gap: 205, delay: -2.1, wave: 2.8 },
-      { offset: 13, width: 1.0, alpha: .14, dash: 28, gap: 150, delay: -2.85, wave: 3.6 }
+      { offset: -12, width: 1.7, alpha: .26, dash: 48, gap: 190, flowDelay: -.2, waveDelay: -.7, pulseDelay: -1.1, wave: 2.4, pulse: 6.8 },
+      { offset: -4, width: 1.2, alpha: .18, dash: 34, gap: 165, flowDelay: -1.35, waveDelay: -2.2, pulseDelay: -3.8, wave: 3.2, pulse: 8.6 },
+      { offset: 5, width: 1.5, alpha: .22, dash: 42, gap: 205, flowDelay: -2.1, waveDelay: -1.4, pulseDelay: -5.1, wave: 2.8, pulse: 7.7 },
+      { offset: 13, width: 1.0, alpha: .14, dash: 28, gap: 150, flowDelay: -2.85, waveDelay: -3.6, pulseDelay: -2.4, wave: 3.6, pulse: 9.4 }
     ];
 
     return variants.map((variant) => `
             <g
               class="air-band ${stopped ? "stopped" : ""}"
-              style="--flow-duration:${duration}; --air-alpha:${variant.alpha}; --air-wave:${variant.wave}px; animation-delay:${variant.delay}s;"
+              style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
             >
               <path
-                class="air-line"
+                class="air-line ${stopped ? "stopped" : ""}"
+                style="--flow-duration:${duration}; --air-alpha:${variant.alpha}; --air-pulse-duration:${variant.pulse}s; --air-flow-delay:${variant.flowDelay}s; --air-pulse-delay:${variant.pulseDelay}s;"
                 stroke-width="${variant.width}"
                 stroke-dasharray="${variant.dash} ${variant.gap}"
                 transform="translate(0 ${variant.offset})"
@@ -205,19 +206,19 @@ class HRVCard extends HTMLElement {
 
   _particles(path, duration, stopped) {
     const variants = [
-      { offset: -8, width: 2.2, gap: 46, alpha: .46, delay: 0, wave: 1.8 },
-      { offset: 0, width: 1.6, gap: 38, alpha: .34, delay: -1.15, wave: 2.5 },
-      { offset: 9, width: 2.8, gap: 58, alpha: .4, delay: -2.2, wave: 2.1 }
+      { offset: -8, width: 2.2, gap: 46, alpha: .42, flowDelay: 0, waveDelay: -.8, pulseDelay: -2.3, wave: 1.8, pulse: 7.2 },
+      { offset: 0, width: 1.6, gap: 38, alpha: .3, flowDelay: -1.15, waveDelay: -2.8, pulseDelay: -4.6, wave: 2.5, pulse: 8.9 },
+      { offset: 9, width: 2.8, gap: 58, alpha: .36, flowDelay: -2.2, waveDelay: -1.6, pulseDelay: -1.5, wave: 2.1, pulse: 7.9 }
     ];
 
     return variants.map((variant) => `
           <g
             class="air-band ${stopped ? "stopped" : ""}"
-            style="--flow-duration:${duration}; --air-wave:${variant.wave}px; animation-delay:${variant.delay}s;"
+            style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
           >
             <path
               class="flow-particles ${stopped ? "stopped" : ""}"
-              style="--flow-duration:${duration}; --particle-alpha:${variant.alpha}; animation-delay:${variant.delay}s;"
+              style="--flow-duration:${duration}; --particle-alpha:${variant.alpha}; --air-pulse-duration:${variant.pulse}s; --air-flow-delay:${variant.flowDelay}s; --air-pulse-delay:${variant.pulseDelay}s;"
               stroke-width="${variant.width}"
               stroke-dasharray="1 ${variant.gap}"
               transform="translate(0 ${variant.offset})"
@@ -270,6 +271,8 @@ class HRVCard extends HTMLElement {
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
+    const gOutdoorSupplyBypass = `${this._id}-outdoor-supply-bypass`;
+    const gExtractExhaustBypass = `${this._id}-extract-exhaust-bypass`;
     const gFlowFade = `${this._id}-flow-fade`;
     const flowMask = `${this._id}-flow-mask`;
     const outdoorSupplyPath = bypassOpen
@@ -338,8 +341,8 @@ class HRVCard extends HTMLElement {
           stroke-width: var(--hrv-flow-width);
           stroke-linecap: round;
           stroke-linejoin: round;
-          opacity: .88;
-          filter: drop-shadow(0 0 10px color-mix(in srgb, var(--hrv-text) 18%, transparent));
+          opacity: .94;
+          filter: drop-shadow(0 0 12px color-mix(in srgb, var(--hrv-text) 16%, transparent));
         }
 
         .flow-glow {
@@ -366,15 +369,26 @@ class HRVCard extends HTMLElement {
           fill: none;
           stroke: rgba(205, 234, 255, var(--air-alpha, .18));
           stroke-linecap: round;
-          animation: airflow var(--flow-duration, 3.6s) linear infinite;
+          animation:
+            airflow var(--flow-duration, 3.6s) linear infinite,
+            air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
+          animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
           filter: drop-shadow(0 0 5px rgba(150, 215, 255, .16));
+        }
+
+        .air-line.stopped {
+          animation: none;
+          opacity: .16;
         }
 
         .flow-particles {
           fill: none;
           stroke: rgba(255, 255, 255, var(--particle-alpha, .65));
           stroke-linecap: round;
-          animation: airflow var(--flow-duration, 3.6s) linear infinite;
+          animation:
+            airflow var(--flow-duration, 3.6s) linear infinite,
+            air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
+          animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
           filter: drop-shadow(0 0 4px rgba(205, 234, 255, .18));
         }
 
@@ -399,6 +413,15 @@ class HRVCard extends HTMLElement {
         @keyframes air-wave {
           from { transform: translateY(calc(var(--air-wave, 2px) * -1)); }
           to { transform: translateY(var(--air-wave, 2px)); }
+        }
+
+        @keyframes air-pulse {
+          0% { opacity: .08; }
+          18% { opacity: calc(var(--air-alpha, var(--particle-alpha, .28)) * .38); }
+          43% { opacity: var(--air-alpha, var(--particle-alpha, .28)); }
+          61% { opacity: calc(var(--air-alpha, var(--particle-alpha, .28)) * .52); }
+          78% { opacity: calc(var(--air-alpha, var(--particle-alpha, .28)) * .9); }
+          100% { opacity: .1; }
         }
 
         .label {
@@ -540,6 +563,8 @@ class HRVCard extends HTMLElement {
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
+              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply, "56", "0", "564", "0")}
+              ${this._gradient(gExtractExhaustBypass, extract, exhaust, "564", "0", "56", "0")}
               <linearGradient id="${gFlowFade}" x1="36" y1="0" x2="584" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="black"></stop>
                 <stop offset="4%" stop-color="white"></stop>
@@ -555,10 +580,10 @@ class HRVCard extends HTMLElement {
               <path class="duct-bg" d="${outdoorSupplyPath}"></path>
               <path class="duct-bg" d="${extractExhaustPath}"></path>
 
-              <path class="flow-glow" stroke="url(#${gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
-              <path class="flow-glow" stroke="url(#${gExtractExhaust})" d="${extractExhaustPath}"></path>
-              <path class="flow" stroke="url(#${gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
-              <path class="flow" stroke="url(#${gExtractExhaust})" d="${extractExhaustPath}"></path>
+              <path class="flow-glow" stroke="url(#${bypassOpen ? gOutdoorSupplyBypass : gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
+              <path class="flow-glow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
+              <path class="flow" stroke="url(#${bypassOpen ? gOutdoorSupplyBypass : gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
+              <path class="flow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
               ${this._airLines(outdoorSupplyPath, fan1Duration, fan1Duration === "0s")}
               ${this._airLines(extractExhaustPath, fan2Duration, fan2Duration === "0s")}
               ${this._particles(outdoorSupplyPath, fan1Duration, fan1Duration === "0s")}
@@ -830,7 +855,7 @@ const hrvCardPickerEntry = {
   description: "Animated heat recovery ventilation card with temperature gradients",
   preview: false,
   documentationURL: "https://github.com/Ralleberg/ha-hrv-card",
-  version: "1.0.4b"
+  version: "1.0.5b"
 };
 
 window.customCards = window.customCards.filter((card) => !["custom:hrv-card", "ha-hrv-card", "custom:ha-hrv-card"].includes(card.type));
@@ -843,5 +868,5 @@ if (existingCardIndex >= 0) {
   window.customCards.push(hrvCardPickerEntry);
 }
 
-window.__HRV_CARD_VERSION__ = "1.0.4b";
-console.info("%c HRV Card %c loaded v1.0.4b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "1.0.5b";
+console.info("%c HRV Card %c loaded v1.0.5b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

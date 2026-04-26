@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.5b - Airflow Gradient Beta
+
+This beta keeps the latest airflow animation changes and aligns runtime beta metadata.
+
+### Changed
+
+- Keeps README on the latest stable version while beta builds continue in package and runtime metadata.
+- Keeps card picker metadata version aligned with the runtime beta version.
+- Keeps bypass-open flow gradients and asynchronous airflow fade loops.
+
 ## v1.0.4b - Airflow Polish Beta
 
 This beta continues the visual airflow polish and card picker metadata work.
