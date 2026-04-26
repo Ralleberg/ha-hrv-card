@@ -511,22 +511,131 @@ class HRVCardEditor extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
+    this._render();
   }
 
-  _value(path, fallback = "") {
-    return path.split(".").reduce((value, key) => value?.[key], this._config) || fallback;
+  _formData() {
+    const entities = this._config?.entities || {};
+    const appearance = this._config?.appearance || {};
+    return {
+      outdoor_temperature: entities.outdoor_temperature,
+      supply_temperature: entities.supply_temperature,
+      extract_temperature: entities.extract_temperature,
+      exhaust_temperature: entities.exhaust_temperature,
+      heat_recovery: entities.heat_recovery,
+      humidity: entities.humidity,
+      bypass: entities.bypass,
+      mode: entities.mode,
+      fan_speed: entities.fan_speed,
+      fan1_rpm: entities.fan1_rpm,
+      fan2_rpm: entities.fan2_rpm,
+      animation: appearance.animation !== false,
+      show_labels: appearance.show_labels !== false,
+      show_badges: appearance.show_badges !== false,
+      show_temperatures: appearance.show_temperatures !== false,
+      compact: appearance.compact === true,
+      max_rpm: appearance.max_rpm
+    };
   }
 
-  _changed(path, value) {
+  _schema() {
+    return [
+      {
+        type: "expandable",
+        name: "temperatures",
+        title: "Temperatures",
+        flatten: true,
+        icon: "mdi:thermometer",
+        schema: [
+          { name: "outdoor_temperature", selector: { entity: { domain: "sensor" } } },
+          { name: "supply_temperature", selector: { entity: { domain: "sensor" } } },
+          { name: "extract_temperature", selector: { entity: { domain: "sensor" } } },
+          { name: "exhaust_temperature", selector: { entity: { domain: "sensor" } } }
+        ]
+      },
+      {
+        type: "expandable",
+        name: "optional_entities",
+        title: "Optional entities",
+        flatten: true,
+        icon: "mdi:tune-variant",
+        schema: [
+          { name: "heat_recovery", selector: { entity: { domain: "sensor" } } },
+          { name: "humidity", selector: { entity: { domain: "sensor" } } },
+          { name: "bypass", selector: { entity: {} } },
+          { name: "mode", selector: { entity: {} } },
+          { name: "fan_speed", selector: { entity: {} } },
+          { name: "fan1_rpm", selector: { entity: { domain: "sensor" } } },
+          { name: "fan2_rpm", selector: { entity: { domain: "sensor" } } }
+        ]
+      },
+      {
+        type: "expandable",
+        name: "appearance",
+        title: "Appearance",
+        flatten: true,
+        icon: "mdi:palette",
+        schema: [
+          { name: "animation", selector: { boolean: {} } },
+          { name: "show_labels", selector: { boolean: {} } },
+          { name: "show_badges", selector: { boolean: {} } },
+          { name: "show_temperatures", selector: { boolean: {} } },
+          { name: "compact", selector: { boolean: {} } },
+          { name: "max_rpm", selector: { number: { min: 100, max: 10000, step: 100, mode: "box", unit_of_measurement: "rpm" } } }
+        ]
+      }
+    ];
+  }
+
+  _computeLabel(schema) {
+    const labels = {
+      outdoor_temperature: "Outdoor temperature",
+      supply_temperature: "Supply temperature",
+      extract_temperature: "Extract temperature",
+      exhaust_temperature: "Exhaust temperature",
+      heat_recovery: "Heat recovery",
+      humidity: "Humidity",
+      bypass: "Bypass",
+      mode: "Mode",
+      fan_speed: "Fan speed",
+      fan1_rpm: "Fan 1 RPM",
+      fan2_rpm: "Fan 2 RPM",
+      animation: "Animation",
+      show_labels: "Show labels",
+      show_badges: "Show badges",
+      show_temperatures: "Show temperatures",
+      compact: "Compact",
+      max_rpm: "Max RPM"
+    };
+    return labels[schema.name] || schema.title || schema.name;
+  }
+
+  _valueChanged(event) {
+    const value = event.detail.value || {};
     const next = structuredClone(this._config || {});
-    const parts = path.split(".");
-    let target = next;
-    while (parts.length > 1) {
-      const part = parts.shift();
-      target[part] = target[part] || {};
-      target = target[part];
-    }
-    target[parts[0]] = value || undefined;
+    next.entities = {
+      ...(next.entities || {}),
+      outdoor_temperature: value.outdoor_temperature || undefined,
+      supply_temperature: value.supply_temperature || undefined,
+      extract_temperature: value.extract_temperature || undefined,
+      exhaust_temperature: value.exhaust_temperature || undefined,
+      heat_recovery: value.heat_recovery || undefined,
+      humidity: value.humidity || undefined,
+      bypass: value.bypass || undefined,
+      mode: value.mode || undefined,
+      fan_speed: value.fan_speed || undefined,
+      fan1_rpm: value.fan1_rpm || undefined,
+      fan2_rpm: value.fan2_rpm || undefined
+    };
+    next.appearance = {
+      ...(next.appearance || {}),
+      animation: value.animation !== false,
+      show_labels: value.show_labels !== false,
+      show_badges: value.show_badges !== false,
+      show_temperatures: value.show_temperatures !== false,
+      compact: value.compact === true,
+      max_rpm: value.max_rpm || undefined
+    };
     this.dispatchEvent(new CustomEvent("config-changed", {
       detail: { config: next },
       bubbles: true,
@@ -535,53 +644,22 @@ class HRVCardEditor extends HTMLElement {
   }
 
   _render() {
+    if (!this.shadowRoot) return;
     this.shadowRoot.innerHTML = `
       <style>
-        .editor {
-          display: grid;
-          gap: 12px;
-        }
-        label {
-          display: grid;
-          gap: 4px;
-          font-size: 12px;
-          color: var(--secondary-text-color);
-        }
-        input {
-          box-sizing: border-box;
-          width: 100%;
-          padding: 8px;
-          border: 1px solid var(--divider-color);
-          border-radius: 6px;
-          background: var(--card-background-color);
-          color: var(--primary-text-color);
-        }
-        h3 {
-          margin: 10px 0 0;
-          font-size: 14px;
-          color: var(--primary-text-color);
+        ha-form {
+          display: block;
         }
       </style>
-      <div class="editor">
-        <h3>Temperature entities</h3>
-        <label>Outdoor temperature<input data-path="entities.outdoor_temperature" value="${this._value("entities.outdoor_temperature")}"></label>
-        <label>Supply temperature<input data-path="entities.supply_temperature" value="${this._value("entities.supply_temperature")}"></label>
-        <label>Extract temperature<input data-path="entities.extract_temperature" value="${this._value("entities.extract_temperature")}"></label>
-        <label>Exhaust temperature<input data-path="entities.exhaust_temperature" value="${this._value("entities.exhaust_temperature")}"></label>
-        <h3>Optional entities</h3>
-        <label>Heat recovery<input data-path="entities.heat_recovery" value="${this._value("entities.heat_recovery")}"></label>
-        <label>Humidity<input data-path="entities.humidity" value="${this._value("entities.humidity")}"></label>
-        <label>Bypass<input data-path="entities.bypass" value="${this._value("entities.bypass")}"></label>
-        <label>Mode<input data-path="entities.mode" value="${this._value("entities.mode")}"></label>
-        <label>Fan speed<input data-path="entities.fan_speed" value="${this._value("entities.fan_speed")}"></label>
-        <label>Fan 1 RPM<input data-path="entities.fan1_rpm" value="${this._value("entities.fan1_rpm")}"></label>
-        <label>Fan 2 RPM<input data-path="entities.fan2_rpm" value="${this._value("entities.fan2_rpm")}"></label>
-      </div>
+      <ha-form></ha-form>
     `;
 
-    this.shadowRoot.querySelectorAll("input").forEach((input) => {
-      input.addEventListener("change", () => this._changed(input.dataset.path, input.value));
-    });
+    const form = this.shadowRoot.querySelector("ha-form");
+    form.hass = this._hass;
+    form.data = this._formData();
+    form.schema = this._schema();
+    form.computeLabel = this._computeLabel;
+    form.addEventListener("value-changed", (event) => this._valueChanged(event));
   }
 }
 
@@ -599,11 +677,19 @@ if (!customElements.get("hrv-card-editor")) {
 
 window.customCards = window.customCards || [];
 
-if (!window.customCards.some((card) => card.type === "hrv-card")) {
-  window.customCards.push({
-    type: "hrv-card",
-    name: "HRV Card",
-    description: "Animated heat recovery ventilation card with temperature gradients",
-    preview: true
-  });
+const hrvCardPickerEntry = {
+  type: "custom:ha-hrv-card",
+  name: "HRV Card",
+  description: "Animated heat recovery ventilation card with temperature gradients",
+  preview: true
+};
+
+window.customCards = window.customCards.filter((card) => !["hrv-card", "ha-hrv-card"].includes(card.type));
+
+const existingCardIndex = window.customCards.findIndex((card) => card.type === hrvCardPickerEntry.type);
+
+if (existingCardIndex >= 0) {
+  window.customCards[existingCardIndex] = hrvCardPickerEntry;
+} else {
+  window.customCards.push(hrvCardPickerEntry);
 }
