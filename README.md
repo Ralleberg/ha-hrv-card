@@ -52,7 +52,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 ## Example configuration
 
 ```yaml
- type: custom:ha-hrv-card
+ type: custom:hrv-card
  entities:
    outdoor_temperature: sensor.dantherm_outdoor_temperature
    supply_temperature: sensor.dantherm_supply_temperature
