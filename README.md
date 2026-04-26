@@ -22,7 +22,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 ### HACS custom repository
 
 1. In Home Assistant, go to **HACS → three dots menu → Custom repositories**.
-2. Add your URL https://github.com/Ralleberg/ha-hrv-card.
+2. Add URL https://github.com/Ralleberg/ha-hrv-card.
 3. Select category **Dashboard**.
 4. Download the card and refresh the browser.
 5. Verify the dashboard resource uses:
