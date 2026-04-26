@@ -62,7 +62,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
    humidity: sensor.dantherm_humidity
    bypass: sensor.dantherm_bypass_template
    mode: sensor.dantherm_op_mode_template
-   fan_speed: sensor.dantherm_fan_state
+   level: sensor.dantherm_op_mode
    fan1_rpm: sensor.dantherm_fan1_rpm
    fan2_rpm: sensor.dantherm_fan2_rpm
  appearance:
@@ -91,13 +91,13 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 | `supply_temperature` | Supply air temperature after HRV |
 | `extract_temperature` | Extract air temperature from rooms |
 | `exhaust_temperature` | Exhaust air temperature after HRV |
-| `heat_recovery` | Heat recovery efficiency in percent, shown as a compact center indicator |
+| `heat_recovery` | Heat recovery efficiency in percent, shown as a compact flow indicator when bypass is not closed |
 | `humidity` | Humidity sensor |
-| `bypass` | Bypass state/text sensor |
+| `bypass` | Bypass state/text sensor. Closed/lukket switches the diagram to direct non-crossing airflow |
 | `mode` | Operation mode/text sensor |
-| `fan_speed` | Optional fan speed/state badge |
-| `fan1_rpm` | Fan 1 RPM sensor shown beside the upper flow. This controls the upper flow animation speed |
-| `fan2_rpm` | Fan 2 RPM sensor shown beside the lower flow. This controls the lower flow animation speed |
+| `level` | Ventilation level sensor, for example `sensor.dantherm_op_mode` |
+| `fan1_rpm` | Fan 1 RPM sensor shown as small italic text beside the upper flow. This controls the upper flow animation speed |
+| `fan2_rpm` | Fan 2 RPM sensor shown as small italic text beside the lower flow. This controls the lower flow animation speed |
 
 ### Appearance
 

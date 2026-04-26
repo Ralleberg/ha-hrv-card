@@ -1,0 +1,42 @@
+# Changelog
+
+## v1.0.0 - First Stable Release
+
+HRV Card v1.0.0 is the first stable release of the custom Home Assistant Lovelace card for heat recovery ventilation systems.
+
+### Highlights
+
+- Adds a polished animated airflow layout for HRV/ERV systems.
+- Adds temperature-based airflow coloring for outdoor, supply, extract, and exhaust air.
+- Adds fan RPM display for separate fan sensors.
+- Uses individual fan RPM values to control the upper and lower airflow animations.
+- Adds a compact heat recovery percentage indicator in the center of the card.
+- Adds a bypass status indicator in the flow layout.
+- Switches to direct non-crossing airflow when bypass is closed/lukket.
+- Supports optional mode, level, bypass, humidity, and temperature display.
+- Adds a configurable Level field for sensors such as `sensor.dantherm_op_mode`.
+- Supports clickable entity values that open the Home Assistant more-info dialog.
+- Adds a visual editor for configuring entities and appearance options from the Lovelace UI.
+- Registers the card for the Home Assistant card picker as `HRV Card`.
+- Updates the HACS structure so `ha-hrv-card.js` is distributed from the repository root.
+
+### Installation
+
+Use HACS as a custom dashboard repository:
+
+```text
+https://github.com/Ralleberg/ha-hrv-card
+```
+
+After installing or updating, refresh the browser and verify that the dashboard resource points to:
+
+```yaml
+url: /hacsfiles/ha-hrv-card/ha-hrv-card.js
+type: module
+```
+
+### Notes
+
+- The old `dist/ha-hrv-card.js` output has been removed.
+- The canonical distributable file is now `ha-hrv-card.js` in the repository root.
+- If Home Assistant still shows an older card version, clear the browser cache and reload the dashboard resource.
