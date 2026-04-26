@@ -79,7 +79,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 | Option | Type | Required | Description |
 | --- | --- | --- | --- |
-| `type` | string | yes | Must be `custom:ha-hrv-card` |
+| `type` | string | yes | Must be `custom:hrv-card` |
 | `entities` | object | no | Entity mapping |
 | `appearance` | object | no | Visual options |
 

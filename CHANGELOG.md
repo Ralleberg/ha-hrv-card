@@ -1,5 +1,17 @@
 # Changelog
 
+## v1.0.2b - Layout Follow-up
+
+This beta follow-up keeps the `custom:hrv-card` registration and adjusts the airflow layout after the bypass changes.
+
+### Changed
+
+- Keeps the card registered for Lovelace as `custom:hrv-card`.
+- Fixes the Exhaust arrow direction.
+- Moves Fan 1 RPM next to Outdoor.
+- Moves Fan 2 RPM next to Exhaust.
+- Moves the lower Exhaust and Supply temperature values back closer to the flow.
+
 ## v1.0.1 - Card Picker and Bypass Flow Fixes
 
 This release fixes the card picker registration problem and updates the HRV layout behavior.
@@ -7,6 +19,7 @@ This release fixes the card picker registration problem and updates the HRV layo
 ### Fixed
 
 - Fixes Home Assistant card picker registration by removing duplicate custom element registration.
+- Restores the Lovelace card type to `custom:hrv-card`.
 - Ensures the card module reaches `window.customCards.push(...)` without failing during load.
 - Uses a proper `CustomEvent` for Home Assistant more-info popups.
 
@@ -15,7 +28,7 @@ This release fixes the card picker registration problem and updates the HRV layo
 - Moves bypass from the bottom badge row into the airflow diagram.
 - Shows bypass as a simple status circle with the current open/closed state.
 - Switches to direct non-crossing airflow when bypass is closed/lukket.
-- Hides heat recovery from the layout when bypass is closed/lukket.
+- Keeps heat recovery above the flow when bypass is open/on and hides it when bypass is closed/lukket.
 - Removes the unused Fan badge.
 - Adds a Level badge for sensors such as `sensor.dantherm_op_mode`.
 - Moves Fan 1 and Fan 2 RPM values into the flow layout as smaller italic text.
