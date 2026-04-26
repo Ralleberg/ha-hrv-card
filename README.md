@@ -27,6 +27,12 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 4. Add your repository URL.
 5. Select category **Dashboard**.
 6. Download the card and refresh the browser.
+7. Verify the dashboard resource uses:
+
+   ```yaml
+   url: /hacsfiles/ha-hrv-card/ha-hrv-card.js
+   type: module
+   ```
 
 ### Manual installation
 

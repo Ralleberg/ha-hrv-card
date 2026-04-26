@@ -187,6 +187,11 @@ class HRVCard extends HTMLElement {
     `;
   }
 
+  _svgEntityAttrs(entityKey) {
+    const entityId = this._entityId(entityKey);
+    return entityId ? `class="entity-hit" data-entity="${entityId}"` : "";
+  }
+
   _fireMoreInfo(entityId) {
     const event = new Event("hass-more-info", { bubbles: true, composed: true });
     event.detail = { entityId };
@@ -220,8 +225,8 @@ class HRVCard extends HTMLElement {
         :host {
           display: block;
           --hrv-flow-width: 38;
-          --hrv-text: var(--primary-text-color, var(--text-primary-color, #ffffff));
-          --hrv-muted: var(--secondary-text-color, rgba(255, 255, 255, .78));
+          --hrv-text: var(--hrv-card-text-color, var(--text-primary-color, var(--primary-text-color, #ffffff)));
+          --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, rgba(255, 255, 255, .78)));
           --hrv-radius: var(--ha-card-border-radius, 12px);
         }
 
@@ -249,6 +254,12 @@ class HRVCard extends HTMLElement {
           width: 100%;
           height: auto;
           display: block;
+          color: var(--hrv-text) !important;
+        }
+
+        svg text {
+          fill: var(--hrv-text) !important;
+          color: var(--hrv-text) !important;
         }
 
         .duct-bg {
@@ -306,12 +317,14 @@ class HRVCard extends HTMLElement {
         .label {
           font-size: 12px;
           fill: var(--hrv-muted) !important;
+          color: var(--hrv-muted) !important;
         }
 
         .temperature {
           font-size: 19px;
           font-weight: 600;
           fill: var(--hrv-text) !important;
+          color: var(--hrv-text) !important;
         }
 
         .side-value {
@@ -341,9 +354,10 @@ class HRVCard extends HTMLElement {
         }
 
         .recovery-value {
-          font-size: 18px;
+          font-size: 17px;
           font-weight: 700;
           fill: var(--hrv-text) !important;
+          color: var(--hrv-text) !important;
         }
 
         .badges {
@@ -372,6 +386,15 @@ class HRVCard extends HTMLElement {
           cursor: default;
         }
 
+        .entity-hit {
+          cursor: pointer;
+        }
+
+        .entity-hit:focus-visible {
+          outline: 2px solid var(--hrv-text);
+          outline-offset: 3px;
+        }
+
         .badge span {
           display: block;
           color: var(--hrv-muted) !important;
@@ -387,6 +410,7 @@ class HRVCard extends HTMLElement {
           margin-top: 2px;
           font-size: 12px;
           line-height: 1.2;
+          color: var(--hrv-text) !important;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -412,26 +436,37 @@ class HRVCard extends HTMLElement {
             ${this._particles(extractExhaustPath, fan2Duration, fan2Duration === "0s")}
 
             <g fill="rgba(255, 255, 255, .92)">
-              <path d="M88 75 H124 V67 L142 82 L124 97 V89 H88 Z"></path>
-              <path d="M532 75 H496 V67 L478 82 L496 97 V89 H532 Z"></path>
-              <path d="M136 175 H100 V167 L82 182 L100 197 V189 H136 Z"></path>
-              <path d="M484 175 H520 V167 L538 182 L520 197 V189 H484 Z"></path>
+              <path d="M96 77 H119 V70 L134 82 L119 94 V87 H96 Z"></path>
+              <path d="M524 77 H501 V70 L486 82 L501 94 V87 H524 Z"></path>
+              <path d="M128 177 H105 V170 L90 182 L105 194 V187 H128 Z"></path>
+              <path d="M492 177 H515 V170 L530 182 L515 194 V187 H492 Z"></path>
             </g>
 
-            ${hasLabels ? `<text x="68" y="28" text-anchor="middle" class="label">Outdoor</text>` : ""}
-            ${hasLabels ? `<text x="552" y="28" text-anchor="middle" class="label">Extract</text>` : ""}
-            ${hasLabels ? `<text x="552" y="226" text-anchor="middle" class="label">Supply</text>` : ""}
-            ${hasLabels ? `<text x="68" y="226" text-anchor="middle" class="label">Exhaust</text>` : ""}
+            <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
+              <rect x="18" y="8" width="100" height="56" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="28" text-anchor="middle" class="label">Outdoor</text>` : ""}
+              ${hasTemps ? `<text x="68" y="54" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs("extract_temperature")} tabindex="0">
+              <rect x="502" y="8" width="100" height="56" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="28" text-anchor="middle" class="label">Extract</text>` : ""}
+              ${hasTemps ? `<text x="552" y="54" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs("supply_temperature")} tabindex="0">
+              <rect x="502" y="206" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="226" text-anchor="middle" class="label">Supply</text>` : ""}
+              ${hasTemps ? `<text x="552" y="252" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
+              <rect x="18" y="206" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="226" text-anchor="middle" class="label">Exhaust</text>` : ""}
+              ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+            </g>
 
-            ${hasTemps ? `<text x="68" y="54" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="552" y="54" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="552" y="252" text-anchor="middle" class="temperature">${this._formatTemp("supply_temperature")}</text>` : ""}
-            ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
-
-            <g transform="translate(310 46)">
-              <circle class="recovery-circle" cx="0" cy="0" r="25"></circle>
-              <circle class="recovery-ring-bg" cx="0" cy="0" r="20"></circle>
-              <circle class="recovery-ring" cx="0" cy="0" r="20" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 0 0)"></circle>
+            <g ${this._svgEntityAttrs("heat_recovery")} tabindex="0" transform="translate(310 46)">
+              <circle class="recovery-circle" cx="0" cy="0" r="32"></circle>
+              <circle class="recovery-ring-bg" cx="0" cy="0" r="26"></circle>
+              <circle class="recovery-ring" cx="0" cy="0" r="26" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 0 0)"></circle>
               <text x="0" y="6" text-anchor="middle" class="recovery-value">${this._formatNumber("heat_recovery", 0, "%")}</text>
             </g>
           </svg>
@@ -452,6 +487,12 @@ class HRVCard extends HTMLElement {
 
     this.shadowRoot.querySelectorAll("[data-entity]").forEach((element) => {
       element.addEventListener("click", () => this._fireMoreInfo(element.dataset.entity));
+      element.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          this._fireMoreInfo(element.dataset.entity);
+        }
+      });
     });
   }
 }

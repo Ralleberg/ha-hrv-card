@@ -1,5 +1,6 @@
 {
   "name": "HRV Card",
+  "content_in_root": false,
   "render_readme": true,
   "filename": "ha-hrv-card.js"
 }
