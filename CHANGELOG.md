@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.4b - Airflow Polish Beta
+
+This beta continues the visual airflow polish and card picker metadata work.
+
+### Changed
+
+- Keeps README on the latest stable version while beta builds continue in package and runtime metadata.
+- Keeps card picker metadata version aligned with the runtime beta version.
+- Keeps the softer fade-ended flow and subtle airflow line animation from the previous beta.
+
 ## v1.0.3b - Card Picker and Flow Refinement Beta
 
 This beta refines the Home Assistant card picker setup and adjusts the flow layout.
@@ -8,9 +18,11 @@ This beta refines the Home Assistant card picker setup and adjusts the flow layo
 
 - Keeps README on the latest stable version while beta builds continue in package and runtime metadata.
 - Keeps `getStubConfig()` free of a `type` field for Home Assistant card picker compatibility.
+- Adds card picker metadata with documentation URL and runtime version.
 - Moves Fan 1 and Fan 2 RPM labels into the flow header/footer area.
 - Enlarges the flow strokes to better use the card space.
 - Uses direct non-crossing airflow when bypass reports open/åben/on/255.
+- Adds softer flow end fades and more subtle animated airflow lines.
 
 ## v1.0.2b - Layout Follow-up
 
