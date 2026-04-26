@@ -563,8 +563,8 @@ class HRVCard extends HTMLElement {
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
-              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply, "56", "0", "564", "0")}
-              ${this._gradient(gExtractExhaustBypass, extract, exhaust, "564", "0", "56", "0")}
+              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply)}
+              ${this._gradient(gExtractExhaustBypass, exhaust, extract)}
               <linearGradient id="${gFlowFade}" x1="36" y1="0" x2="584" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="black"></stop>
                 <stop offset="4%" stop-color="white"></stop>
@@ -855,7 +855,7 @@ const hrvCardPickerEntry = {
   description: "Animated heat recovery ventilation card with temperature gradients",
   preview: false,
   documentationURL: "https://github.com/Ralleberg/ha-hrv-card",
-  version: "1.0.5b"
+  version: "1.0.6b"
 };
 
 window.customCards = window.customCards.filter((card) => !["custom:hrv-card", "ha-hrv-card", "custom:ha-hrv-card"].includes(card.type));
@@ -868,5 +868,5 @@ if (existingCardIndex >= 0) {
   window.customCards.push(hrvCardPickerEntry);
 }
 
-window.__HRV_CARD_VERSION__ = "1.0.5b";
-console.info("%c HRV Card %c loaded v1.0.5b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "1.0.6b";
+console.info("%c HRV Card %c loaded v1.0.6b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

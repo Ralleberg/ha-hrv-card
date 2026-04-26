@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.6b - Bypass Flow Gradient Fix Beta
+
+This beta fixes the visible colored airflow channel when bypass is open.
+
+### Fixed
+
+- Fixes bypass-open flow gradients so the wide airflow channels render with temperature-based colors.
+- Keeps subtle airflow line and particle animations on top of the colored flow.
+- Keeps README on the latest stable version while beta builds continue in package and runtime metadata.
+
 ## v1.0.5b - Airflow Gradient Beta
 
 This beta keeps the latest airflow animation changes and aligns runtime beta metadata.
