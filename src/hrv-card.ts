@@ -170,9 +170,10 @@ class HRVCard extends HTMLElement {
     return `${5.2 - normalized * 3.5}s`;
   }
 
-  _gradient(id, from, to, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "0%") {
+  _gradient(id, from, to, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "0%", gradientUnits = "") {
+    const units = gradientUnits ? ` gradientUnits="${gradientUnits}"` : "";
     return `
-      <linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+      <linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${units}>
         <stop offset="0%" stop-color="${this._temperatureColor(from)}"></stop>
         <stop offset="52%" stop-color="${this._temperatureColor((Number(from) + Number(to)) / 2)}"></stop>
         <stop offset="100%" stop-color="${this._temperatureColor(to)}"></stop>
@@ -563,8 +564,8 @@ class HRVCard extends HTMLElement {
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
-              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply)}
-              ${this._gradient(gExtractExhaustBypass, exhaust, extract)}
+              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply, "56", "100", "564", "100", "userSpaceOnUse")}
+              ${this._gradient(gExtractExhaustBypass, exhaust, extract, "56", "184", "564", "184", "userSpaceOnUse")}
               <linearGradient id="${gFlowFade}" x1="36" y1="0" x2="584" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="black"></stop>
                 <stop offset="4%" stop-color="white"></stop>
@@ -598,12 +599,12 @@ class HRVCard extends HTMLElement {
             </g>
 
             <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
-              <rect x="116" y="38" width="96" height="18" rx="8" fill="transparent"></rect>
-              <text x="164" y="50" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+              <rect x="126" y="68" width="96" height="18" rx="8" fill="transparent"></rect>
+              <text x="174" y="80" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
             </g>
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="116" y="240" width="96" height="18" rx="8" fill="transparent"></rect>
-              <text x="164" y="252" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <rect x="126" y="216" width="96" height="18" rx="8" fill="transparent"></rect>
+              <text x="174" y="228" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
             </g>
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
@@ -855,7 +856,7 @@ const hrvCardPickerEntry = {
   description: "Animated heat recovery ventilation card with temperature gradients",
   preview: false,
   documentationURL: "https://github.com/Ralleberg/ha-hrv-card",
-  version: "1.0.6b"
+  version: "1.0.7b"
 };
 
 window.customCards = window.customCards.filter((card) => !["custom:hrv-card", "ha-hrv-card", "custom:ha-hrv-card"].includes(card.type));
@@ -868,5 +869,5 @@ if (existingCardIndex >= 0) {
   window.customCards.push(hrvCardPickerEntry);
 }
 
-window.__HRV_CARD_VERSION__ = "1.0.6b";
-console.info("%c HRV Card %c loaded v1.0.6b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "1.0.7b";
+console.info("%c HRV Card %c loaded v1.0.7b ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

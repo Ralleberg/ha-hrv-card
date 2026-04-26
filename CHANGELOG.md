@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.7b - Straight Bypass Flow Gradient Fix Beta
+
+This beta fixes the straight bypass-open flow so it renders the same wide temperature-colored channels as the crossing layout.
+
+### Fixed
+
+- Uses `userSpaceOnUse` gradients for straight bypass-open flow paths so horizontal strokes render with the full temperature-colored channel.
+- Keeps the non-crossing bypass-open geometry.
+- Moves Fan 1 and Fan 2 RPM labels closer to their airflow paths.
+
 ## v1.0.6b - Bypass Flow Gradient Fix Beta
 
 This beta fixes the visible colored airflow channel when bypass is open.
