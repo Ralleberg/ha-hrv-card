@@ -29,12 +29,6 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
 2. Add URL https://github.com/Ralleberg/ha-hrv-card.
 3. Select category **Dashboard**.
 4. Download the card and refresh the browser.
-5. Verify the dashboard resource uses:
-
-   ```yaml
-   url: /hacsfiles/ha-hrv-card/ha-hrv-card.js
-   type: module
-   ```
 
 ### Manual installation
 

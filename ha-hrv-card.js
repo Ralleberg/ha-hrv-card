@@ -39,6 +39,7 @@ class HRVCard extends HTMLElement {
     this._config = {};
     this._hass = undefined;
     this._id = `hrv-${Math.random().toString(36).slice(2, 10)}`;
+    this._lastRenderSignature = "";
   }
 
   setConfig(config) {
@@ -67,24 +68,60 @@ class HRVCard extends HTMLElement {
         ...(config.appearance || {})
       }
     };
+    this._lastRenderSignature = "";
     this._render();
   }
 
   set hass(hass) {
     this._hass = hass;
+    const nextSignature = this._renderSignature();
+    if (nextSignature === this._lastRenderSignature) return;
     this._render();
   }
 
   getCardSize() {
-    return this._config?.appearance?.compact ? 4 : 5;
+    return this._config?.appearance?.compact ? 3 : 4;
   }
 
   getGridOptions() {
     return {
-      rows: this._config?.appearance?.compact ? 4 : 5,
+      rows: this._config?.appearance?.compact ? 3 : 4,
       columns: 12,
-      min_rows: 4
+      min_rows: 3
     };
+  }
+
+  _renderSignature() {
+    const entityKeys = [
+      "outdoor_temperature",
+      "supply_temperature",
+      "extract_temperature",
+      "exhaust_temperature",
+      "heat_recovery",
+      "humidity",
+      "bypass",
+      "mode",
+      "level",
+      "fan1_rpm",
+      "fan2_rpm"
+    ];
+    const appearance = this._config?.appearance || {};
+    const entities = this._config?.entities || {};
+    const stateParts = entityKeys.map((key) => {
+      const entityId = entities[key] || "";
+      const entity = entityId && this._hass ? this._hass.states[entityId] : undefined;
+      return [
+        key,
+        entityId,
+        entity?.state ?? "",
+        entity?.attributes?.unit_of_measurement ?? ""
+      ].join(":");
+    });
+
+    return JSON.stringify({
+      appearance,
+      states: stateParts
+    });
   }
 
   _entityId(key) {
@@ -188,22 +225,19 @@ class HRVCard extends HTMLElement {
 
   _airLines(path, duration, stopped) {
     const variants = [
-      { offset: -14, width: 2.4, alpha: .82, dash: 28, gap: 112, flowDelay: -.2, waveDelay: -.7, pulseDelay: -1.1, wave: 4.2, pulse: 6.8 },
-      { offset: -6, width: 1.8, alpha: .66, dash: 16, gap: 82, flowDelay: -1.35, waveDelay: -2.2, pulseDelay: -3.8, wave: 5.2, pulse: 8.6 },
-      { offset: 4, width: 2.1, alpha: .74, dash: 22, gap: 126, flowDelay: -2.1, waveDelay: -1.4, pulseDelay: -5.1, wave: 4.8, pulse: 7.7 },
-      { offset: 13, width: 1.5, alpha: .58, dash: 12, gap: 68, flowDelay: -2.85, waveDelay: -3.6, pulseDelay: -2.4, wave: 5.8, pulse: 9.4 },
-      { offset: 0, width: 1.4, alpha: .5, dash: 36, gap: 152, flowDelay: -3.55, waveDelay: -4.4, pulseDelay: -6.2, wave: 3.6, pulse: 10.2 }
+      { offset: -12, width: 2.8, alpha: .84, dash: 30, gap: 104, flowDelay: -.2, waveDelay: -.7, wave: 3.2 },
+      { offset: 0, width: 2.2, alpha: .72, dash: 18, gap: 78, flowDelay: -1.35, waveDelay: -2.2, wave: 3.8 },
+      { offset: 12, width: 2.4, alpha: .78, dash: 24, gap: 120, flowDelay: -2.1, waveDelay: -1.4, wave: 3.4 }
     ];
 
     return variants.map((variant) => `
-            <g
-              class="air-band ${stopped ? "stopped" : ""}"
-              style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
-              filter="url(#${this._id}-air-wobble)"
-            >
-              <path
-                class="air-line ${stopped ? "stopped" : ""}"
-                style="--flow-duration:${duration}; --air-alpha:${variant.alpha}; --air-pulse-duration:${variant.pulse}s; --air-flow-delay:${variant.flowDelay}s; --air-pulse-delay:${variant.pulseDelay}s;"
+              <g
+                class="air-band ${stopped ? "stopped" : ""}"
+                style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
+              >
+                <path
+                  class="air-line ${stopped ? "stopped" : ""}"
+                style="--flow-duration:${duration}; --air-alpha:${variant.alpha}; --air-flow-delay:${variant.flowDelay}s;"
                 stroke-width="${variant.width}"
                 stroke-dasharray="${variant.dash} ${variant.gap}"
                 transform="translate(0 ${variant.offset})"
@@ -214,20 +248,18 @@ class HRVCard extends HTMLElement {
 
   _particles(path, duration, stopped) {
     const variants = [
-      { offset: -8, width: 3.2, gap: 42, alpha: .82, flowDelay: 0, waveDelay: -.8, pulseDelay: -2.3, wave: 2.4, pulse: 7.2 },
-      { offset: 0, width: 2.4, gap: 34, alpha: .68, flowDelay: -1.15, waveDelay: -2.8, pulseDelay: -4.6, wave: 3.2, pulse: 8.9 },
-      { offset: 9, width: 3.8, gap: 54, alpha: .72, flowDelay: -2.2, waveDelay: -1.6, pulseDelay: -1.5, wave: 2.8, pulse: 7.9 }
+      { offset: -6, width: 3.8, gap: 42, alpha: .82, flowDelay: 0, waveDelay: -.8, wave: 2.2 },
+      { offset: 8, width: 4.2, gap: 54, alpha: .72, flowDelay: -1.7, waveDelay: -1.6, wave: 2.6 }
     ];
 
     return variants.map((variant) => `
           <g
             class="air-band ${stopped ? "stopped" : ""}"
             style="--air-wave:${variant.wave}px; animation-delay:${variant.waveDelay}s;"
-            filter="url(#${this._id}-air-wobble)"
           >
             <path
               class="flow-particles ${stopped ? "stopped" : ""}"
-              style="--flow-duration:${duration}; --particle-alpha:${variant.alpha}; --air-pulse-duration:${variant.pulse}s; --air-flow-delay:${variant.flowDelay}s; --air-pulse-delay:${variant.pulseDelay}s;"
+              style="--flow-duration:${duration}; --particle-alpha:${variant.alpha}; --air-flow-delay:${variant.flowDelay}s;"
               stroke-width="${variant.width}"
               stroke-dasharray="1 ${variant.gap}"
               transform="translate(0 ${variant.offset})"
@@ -262,6 +294,7 @@ class HRVCard extends HTMLElement {
 
   _render() {
     if (!this.shadowRoot || !this._config) return;
+    this._lastRenderSignature = this._renderSignature();
 
     const outdoor = this._number("outdoor_temperature");
     const supply = this._number("supply_temperature");
@@ -299,7 +332,7 @@ class HRVCard extends HTMLElement {
       <style>
         :host {
           display: block;
-          --hrv-flow-width: 42;
+          --hrv-flow-width: 46;
           --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, var(--paper-card-background-color, var(--primary-background-color, #1c1c1c)))));
           --hrv-text: var(--hrv-card-text-color, var(--primary-text-color, var(--text-primary-color, currentColor)));
           --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, var(--hrv-text)));
@@ -317,7 +350,7 @@ class HRVCard extends HTMLElement {
         }
 
         .card {
-          padding: ${compact ? "8px" : "12px"};
+          padding: ${compact ? "6px" : "10px"};
           border-radius: var(--hrv-radius);
           background:
             radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
@@ -353,7 +386,6 @@ class HRVCard extends HTMLElement {
           stroke-linecap: round;
           stroke-linejoin: round;
           opacity: .78;
-          filter: drop-shadow(0 0 12px color-mix(in srgb, var(--hrv-text) 16%, transparent));
         }
 
         .flow-glow {
@@ -362,7 +394,6 @@ class HRVCard extends HTMLElement {
           stroke-linecap: round;
           stroke-linejoin: round;
           opacity: .16;
-          filter: blur(7px);
         }
 
         .air-band {
@@ -380,11 +411,9 @@ class HRVCard extends HTMLElement {
           fill: none;
           stroke: var(--hrv-flow-detail);
           stroke-linecap: round;
-          animation:
-            airflow var(--flow-duration, 3.6s) linear infinite,
-            air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
-          animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
-          filter: drop-shadow(0 0 8px rgba(255, 255, 255, .46));
+          opacity: var(--air-alpha, .72);
+          animation: airflow var(--flow-duration, 3.6s) linear infinite;
+          animation-delay: var(--air-flow-delay, 0s);
         }
 
         .air-line.stopped {
@@ -396,11 +425,9 @@ class HRVCard extends HTMLElement {
           fill: none;
           stroke: var(--hrv-flow-detail);
           stroke-linecap: round;
-          animation:
-            airflow var(--flow-duration, 3.6s) linear infinite,
-            air-pulse var(--air-pulse-duration, 7.4s) ease-in-out infinite;
-          animation-delay: var(--air-flow-delay, 0s), var(--air-pulse-delay, 0s);
-          filter: drop-shadow(0 0 7px rgba(255, 255, 255, .52));
+          opacity: var(--particle-alpha, .72);
+          animation: airflow var(--flow-duration, 3.6s) linear infinite;
+          animation-delay: var(--air-flow-delay, 0s);
         }
 
         .flow-particles.reverse {
@@ -426,23 +453,14 @@ class HRVCard extends HTMLElement {
           to { transform: translateY(var(--air-wave, 2px)); }
         }
 
-        @keyframes air-pulse {
-          0% { opacity: .28; }
-          18% { opacity: calc(var(--air-alpha, var(--particle-alpha, .5)) * .58); }
-          43% { opacity: var(--air-alpha, var(--particle-alpha, .28)); }
-          61% { opacity: calc(var(--air-alpha, var(--particle-alpha, .5)) * .72); }
-          78% { opacity: calc(var(--air-alpha, var(--particle-alpha, .5)) * 1.05); }
-          100% { opacity: .3; }
-        }
-
         .label {
-          font-size: 12px;
+          font-size: 13px;
           fill: var(--hrv-muted) !important;
           color: var(--hrv-muted) !important;
         }
 
         .temperature {
-          font-size: 19px;
+          font-size: 20px;
           font-weight: 600;
           fill: var(--hrv-text) !important;
           color: var(--hrv-text) !important;
@@ -455,7 +473,7 @@ class HRVCard extends HTMLElement {
         }
 
         .rpm-inline {
-          font-size: 10px;
+          font-size: 11px;
           font-style: italic;
           font-weight: 500;
           fill: var(--hrv-muted) !important;
@@ -466,7 +484,6 @@ class HRVCard extends HTMLElement {
           fill: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           stroke: color-mix(in srgb, var(--hrv-text) 18%, transparent);
           stroke-width: 1;
-          filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .24));
         }
 
         .recovery-ring-bg {
@@ -493,7 +510,6 @@ class HRVCard extends HTMLElement {
           fill: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           stroke: color-mix(in srgb, var(--hrv-text) 18%, transparent);
           stroke-width: 1;
-          filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .22));
         }
 
         .status-label {
@@ -515,7 +531,7 @@ class HRVCard extends HTMLElement {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
           gap: 6px;
-          margin-top: 8px;
+          margin-top: 6px;
         }
 
         .badge {
@@ -530,7 +546,6 @@ class HRVCard extends HTMLElement {
           cursor: pointer;
           font: inherit;
           box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 10%, transparent);
-          backdrop-filter: blur(6px);
         }
 
         .badge:not([data-entity]) {
@@ -570,7 +585,7 @@ class HRVCard extends HTMLElement {
 
       <ha-card>
         <div class="card ${animationOff ? "no-animation" : ""}">
-          <svg viewBox="0 0 620 288" role="img" aria-label="HRV airflow diagram">
+          <svg viewBox="0 0 620 270" role="img" aria-label="HRV airflow diagram">
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
@@ -585,12 +600,6 @@ class HRVCard extends HTMLElement {
               <mask id="${flowMask}" maskUnits="userSpaceOnUse" x="36" y="58" width="548" height="160">
                 <rect x="36" y="58" width="548" height="160" fill="url(#${gFlowFade})"></rect>
               </mask>
-              <filter id="${this._id}-air-wobble" x="-12%" y="-70%" width="124%" height="240%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.018 0.12" numOctaves="1" seed="8" result="airNoise">
-                  <animate attributeName="baseFrequency" values="0.014 0.09;0.026 0.16;0.017 0.11" dur="7.6s" repeatCount="indefinite"></animate>
-                </feTurbulence>
-                <feDisplacementMap in="SourceGraphic" in2="airNoise" scale="5" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
-              </filter>
             </defs>
 
             <g mask="url(#${flowMask})">
@@ -619,8 +628,8 @@ class HRVCard extends HTMLElement {
               <text x="167" y="44" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
             </g>
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="118" y="229" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="242" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <rect x="118" y="219" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="232" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
             </g>
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
@@ -634,14 +643,14 @@ class HRVCard extends HTMLElement {
               ${hasTemps ? `<text x="552" y="54" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
-              <rect x="502" y="206" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="552" y="226" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="252" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
+              <rect x="502" y="198" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="218" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="244" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
-              <rect x="18" y="206" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="226" text-anchor="middle" class="label">Exhaust</text>` : ""}
-              ${hasTemps ? `<text x="68" y="252" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+              <rect x="18" y="198" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="218" text-anchor="middle" class="label">Exhaust</text>` : ""}
+              ${hasTemps ? `<text x="68" y="244" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
             </g>
 
             ${bypassOpen ? "" : `
@@ -653,7 +662,7 @@ class HRVCard extends HTMLElement {
               </g>
             `}
 
-            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(310 245)">
+            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(310 236)">
               <circle class="status-circle" cx="0" cy="0" r="30"></circle>
               <text x="0" y="-5" text-anchor="middle" class="status-label">Bypass</text>
               <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
