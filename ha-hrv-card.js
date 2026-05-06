@@ -1108,5 +1108,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.1.0";
-console.info("%c HRV Card %c loaded v2.1.0 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.1.1";
+console.info("%c HRV Card %c loaded v2.1.1 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
