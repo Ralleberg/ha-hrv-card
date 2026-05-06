@@ -473,8 +473,8 @@ class HRVCard extends HTMLElement {
               <path class="duct-bg" d="${extractExhaustPath}"></path>
               <path class="flow-glow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
               <path class="flow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
-              ${this._airLines(extractExhaustPath, flowDuration, flowDuration === "0s", true)}
-              ${this._particles(extractExhaustPath, flowDuration, flowDuration === "0s", true)}
+              ${this._airLines(extractExhaustPath, flowDuration, flowDuration === "0s", !summerMode)}
+              ${this._particles(extractExhaustPath, flowDuration, flowDuration === "0s", !summerMode)}
     `;
     const arrowsMarkup = summerMode ? `
               <path d="M524 122 H501 V115 L486 128 L501 141 V134 H524 Z"></path>
