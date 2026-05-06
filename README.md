@@ -4,7 +4,9 @@ Animated Home Assistant Lovelace card for heat recovery ventilation systems.
 
 The card is intentionally vendor-neutral. You choose the entities you have, regardless of whether the system is Dantherm, Zehnder/ComfoAir, Nilan, Genvex, Brink, or another HRV/ERV unit.
 
-![Version](https://img.shields.io/badge/version-v2.0.0-blue)
+The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
+
+![Version](https://img.shields.io/badge/version-v2.1.0-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 
 ![HRV Card preview](assets/hrv-card-preview.png)
@@ -58,11 +60,11 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
    exhaust_temperature: sensor.dantherm_exhaust_temperature
    heat_recovery: sensor.dantherm_heat_recovery_efficiency
    humidity: sensor.dantherm_humidity
-   bypass: sensor.dantherm_bypass_template
-   mode: sensor.dantherm_op_mode_template
-   level: sensor.dantherm_op_mode
-   fan1_rpm: sensor.dantherm_fan1_rpm
-   fan2_rpm: sensor.dantherm_fan2_rpm
+   bypass: cover.dantherm_bypass_damper
+   mode: select.dantherm_operation_selection
+   level: select.dantherm_fan_level_selection
+   fan1_rpm: sensor.dantherm_fan1_speed
+   fan2_rpm: sensor.dantherm_fan2_speed
  appearance:
    animation: true
    show_labels: true
@@ -89,13 +91,13 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
 | `supply_temperature` | Supply air temperature after HRV |
 | `extract_temperature` | Extract air temperature from rooms |
 | `exhaust_temperature` | Exhaust air temperature after HRV |
-| `heat_recovery` | Heat recovery efficiency in percent, shown as a compact flow indicator when bypass is not closed |
+| `heat_recovery` | Heat recovery efficiency in percent, shown as a compact flow indicator when bypass is closed and mode is not summer |
 | `humidity` | Humidity sensor |
-| `bypass` | Bypass state/text sensor. Open/åben/on/255 switches the diagram to direct non-crossing airflow |
-| `mode` | Operation mode/text sensor |
-| `level` | Ventilation level sensor, for example `sensor.dantherm_op_mode` |
-| `fan1_rpm` | Fan 1 RPM sensor shown as small italic text beside the upper flow. This controls the upper flow animation speed |
-| `fan2_rpm` | Fan 2 RPM sensor shown as small italic text beside the lower flow. This controls the lower flow animation speed |
+| `bypass` | Bypass state/text sensor or cover. Open/åben/on/255 switches the diagram to direct non-crossing airflow |
+| `mode` | Operation mode sensor or select. Select entities are shown as writable dropdown controls. Summer/sommer switches the diagram to one-way extract-to-exhaust airflow |
+| `level` | Ventilation level sensor or select. Select entities are shown as writable dropdown controls. Values 1-4 control airflow animation speed |
+| `fan1_rpm` | Fan 1 RPM/speed sensor shown as small italic text beside the upper flow |
+| `fan2_rpm` | Fan 2 RPM/speed sensor shown as small italic text beside the lower flow |
 
 ### Appearance
 
@@ -106,7 +108,6 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
 | `show_badges` | `true` | Show optional state badges |
 | `show_temperatures` | `true` | Show temperature values in the diagram |
 | `compact` | `false` | Slightly smaller padding/card size |
-| `max_rpm` | `3000` | RPM value treated as full speed for animation scaling. Values from 0-100 are treated as percent-like fan levels |
 
 ## Development
 

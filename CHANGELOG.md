@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.1.0 - Dantherm Select Controls
+
+### Changed
+
+- Drives airflow animation speed from the configured ventilation level entity instead of fan RPM.
+- Adds Danish/English labels in the card and visual editor based on the Home Assistant language.
+- Lightens the airflow channel rendering.
+- Optimizes the default Dantherm entity mapping for Tvalley71/dantherm entity names.
+
+### Fixed
+
+- Keeps animated airflow lines and particles visible on the closed-bypass crossing flow.
+
+### Added
+
+- Adds summer/sommer mode airflow with one-way extract-to-exhaust animation.
+- Adds writable bottom dropdown controls when mode and fan level are configured as Home Assistant select entities.
+
 ## v2.0.0 - Theme Surface and Airflow Visibility
 
 This release improves theme integration and makes the animated airflow easier to see.
