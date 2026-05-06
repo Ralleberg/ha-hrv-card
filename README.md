@@ -6,7 +6,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.1.1-blue)
+![Version](https://img.shields.io/badge/version-v2.1.2-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 
 ![HRV Card preview](assets/hrv-card-preview.png)
@@ -63,8 +63,8 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
    bypass: cover.dantherm_bypass_damper
    mode: select.dantherm_operation_selection
    level: select.dantherm_fan_level_selection
-   fan1_rpm: sensor.dantherm_fan1_speed
-   fan2_rpm: sensor.dantherm_fan2_speed
+   fan1_rpm: sensor.dantherm_fan2_speed
+   fan2_rpm: sensor.dantherm_fan1_speed
  appearance:
    animation: true
    show_labels: true
@@ -96,8 +96,8 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
 | `bypass` | Bypass state/text sensor or cover. Open/åben/on/255 switches the diagram to direct non-crossing airflow |
 | `mode` | Operation mode sensor or select. Select entities are shown as writable dropdown controls. Summer/sommer switches the diagram to one-way extract-to-exhaust airflow |
 | `level` | Ventilation level sensor or select. Select entities are shown as writable dropdown controls. Values 1-4 control airflow animation speed |
-| `fan1_rpm` | Fan 1 RPM/speed sensor shown as small italic text beside the upper flow |
-| `fan2_rpm` | Fan 2 RPM/speed sensor shown as small italic text beside the lower flow |
+| `fan1_rpm` | Fan RPM/speed sensor shown as small italic text beside the upper flow. Dantherm defaults map this to fan 2 speed |
+| `fan2_rpm` | Fan RPM/speed sensor shown as small italic text beside the lower flow. Dantherm defaults map this to fan 1 speed |
 
 ### Appearance
 

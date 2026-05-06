@@ -10,14 +10,14 @@ class HRVCard extends HTMLElement {
         outdoor_temperature: findEntity(["outdoor", "outside", "ude"], "sensor.outdoor_temperature"),
         supply_temperature: findEntity(["supply", "indblaes", "indblæs"], "sensor.supply_temperature"),
         extract_temperature: findEntity(["extract", "udsug"], "sensor.extract_temperature"),
-        exhaust_temperature: findEntity(["exhaust", "afkast"], "sensor.exhaust_temperature"),
+        exhaust_temperature: findEntity(["exhaust", "afkast", "udblaes", "udblæs"], "sensor.exhaust_temperature"),
         heat_recovery: findEntity(["heat_recovery", "recovery", "genvinding"], "sensor.heat_recovery_efficiency"),
         humidity: findEntity(["humidity", "fugt"], "sensor.humidity"),
         bypass: findEntity(["bypass_damper", "bypass"], "cover.dantherm_bypass_damper"),
         mode: findEntity(["operation_selection", "operation_mode", "op_mode", "mode"], "select.dantherm_operation_selection"),
         level: findEntity(["fan_level_selection", "fan_level", "op_mode", "level"], "select.dantherm_fan_level_selection"),
-        fan1_rpm: findEntity(["fan1_speed", "fan1_rpm", "fan_1_rpm"], "sensor.dantherm_fan1_speed"),
-        fan2_rpm: findEntity(["fan2_speed", "fan2_rpm", "fan_2_rpm"], "sensor.dantherm_fan2_speed")
+        fan1_rpm: findEntity(["fan2_speed", "fan2_rpm", "fan_2_rpm"], "sensor.dantherm_fan2_speed"),
+        fan2_rpm: findEntity(["fan1_speed", "fan1_rpm", "fan_1_rpm"], "sensor.dantherm_fan1_speed")
       },
       appearance: {
         animation: true,
@@ -226,7 +226,7 @@ class HRVCard extends HTMLElement {
         outdoor: "Ude",
         supply: "Indblæsning",
         extract: "Udsugning",
-        exhaust: "Afkast",
+        exhaust: "Udblæs",
         bypass: "Bypass",
         mode: "Drift",
         level: "Ventilationstrin",
@@ -237,10 +237,10 @@ class HRVCard extends HTMLElement {
         outdoor_temperature: "Udetemperatur",
         supply_temperature: "Indblæsningstemperatur",
         extract_temperature: "Udsugningstemperatur",
-        exhaust_temperature: "Afkasttemperatur",
+        exhaust_temperature: "Udblæsningstemperatur",
         heat_recovery: "Varmegenvinding",
-        fan1_rpm: "Ventilator 1 RPM",
-        fan2_rpm: "Ventilator 2 RPM",
+        fan1_rpm: "Ventilator 2 RPM",
+        fan2_rpm: "Ventilator 1 RPM",
         animation: "Animation",
         show_labels: "Vis labels",
         show_badges: "Vis badges",
@@ -954,14 +954,14 @@ class HRVCardEditor extends HTMLElement {
         outdoor_temperature: "Udetemperatur",
         supply_temperature: "Indblæsningstemperatur",
         extract_temperature: "Udsugningstemperatur",
-        exhaust_temperature: "Afkasttemperatur",
+        exhaust_temperature: "Udblæsningstemperatur",
         heat_recovery: "Varmegenvinding",
         humidity: "Fugt",
         bypass: "Bypass",
         mode: "Drift",
         level: "Ventilationstrin",
-        fan1_rpm: "Ventilator 1 RPM",
-        fan2_rpm: "Ventilator 2 RPM",
+        fan1_rpm: "Ventilator 2 RPM",
+        fan2_rpm: "Ventilator 1 RPM",
         animation: "Animation",
         show_labels: "Vis labels",
         show_badges: "Vis badges",
@@ -1108,5 +1108,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.1.1";
-console.info("%c HRV Card %c loaded v2.1.1 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.1.2";
+console.info("%c HRV Card %c loaded v2.1.2 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
