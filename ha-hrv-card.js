@@ -219,7 +219,9 @@ class HRVCard extends HTMLElement {
         show_labels: "Show labels",
         show_badges: "Show badges",
         show_temperatures: "Show temperatures",
-        compact: "Compact"
+        compact: "Compact",
+        state_open: "Open",
+        state_closed: "Closed"
       },
       da: {
         airflow_diagram: "HRV luftstrømsdiagram",
@@ -245,7 +247,9 @@ class HRVCard extends HTMLElement {
         show_labels: "Vis labels",
         show_badges: "Vis badges",
         show_temperatures: "Vis temperaturer",
-        compact: "Kompakt"
+        compact: "Kompakt",
+        state_open: "Åben",
+        state_closed: "Lukket"
       }
     };
     return translations[this._language()]?.[key] || translations.en[key] || key;
@@ -269,6 +273,13 @@ class HRVCard extends HTMLElement {
   _formatBypassState() {
     const value = this._state("bypass");
     if (value === undefined) return "—";
+    const normalized = value.toString().trim().toLowerCase();
+    if (["open", "åben", "aaben", "on", "true", "1", "yes", "ja", "255"].includes(normalized)) {
+      return this._t("state_open");
+    }
+    if (["closed", "lukket", "close", "off", "false", "0", "no", "nej"].includes(normalized)) {
+      return this._t("state_closed");
+    }
     return value.toString().trim();
   }
 
@@ -473,8 +484,8 @@ class HRVCard extends HTMLElement {
               <path class="duct-bg" d="${extractExhaustPath}"></path>
               <path class="flow-glow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
               <path class="flow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
-              ${this._airLines(extractExhaustPath, flowDuration, flowDuration === "0s", !summerMode)}
-              ${this._particles(extractExhaustPath, flowDuration, flowDuration === "0s", !summerMode)}
+              ${this._airLines(extractExhaustPath, flowDuration, flowDuration === "0s", summerMode)}
+              ${this._particles(extractExhaustPath, flowDuration, flowDuration === "0s", summerMode)}
     `;
     const arrowsMarkup = summerMode ? `
               <path d="M524 122 H501 V115 L486 128 L501 141 V134 H524 Z"></path>
@@ -765,14 +776,20 @@ class HRVCard extends HTMLElement {
           margin-top: 2px;
           border: 0;
           border-radius: 6px;
-          background: transparent;
+          background: color-mix(in srgb, var(--hrv-background) 94%, var(--hrv-text) 6%);
           color: var(--hrv-text) !important;
           font: inherit;
           font-size: 12px;
           font-weight: 700;
           line-height: 1.2;
           min-height: 22px;
-          padding: 0;
+          padding: 2px 4px;
+          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 12%, transparent);
+        }
+
+        .select-control select option {
+          background: var(--hrv-background);
+          color: var(--hrv-text);
         }
       </style>
 
@@ -805,33 +822,33 @@ class HRVCard extends HTMLElement {
             </g>
 
             <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
-              <rect x="118" y="31" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="44" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+              <rect x="118" y="39" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="52" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
             </g>
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="118" y="219" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="232" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <rect x="118" y="211" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="224" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
             </g>
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
-              <rect x="18" y="8" width="100" height="56" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="28" text-anchor="middle" class="label">${this._t("outdoor")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="54" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+              <rect x="18" y="16" width="100" height="56" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="36" text-anchor="middle" class="label">${this._t("outdoor")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="62" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightTopKey)} tabindex="0">
-              <rect x="502" y="8" width="100" height="56" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="552" y="28" text-anchor="middle" class="label">${rightTopLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="54" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
+              <rect x="502" y="16" width="100" height="56" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="36" text-anchor="middle" class="label">${rightTopLabel}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="62" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
-              <rect x="502" y="198" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="552" y="218" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="244" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
+              <rect x="502" y="190" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="210" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="236" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
-              <rect x="18" y="198" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="218" text-anchor="middle" class="label">${this._t("exhaust")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="244" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+              <rect x="18" y="190" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="210" text-anchor="middle" class="label">${this._t("exhaust")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="236" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
             </g>
 
             ${bypassOpen || summerMode ? "" : `

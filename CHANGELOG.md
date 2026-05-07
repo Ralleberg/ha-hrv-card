@@ -19,6 +19,10 @@
 - Adds writable bottom dropdown controls when mode and fan level are configured as Home Assistant select entities.
 - Uses Danish Udblæs/Udblæsningstemperatur labels for exhaust air.
 - Swaps the default Dantherm fan speed mapping so the card setup matches the displayed upper/lower airflow positions.
+- Reverses extract/exhaust airflow animation direction for normal and summer operation.
+- Translates the displayed bypass state between English and Danish.
+- Moves temperature and RPM values closer to the airflow paths.
+- Aligns writable select controls more closely with Home Assistant theme colors.
 
 ## v2.0.0 - Theme Surface and Airflow Visibility
 
