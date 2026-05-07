@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.1.2 - Dantherm Select Controls
+## v2.1.3 - Dantherm Select Controls
 
 ### Changed
 
