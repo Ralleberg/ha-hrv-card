@@ -795,7 +795,7 @@ class HRVCard extends HTMLElement {
 
       <ha-card>
         <div class="card ${animationOff ? "no-animation" : ""}">
-          <svg viewBox="0 0 620 270" role="img" aria-label="${this._t("airflow_diagram")}">
+          <svg viewBox="0 0 620 292" role="img" aria-label="${this._t("airflow_diagram")}">
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
@@ -841,14 +841,14 @@ class HRVCard extends HTMLElement {
               ${hasTemps ? `<text x="552" y="62" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
-              <rect x="502" y="202" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="552" y="222" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="248" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
+              <rect x="502" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="234" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="260" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
-              <rect x="18" y="202" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="222" text-anchor="middle" class="label">${this._t("exhaust")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="248" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+              <rect x="18" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._t("exhaust")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
             </g>
 
             ${bypassOpen || summerMode ? "" : `
@@ -860,7 +860,7 @@ class HRVCard extends HTMLElement {
               </g>
             `}
 
-            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(310 242)">
+            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(310 254)">
               <circle class="status-circle" cx="0" cy="0" r="30"></circle>
               <text x="0" y="-5" text-anchor="middle" class="status-label">${this._t("bypass")}</text>
               <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
