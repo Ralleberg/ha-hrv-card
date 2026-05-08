@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.1.6 - Dantherm Select Controls
+## v2.1.7 - Dantherm Select Controls
 
 ### Changed
 
@@ -26,6 +26,8 @@
 - Shows mode and fan level select entities as clickable value badges that open the Home Assistant entity dialog.
 - Increases the reported compact/non-compact card height to avoid overlap with cards below.
 - Expands the airflow layout horizontally so the card uses more of the available width, especially on phones.
+- Centers the bottom Mode, Level, and Humidity badge labels and values.
+- Displays select entity values using the matching option label when possible.
 
 ## v2.0.0 - Theme Surface and Airflow Visibility
 

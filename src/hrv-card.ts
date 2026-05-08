@@ -167,6 +167,15 @@ class HRVCard extends HTMLElement {
     return `${value}${suffix}`;
   }
 
+  _formatSelectState(key) {
+    const value = this._state(key);
+    if (value === undefined) return "—";
+    const options = this._entity(key)?.attributes?.options;
+    if (!Array.isArray(options)) return value;
+
+    return options.find((option) => option.toString().toLowerCase() === value.toString().toLowerCase()) || value;
+  }
+
   _escapeHtml(value) {
     return value?.toString()
       .replace(/&/g, "&amp;")
@@ -710,11 +719,11 @@ class HRVCard extends HTMLElement {
           background: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           color: var(--hrv-text) !important;
           padding: 6px 8px;
-          text-align: left;
+          text-align: center;
           min-width: 0;
           cursor: pointer;
           font: inherit;
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 10%, transparent);
+          box-shadow: none;
         }
 
         .badge:not([data-entity]) {
@@ -869,8 +878,8 @@ class HRVCard extends HTMLElement {
 
           ${hasBadges ? `
             <div class="badges">
-              ${this._badge(this._t("mode"), this._formatState("mode"), "mode")}
-              ${this._badge(this._t("level"), this._formatState("level"), "level")}
+              ${this._badge(this._t("mode"), this._formatSelectState("mode"), "mode")}
+              ${this._badge(this._t("level"), this._formatSelectState("level"), "level")}
               ${this._badge(this._t("humidity"), this._formatNumber("humidity", 0, "%"), "humidity")}
             </div>
           ` : ""}
@@ -1125,5 +1134,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.1.6";
-console.info("%c HRV Card %c loaded v2.1.6 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.1.7";
+console.info("%c HRV Card %c loaded v2.1.7 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
