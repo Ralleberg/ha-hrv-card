@@ -340,9 +340,9 @@ class HRVCard extends HTMLElement {
 
   _airLines(path, duration, stopped, reverse = false) {
     const variants = [
-      { offset: -15, width: 3.4, alpha: .84, dash: 34, gap: 104, flowDelay: -.2, waveDelay: -.7, wave: 3.2 },
-      { offset: 0, width: 2.8, alpha: .72, dash: 22, gap: 78, flowDelay: -1.35, waveDelay: -2.2, wave: 3.8 },
-      { offset: 15, width: 3, alpha: .78, dash: 28, gap: 120, flowDelay: -2.1, waveDelay: -1.4, wave: 3.4 }
+      { offset: -12, width: 2.8, alpha: .84, dash: 30, gap: 104, flowDelay: -.2, waveDelay: -.7, wave: 3.2 },
+      { offset: 0, width: 2.2, alpha: .72, dash: 18, gap: 78, flowDelay: -1.35, waveDelay: -2.2, wave: 3.8 },
+      { offset: 12, width: 2.4, alpha: .78, dash: 24, gap: 120, flowDelay: -2.1, waveDelay: -1.4, wave: 3.4 }
     ];
 
     return variants.map((variant) => `
@@ -363,8 +363,8 @@ class HRVCard extends HTMLElement {
 
   _particles(path, duration, stopped, reverse = false) {
     const variants = [
-      { offset: -8, width: 4.8, gap: 42, alpha: .82, flowDelay: 0, waveDelay: -.8, wave: 2.2 },
-      { offset: 10, width: 5.2, gap: 54, alpha: .72, flowDelay: -1.7, waveDelay: -1.6, wave: 2.6 }
+      { offset: -6, width: 3.8, gap: 42, alpha: .82, flowDelay: 0, waveDelay: -.8, wave: 2.2 },
+      { offset: 8, width: 4.2, gap: 54, alpha: .72, flowDelay: -1.7, waveDelay: -1.6, wave: 2.6 }
     ];
 
     return variants.map((variant) => `
@@ -462,13 +462,13 @@ class HRVCard extends HTMLElement {
     const outdoorSupplyPath = summerMode
       ? ""
       : bypassOpen
-      ? "M56 100 H564"
-      : "M56 92 H192 C246 92 256 138 310 138 C364 138 374 184 428 184 H564";
+      ? "M34 100 H586"
+      : "M34 92 H172 C238 92 252 138 310 138 C368 138 382 184 448 184 H586";
     const extractExhaustPath = summerMode
-      ? "M564 128 H428 C374 128 364 184 310 184 C256 184 246 184 192 184 H56"
+      ? "M586 128 H448 C382 128 368 184 310 184 C252 184 238 184 172 184 H34"
       : bypassOpen
-      ? "M564 184 H56"
-      : "M564 92 H428 C374 92 364 138 310 138 C256 138 246 184 192 184 H56";
+      ? "M586 184 H34"
+      : "M586 92 H448 C382 92 368 138 310 138 C252 138 238 184 172 184 H34";
     const rightTopKey = bypassOpen ? "supply_temperature" : "extract_temperature";
     const rightTopLabel = bypassOpen ? this._t("supply") : this._t("extract");
     const rightBottomKey = bypassOpen ? "extract_temperature" : "supply_temperature";
@@ -489,19 +489,19 @@ class HRVCard extends HTMLElement {
     `;
     const arrowsMarkup = summerMode ? `
               <path d="M524 122 H501 V115 L486 128 L501 141 V134 H524 Z"></path>
-              <path d="M134 178 H111 V171 L96 184 L111 197 V190 H134 Z"></path>
+              <path d="M114 178 H91 V171 L76 184 L91 197 V190 H114 Z"></path>
     ` : `
-              <path d="${bypassOpen ? "M96 94 H119 V87 L134 100 L119 113 V106 H96 Z" : "M96 86 H119 V79 L134 92 L119 105 V98 H96 Z"}"></path>
-              <path d="${bypassOpen ? "M486 94 H509 V87 L524 100 L509 113 V106 H486 Z" : "M524 86 H501 V79 L486 92 L501 105 V98 H524 Z"}"></path>
-              <path d="${bypassOpen ? "M524 178 H501 V171 L486 184 L501 197 V190 H524 Z" : "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z"}"></path>
-              <path d="${bypassOpen ? "M134 178 H111 V171 L96 184 L111 197 V190 H134 Z" : "M486 178 H509 V171 L524 184 L509 197 V190 H486 Z"}"></path>
+              <path d="${bypassOpen ? "M76 94 H99 V87 L114 100 L99 113 V106 H76 Z" : "M76 86 H99 V79 L114 92 L99 105 V98 H76 Z"}"></path>
+              <path d="${bypassOpen ? "M506 94 H529 V87 L544 100 L529 113 V106 H506 Z" : "M544 86 H521 V79 L506 92 L521 105 V98 H544 Z"}"></path>
+              <path d="${bypassOpen ? "M544 178 H521 V171 L506 184 L521 197 V190 H544 Z" : "M114 178 H91 V171 L76 184 L91 197 V190 H114 Z"}"></path>
+              <path d="${bypassOpen ? "M114 178 H91 V171 L76 184 L91 197 V190 H114 Z" : "M506 178 H529 V171 L544 184 L529 197 V190 H506 Z"}"></path>
     `;
 
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           display: block;
-          --hrv-flow-width: 56;
+          --hrv-flow-width: 46;
           --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, var(--paper-card-background-color, var(--primary-background-color, #1c1c1c)))));
           --hrv-text: var(--hrv-card-text-color, var(--primary-text-color, var(--text-primary-color, currentColor)));
           --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, var(--hrv-text)));
@@ -519,7 +519,7 @@ class HRVCard extends HTMLElement {
         }
 
         .card {
-          padding: ${compact ? "6px" : "10px"};
+          padding: ${compact ? "4px 3px 6px" : "8px 5px 10px"};
           border-radius: var(--hrv-radius);
           background:
             radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
@@ -799,16 +799,16 @@ class HRVCard extends HTMLElement {
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
-              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply, "56", "100", "564", "100", "userSpaceOnUse")}
-              ${this._gradient(gExtractExhaustBypass, exhaust, extract, "56", "184", "564", "184", "userSpaceOnUse")}
-              <linearGradient id="${gFlowFade}" x1="36" y1="0" x2="584" y2="0" gradientUnits="userSpaceOnUse">
+              ${this._gradient(gOutdoorSupplyBypass, outdoor, supply, "34", "100", "586", "100", "userSpaceOnUse")}
+              ${this._gradient(gExtractExhaustBypass, exhaust, extract, "34", "184", "586", "184", "userSpaceOnUse")}
+              <linearGradient id="${gFlowFade}" x1="18" y1="0" x2="602" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="black"></stop>
                 <stop offset="4%" stop-color="white"></stop>
                 <stop offset="96%" stop-color="white"></stop>
                 <stop offset="100%" stop-color="black"></stop>
               </linearGradient>
-              <mask id="${flowMask}" maskUnits="userSpaceOnUse" x="36" y="58" width="548" height="160">
-                <rect x="36" y="58" width="548" height="160" fill="url(#${gFlowFade})"></rect>
+              <mask id="${flowMask}" maskUnits="userSpaceOnUse" x="18" y="58" width="584" height="160">
+                <rect x="18" y="58" width="584" height="160" fill="url(#${gFlowFade})"></rect>
               </mask>
             </defs>
 
@@ -1125,5 +1125,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.1.5";
-console.info("%c HRV Card %c loaded v2.1.5 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.1.6";
+console.info("%c HRV Card %c loaded v2.1.6 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
