@@ -23,6 +23,9 @@
 - Translates the displayed bypass state between English and Danish.
 - Moves temperature and RPM values closer to the airflow paths.
 - Aligns writable select controls more closely with Home Assistant theme colors.
+- Shows mode and fan level select entities as clickable value badges that open the Home Assistant entity dialog.
+- Increases the reported compact/non-compact card height to avoid overlap with cards below.
+- Enlarges airflow channels, animated air lines, particles, and temperature text.
 
 ## v2.0.0 - Theme Surface and Airflow Visibility
 
