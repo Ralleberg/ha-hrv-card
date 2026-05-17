@@ -73,6 +73,39 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
    compact: false
 ```
 
+## Heat Recovery Efficiency Template Sensor
+
+The `heat_recovery` entity should be a percentage sensor. A common way to calculate heat recovery efficiency is:
+
+```text
+((supply_temperature - outdoor_temperature) / (extract_temperature - outdoor_temperature)) * 100
+```
+
+This compares how much the supply air has been warmed up relative to the available temperature difference between extract air and outdoor air. The template below clamps the result between `0` and `100`, rounds it to one decimal, and returns `NONE` when the calculation cannot be made.
+
+Example Home Assistant template sensor:
+
+```yaml
+template:
+  - sensor:
+      - name: Dantherm heat recovery efficiency
+        unique_id: dantherm_heat_recovery_efficiency
+        unit_of_measurement: "%"
+        state: >
+          {% set bypass = states('cover.dantherm_bypass_spjaeld') %}
+          {% set outdoor = states('sensor.dantherm_udeluftstemperatur') | float(none) %}
+          {% set supply = states('sensor.dantherm_indblaesningstemperatur') | float(none) %}
+          {% set extract = states('sensor.dantherm_udsugningstemperatur') | float(none) %}
+          {% if bypass is not none and bypass == 'closed' %}
+            0
+          {% elif outdoor is not none and supply is not none and extract is not none and (extract - outdoor) | abs > 0.1 %}
+            {% set efficiency = (((supply - outdoor) / (extract - outdoor)) * 100) %}
+            {{ [0, [efficiency, 100] | min] | max | round(1) }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+```
+
 ## Configuration
 
 ### Main options
