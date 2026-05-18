@@ -19,7 +19,7 @@ class HRVCard extends HTMLElement {
         fan1_rpm: findEntity(["ventilator_hastighed_tilluft", "fan2_speed", "fan2_rpm", "fan_2_rpm"], "sensor.dantherm_fan2_speed"),
         fan2_rpm: findEntity(["ventilator_hastighed_fraluft", "fan1_speed", "fan1_rpm", "fan_1_rpm"], "sensor.dantherm_fan1_speed"),
         co2: findEntity(["co2_sensor", "co2", "carbon_dioxide"], undefined),
-        filter_days: findEntity(["dage_til_filter_skift", "filter_days", "filter"], undefined),
+        filter_days: findEntity(["dage_til_filter_skift", "filterrestlevetid", "filter_days", "filter"], undefined),
         alarm: findEntity(["aktiv_alarm_liste", "aktiv_alarm_antal", "alarm"], undefined)
       },
       appearance: {
@@ -1128,7 +1128,7 @@ class HRVCardEditor extends HTMLElement {
           { name: "mode", selector: { entity: {} } },
           { name: "level", selector: { entity: {} } },
           { name: "co2", selector: { entity: { domain: "sensor" } } },
-          { name: "filter_days", selector: { entity: { domain: "sensor" } } },
+          { name: "filter_days", selector: { entity: {} } },
           { name: "alarm", selector: { entity: { domain: ["sensor", "binary_sensor"] } } },
           { name: "fan1_rpm", selector: { entity: { domain: "sensor" } } },
           { name: "fan2_rpm", selector: { entity: { domain: "sensor" } } }

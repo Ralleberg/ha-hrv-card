@@ -67,7 +67,7 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
    fan2_rpm: sensor.dantherm_fan1_speed
    # Optional Nilan/Genvex examples:
    # co2: sensor.remote_lscontrol_co2_sensor
-   # filter_days: sensor.remote_lscontrol_remaining_filter_days
+   # filter_days: sensor.dantherm_filterrestlevetid
    # alarm: sensor.remote_lscontrol_active_alarms
  appearance:
    animation: true
