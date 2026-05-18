@@ -6,7 +6,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.1.7-blue)
+![Version](https://img.shields.io/badge/version-v2.2.0-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 
 ![HRV Card preview](assets/hrv-card-preview.png)
@@ -65,6 +65,10 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
    level: select.dantherm_fan_level_selection
    fan1_rpm: sensor.dantherm_fan2_speed
    fan2_rpm: sensor.dantherm_fan1_speed
+   # Optional Nilan/Genvex examples:
+   # co2: sensor.remote_lscontrol_co2_sensor
+   # filter_days: sensor.remote_lscontrol_remaining_filter_days
+   # alarm: sensor.remote_lscontrol_active_alarms
  appearance:
    animation: true
    show_labels: true
@@ -127,8 +131,11 @@ template:
 | `heat_recovery` | Heat recovery efficiency in percent, shown as a compact flow indicator when bypass is closed and mode is not summer |
 | `humidity` | Humidity sensor |
 | `bypass` | Bypass state/text sensor or cover. Open/åben/on/255 switches the diagram to direct non-crossing airflow |
-| `mode` | Operation mode sensor or select. Select entities are shown as writable dropdown controls. Summer/sommer switches the diagram to one-way extract-to-exhaust airflow |
-| `level` | Ventilation level sensor or select. Select entities are shown as writable dropdown controls. Values 1-4 control airflow animation speed |
+| `mode` | Operation mode sensor or select. Select entities are shown as clickable value badges that open the Home Assistant entity dialog. Summer/sommer switches the diagram to one-way extract-to-exhaust airflow |
+| `level` | Ventilation level sensor or select. Select entities are shown as clickable value badges that open the Home Assistant entity dialog. Values 1-4 control airflow animation speed |
+| `co2` | Optional CO2 sensor shown as a small status circle left of bypass |
+| `filter_days` | Optional remaining filter days sensor shown as a small status circle right of bypass. When the value is `0` or lower, the value turns red and fades/blinks |
+| `alarm` | Optional alarm entity. `No Alarm`, `No alarm`, `0`, `none`, or `ok` are treated as no alarm; other text or numbers above `0` show a red blinking warning triangle |
 | `fan1_rpm` | Fan RPM/speed sensor shown as small italic text beside the upper flow. Dantherm defaults map this to fan 2 speed |
 | `fan2_rpm` | Fan RPM/speed sensor shown as small italic text beside the lower flow. Dantherm defaults map this to fan 1 speed |
 

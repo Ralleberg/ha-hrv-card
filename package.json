@@ -1,6 +1,6 @@
 {
   "name": "ha-hrv-card",
-  "version": "2.1.7",
+  "version": "2.2.0",
   "description": "Animated Home Assistant Lovelace card for heat recovery ventilation systems.",
   "type": "module",
   "scripts": {

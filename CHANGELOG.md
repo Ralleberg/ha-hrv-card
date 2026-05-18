@@ -1,33 +1,20 @@
 # Changelog
 
-## v2.1.7 - Dantherm Select Controls
-
-### Changed
-
-- Drives airflow animation speed from the configured ventilation level entity instead of fan RPM.
-- Adds Danish/English labels in the card and visual editor based on the Home Assistant language.
-- Lightens the airflow channel rendering.
-- Optimizes the default Dantherm entity mapping for Tvalley71/dantherm entity names.
-
-### Fixed
-
-- Keeps animated airflow lines and particles visible on the closed-bypass crossing flow.
+## v2.2.0 - Nilan/Genvex Integration
 
 ### Added
 
-- Adds summer/sommer mode airflow with one-way extract-to-exhaust animation.
-- Adds writable bottom dropdown controls when mode and fan level are configured as Home Assistant select entities.
-- Uses Danish Udblæs/Udblæsningstemperatur labels for exhaust air.
-- Swaps the default Dantherm fan speed mapping so the card setup matches the displayed upper/lower airflow positions.
-- Reverses extract/exhaust airflow animation direction for normal and summer operation.
-- Translates the displayed bypass state between English and Danish.
-- Moves temperature and RPM values closer to the airflow paths.
-- Aligns writable select controls more closely with Home Assistant theme colors.
-- Shows mode and fan level select entities as clickable value badges that open the Home Assistant entity dialog.
-- Increases the reported compact/non-compact card height to avoid overlap with cards below.
-- Expands the airflow layout horizontally so the card uses more of the available width, especially on phones.
-- Centers the bottom Mode, Level, and Humidity badge labels and values.
-- Displays select entity values using the matching option label when possible.
+- Optional CO2 status circle shown to the left of the bypass status.
+- Optional remaining filter-days status circle shown to the right of the bypass status.
+- Filter-days warning state: values at `0` or below turn red and fade/blink in a 2 second loop.
+- Optional alarm indicator shown as a small red warning triangle when an alarm entity reports an active alarm.
+- Alarm entities treat `No Alarm`, `No alarm`, `0`, `none`, and `ok` as no active alarm.
+
+### Changed
+
+- Extends entity auto-detection for Nilan/Genvex-style names, including CO2, filter days, alarm, Nilan temperatures, humidity, efficiency, fan level, and fan speed entities.
+- Keeps the new Nilan/Genvex fields optional so existing Dantherm and generic card configurations keep their current layout unless the new entities are configured.
+- Documents Nilan/Genvex example entities in the README configuration block.
 
 ## v2.0.0 - Theme Surface and Airflow Visibility
 

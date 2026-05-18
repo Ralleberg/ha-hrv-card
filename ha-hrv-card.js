@@ -7,17 +7,20 @@ class HRVCard extends HTMLElement {
 
     return {
       entities: {
-        outdoor_temperature: findEntity(["outdoor", "outside", "ude"], "sensor.outdoor_temperature"),
-        supply_temperature: findEntity(["supply", "indblaes", "indblæs"], "sensor.supply_temperature"),
-        extract_temperature: findEntity(["extract", "udsug"], "sensor.extract_temperature"),
-        exhaust_temperature: findEntity(["exhaust", "afkast", "udblaes", "udblæs"], "sensor.exhaust_temperature"),
-        heat_recovery: findEntity(["heat_recovery", "recovery", "genvinding"], "sensor.heat_recovery_efficiency"),
-        humidity: findEntity(["humidity", "fugt"], "sensor.humidity"),
+        outdoor_temperature: findEntity(["outdoor", "outside", "ude", "udeluft"], "sensor.outdoor_temperature"),
+        supply_temperature: findEntity(["supply", "indblaes", "indblæs", "tilluft"], "sensor.supply_temperature"),
+        extract_temperature: findEntity(["extract", "udsug", "fraluft"], "sensor.extract_temperature"),
+        exhaust_temperature: findEntity(["exhaust", "afkast", "afkastluft", "udblaes", "udblæs"], "sensor.exhaust_temperature"),
+        heat_recovery: findEntity(["heat_recovery", "recovery", "genvinding", "effektivitet"], "sensor.heat_recovery_efficiency"),
+        humidity: findEntity(["humidity", "fugt", "luftfugtighed"], "sensor.humidity"),
         bypass: findEntity(["bypass_damper", "bypass"], "cover.dantherm_bypass_damper"),
         mode: findEntity(["operation_selection", "operation_mode", "op_mode", "mode"], "select.dantherm_operation_selection"),
-        level: findEntity(["fan_level_selection", "fan_level", "op_mode", "level"], "select.dantherm_fan_level_selection"),
-        fan1_rpm: findEntity(["fan2_speed", "fan2_rpm", "fan_2_rpm"], "sensor.dantherm_fan2_speed"),
-        fan2_rpm: findEntity(["fan1_speed", "fan1_rpm", "fan_1_rpm"], "sensor.dantherm_fan1_speed")
+        level: findEntity(["fan_level_selection", "fan_level", "ventilator_trin", "op_mode", "level"], "select.dantherm_fan_level_selection"),
+        fan1_rpm: findEntity(["ventilator_hastighed_tilluft", "fan2_speed", "fan2_rpm", "fan_2_rpm"], "sensor.dantherm_fan2_speed"),
+        fan2_rpm: findEntity(["ventilator_hastighed_fraluft", "fan1_speed", "fan1_rpm", "fan_1_rpm"], "sensor.dantherm_fan1_speed"),
+        co2: findEntity(["co2_sensor", "co2", "carbon_dioxide"], undefined),
+        filter_days: findEntity(["dage_til_filter_skift", "filter_days", "filter"], undefined),
+        alarm: findEntity(["aktiv_alarm_liste", "aktiv_alarm_antal", "alarm"], undefined)
       },
       appearance: {
         animation: true,
@@ -103,7 +106,10 @@ class HRVCard extends HTMLElement {
       "mode",
       "level",
       "fan1_rpm",
-      "fan2_rpm"
+      "fan2_rpm",
+      "co2",
+      "filter_days",
+      "alarm"
     ];
     const appearance = this._config?.appearance || {};
     const entities = this._config?.entities || {};
@@ -197,6 +203,32 @@ class HRVCard extends HTMLElement {
     return `${value.toFixed(0)} ${this._unit(key, "rpm")}`;
   }
 
+  _formatCo2() {
+    const value = this._number("co2");
+    if (value === undefined) return "—";
+    return `${value.toFixed(0)} ${this._unit("co2", "ppm")}`;
+  }
+
+  _formatFilterDays() {
+    const value = this._number("filter_days");
+    if (value === undefined) return "—";
+    return `${value.toFixed(0)} ${this._unit("filter_days", this._t("days_short"))}`;
+  }
+
+  _isFilterDue() {
+    const value = this._number("filter_days");
+    return value !== undefined && value <= 0;
+  }
+
+  _isAlarmActive() {
+    const value = this._state("alarm");
+    if (value === undefined) return false;
+    const normalized = value.toString().trim().toLowerCase();
+    const numeric = Number.parseFloat(normalized);
+    if (Number.isFinite(numeric)) return numeric > 0;
+    return normalized !== "no alarm" && normalized !== "no_alarm" && normalized !== "none" && normalized !== "ok" && normalized !== "0";
+  }
+
   _language() {
     const language = this._hass?.locale?.language || this._hass?.language || "en";
     return language.toString().toLowerCase().startsWith("da") ? "da" : "en";
@@ -214,6 +246,10 @@ class HRVCard extends HTMLElement {
         mode: "Mode",
         level: "Level",
         humidity: "Humidity",
+        co2: "CO2",
+        filter_days: "Filter",
+        alarm: "Alarm",
+        days_short: "d",
         temperatures: "Temperatures",
         optional_entities: "Optional entities",
         appearance: "Appearance",
@@ -242,6 +278,10 @@ class HRVCard extends HTMLElement {
         mode: "Drift",
         level: "Ventilationstrin",
         humidity: "Fugt",
+        co2: "CO2",
+        filter_days: "Filter",
+        alarm: "Alarm",
+        days_short: "d",
         temperatures: "Temperaturer",
         optional_entities: "Valgfri enheder",
         appearance: "Udseende",
@@ -430,9 +470,32 @@ class HRVCard extends HTMLElement {
     });
   }
 
-  _svgEntityAttrs(entityKey) {
+  _svgEntityAttrs(entityKey, extraClass = "") {
     const entityId = this._entityId(entityKey);
-    return entityId ? `class="entity-hit" data-entity="${entityId}"` : "";
+    const className = ["entity-hit", extraClass].filter(Boolean).join(" ");
+    return entityId ? `class="${className}" data-entity="${entityId}"` : (extraClass ? `class="${extraClass}"` : "");
+  }
+
+  _statusCircle(entityKey, label, value, x, valueClass = "") {
+    if (!this._entityId(entityKey)) return "";
+    const textClass = ["status-value", valueClass].filter(Boolean).join(" ");
+    return `
+            <g ${this._svgEntityAttrs(entityKey)} tabindex="0" transform="translate(${x} 254)">
+              <circle class="status-circle" cx="0" cy="0" r="28"></circle>
+              <text x="0" y="-5" text-anchor="middle" class="status-label">${this._escapeHtml(label)}</text>
+              <text x="0" y="11" text-anchor="middle" class="${textClass}">${this._escapeHtml(value)}</text>
+            </g>
+    `;
+  }
+
+  _alarmIndicator() {
+    if (!this._entityId("alarm") || !this._isAlarmActive()) return "";
+    return `
+            <g ${this._svgEntityAttrs("alarm", "blink-fade")} tabindex="0" transform="translate(456 254)">
+              <path class="alarm-triangle" d="M0 -18 L20 17 H-20 Z"></path>
+              <text x="0" y="10" text-anchor="middle" class="alarm-mark">!</text>
+            </g>
+    `;
   }
 
   _fireMoreInfo(entityId) {
@@ -705,6 +768,33 @@ class HRVCard extends HTMLElement {
           color: var(--hrv-text) !important;
         }
 
+        .status-value.danger {
+          fill: var(--error-color, #db4437) !important;
+          color: var(--error-color, #db4437) !important;
+        }
+
+        .blink-fade {
+          animation: fade-blink 2s ease-in-out infinite;
+        }
+
+        .alarm-triangle {
+          fill: var(--error-color, #db4437);
+          stroke: color-mix(in srgb, var(--hrv-background) 55%, transparent);
+          stroke-width: 1;
+        }
+
+        .alarm-mark {
+          fill: #fff !important;
+          color: #fff !important;
+          font-size: 20px;
+          font-weight: 900;
+        }
+
+        @keyframes fade-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: .25; }
+        }
+
         .badges {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
@@ -874,6 +964,9 @@ class HRVCard extends HTMLElement {
               <text x="0" y="-5" text-anchor="middle" class="status-label">${this._t("bypass")}</text>
               <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
             </g>
+            ${this._statusCircle("co2", this._t("co2"), this._formatCo2(), 232)}
+            ${this._statusCircle("filter_days", this._t("filter_days"), this._formatFilterDays(), 388, this._isFilterDue() ? "danger blink-fade" : "")}
+            ${this._alarmIndicator()}
           </svg>
 
           ${hasBadges ? `
@@ -935,6 +1028,9 @@ class HRVCardEditor extends HTMLElement {
       bypass: entities.bypass,
       mode: entities.mode,
       level: entities.level,
+      co2: entities.co2,
+      filter_days: entities.filter_days,
+      alarm: entities.alarm,
       fan1_rpm: entities.fan1_rpm,
       fan2_rpm: entities.fan2_rpm,
       animation: appearance.animation !== false,
@@ -962,6 +1058,9 @@ class HRVCardEditor extends HTMLElement {
         exhaust_temperature: "Exhaust temperature",
         heat_recovery: "Heat recovery",
         humidity: "Humidity",
+        co2: "CO2 level",
+        filter_days: "Filter remaining days",
+        alarm: "Alarm",
         bypass: "Bypass",
         mode: "Mode",
         level: "Level",
@@ -983,6 +1082,9 @@ class HRVCardEditor extends HTMLElement {
         exhaust_temperature: "Udblæsningstemperatur",
         heat_recovery: "Varmegenvinding",
         humidity: "Fugt",
+        co2: "CO2 niveau",
+        filter_days: "Resterende filter i dage",
+        alarm: "Alarm",
         bypass: "Bypass",
         mode: "Drift",
         level: "Ventilationstrin",
@@ -1025,6 +1127,9 @@ class HRVCardEditor extends HTMLElement {
           { name: "bypass", selector: { entity: {} } },
           { name: "mode", selector: { entity: {} } },
           { name: "level", selector: { entity: {} } },
+          { name: "co2", selector: { entity: { domain: "sensor" } } },
+          { name: "filter_days", selector: { entity: { domain: "sensor" } } },
+          { name: "alarm", selector: { entity: {} } },
           { name: "fan1_rpm", selector: { entity: { domain: "sensor" } } },
           { name: "fan2_rpm", selector: { entity: { domain: "sensor" } } }
         ]
@@ -1065,6 +1170,9 @@ class HRVCardEditor extends HTMLElement {
       bypass: value.bypass || undefined,
       mode: value.mode || undefined,
       level: value.level || undefined,
+      co2: value.co2 || undefined,
+      filter_days: value.filter_days || undefined,
+      alarm: value.alarm || undefined,
       fan1_rpm: value.fan1_rpm || undefined,
       fan2_rpm: value.fan2_rpm || undefined
     };
@@ -1134,5 +1242,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.1.7";
-console.info("%c HRV Card %c loaded v2.1.7 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.2.0";
+console.info("%c HRV Card %c loaded v2.2.0 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
