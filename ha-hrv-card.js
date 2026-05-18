@@ -226,7 +226,7 @@ class HRVCard extends HTMLElement {
     const normalized = value.toString().trim().toLowerCase();
     const numeric = Number.parseFloat(normalized);
     if (Number.isFinite(numeric)) return numeric > 0;
-    return normalized !== "no alarm" && normalized !== "no_alarm" && normalized !== "ingen" && normalized !== "none" && normalized !== "ok" && normalized !== "0";
+    return normalized !== "no alarm" && normalized !== "no_alarm" && normalized !== "ingen" && normalized !== "none" && normalized !== "ok" && normalized !== "clear" && normalized !== "off" && normalized !== "0";
   }
 
   _language() {
@@ -1129,7 +1129,7 @@ class HRVCardEditor extends HTMLElement {
           { name: "level", selector: { entity: {} } },
           { name: "co2", selector: { entity: { domain: "sensor" } } },
           { name: "filter_days", selector: { entity: { domain: "sensor" } } },
-          { name: "alarm", selector: { entity: {} } },
+          { name: "alarm", selector: { entity: { domain: ["sensor", "binary_sensor"] } } },
           { name: "fan1_rpm", selector: { entity: { domain: "sensor" } } },
           { name: "fan2_rpm", selector: { entity: { domain: "sensor" } } }
         ]
