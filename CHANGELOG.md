@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.2.0 - Nilan/Genvex Integration
+## v2.2.1 - Nilan/Genvex Integration
 
 ### Added
 
