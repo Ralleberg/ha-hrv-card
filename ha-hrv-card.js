@@ -27,6 +27,7 @@ class HRVCard extends HTMLElement {
         show_labels: true,
         show_badges: true,
         show_temperatures: true,
+        invert_heat_recovery: false,
         compact: false
       }
     };
@@ -56,6 +57,7 @@ class HRVCard extends HTMLElement {
         show_labels: true,
         show_badges: true,
         show_temperatures: true,
+        invert_heat_recovery: false,
         compact: false
       },
       ...config,
@@ -67,6 +69,7 @@ class HRVCard extends HTMLElement {
         show_labels: true,
         show_badges: true,
         show_temperatures: true,
+        invert_heat_recovery: false,
         compact: false,
         ...(config.appearance || {})
       }
@@ -197,6 +200,18 @@ class HRVCard extends HTMLElement {
     return `${value.toFixed(decimals)}${suffix}`;
   }
 
+  _heatRecoveryValue() {
+    const value = this._number("heat_recovery");
+    if (value === undefined) return undefined;
+    return this._config?.appearance?.invert_heat_recovery === true ? 100 - value : value;
+  }
+
+  _formatHeatRecovery() {
+    const value = this._heatRecoveryValue();
+    if (value === undefined) return "—";
+    return `${Math.max(0, Math.min(100, value)).toFixed(0)}%`;
+  }
+
   _formatRpm(key) {
     const value = this._number(key);
     if (value === undefined) return "—";
@@ -258,6 +273,7 @@ class HRVCard extends HTMLElement {
         extract_temperature: "Extract temperature",
         exhaust_temperature: "Exhaust temperature",
         heat_recovery: "Heat recovery",
+        invert_heat_recovery: "Invert heat recovery",
         fan1_rpm: "Fan 1 RPM",
         fan2_rpm: "Fan 2 RPM",
         animation: "Animation",
@@ -290,6 +306,7 @@ class HRVCard extends HTMLElement {
         extract_temperature: "Udsugningstemperatur",
         exhaust_temperature: "Udblæsningstemperatur",
         heat_recovery: "Varmegenvinding",
+        invert_heat_recovery: "Omvend varmegenvinding",
         fan1_rpm: "Ventilator 2 RPM",
         fan2_rpm: "Ventilator 1 RPM",
         animation: "Animation",
@@ -539,7 +556,7 @@ class HRVCard extends HTMLElement {
     const supply = this._number("supply_temperature");
     const extract = this._number("extract_temperature");
     const exhaust = this._number("exhaust_temperature");
-    const heatRecovery = this._number("heat_recovery");
+    const heatRecovery = this._heatRecoveryValue();
     const recoveryProgress = Number.isFinite(heatRecovery) ? Math.max(0, Math.min(100, heatRecovery)) : 0;
     const flowDuration = this._flowDuration();
     const bypassOpen = this._isBypassOpen();
@@ -980,7 +997,7 @@ class HRVCard extends HTMLElement {
                 <circle class="recovery-circle" cx="0" cy="0" r="32"></circle>
                 <circle class="recovery-ring-bg" cx="0" cy="0" r="26"></circle>
                 <circle class="recovery-ring" cx="0" cy="0" r="26" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 0 0)"></circle>
-                <text x="0" y="6" text-anchor="middle" class="recovery-value">${this._formatNumber("heat_recovery", 0, "%")}</text>
+                <text x="0" y="6" text-anchor="middle" class="recovery-value">${this._formatHeatRecovery()}</text>
               </g>
             `}
 
@@ -1056,6 +1073,7 @@ class HRVCardEditor extends HTMLElement {
       show_labels: appearance.show_labels !== false,
       show_badges: appearance.show_badges !== false,
       show_temperatures: appearance.show_temperatures !== false,
+      invert_heat_recovery: appearance.invert_heat_recovery === true,
       compact: appearance.compact === true
     };
   }
@@ -1076,6 +1094,7 @@ class HRVCardEditor extends HTMLElement {
         extract_temperature: "Extract temperature",
         exhaust_temperature: "Exhaust temperature",
         heat_recovery: "Heat recovery",
+        invert_heat_recovery: "Invert heat recovery",
         humidity: "Humidity",
         co2: "CO2 level",
         filter_days: "Filter remaining days",
@@ -1100,6 +1119,7 @@ class HRVCardEditor extends HTMLElement {
         extract_temperature: "Udsugningstemperatur",
         exhaust_temperature: "Udblæsningstemperatur",
         heat_recovery: "Varmegenvinding",
+        invert_heat_recovery: "Omvend varmegenvinding",
         humidity: "Fugt",
         co2: "CO2 niveau",
         filter_days: "Resterende filter i dage",
@@ -1164,6 +1184,7 @@ class HRVCardEditor extends HTMLElement {
           { name: "show_labels", selector: { boolean: {} } },
           { name: "show_badges", selector: { boolean: {} } },
           { name: "show_temperatures", selector: { boolean: {} } },
+          { name: "invert_heat_recovery", selector: { boolean: {} } },
           { name: "compact", selector: { boolean: {} } }
         ]
       }
@@ -1201,6 +1222,7 @@ class HRVCardEditor extends HTMLElement {
       show_labels: value.show_labels !== false,
       show_badges: value.show_badges !== false,
       show_temperatures: value.show_temperatures !== false,
+      invert_heat_recovery: value.invert_heat_recovery === true,
       compact: value.compact === true
     };
     Object.keys(next.entities).forEach((key) => {
@@ -1261,5 +1283,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.2.1";
-console.info("%c HRV Card %c loaded v2.2.1 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.2.2";
+console.info("%c HRV Card %c loaded v2.2.2 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

@@ -6,7 +6,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.2.1-blue)
+![Version](https://img.shields.io/badge/version-v2.2.2-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 
 ![HRV Card preview](assets/hrv-card-preview.png)
@@ -74,6 +74,7 @@ Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat r
    show_labels: true
    show_badges: true
    show_temperatures: true
+   invert_heat_recovery: false
    compact: false
 ```
 
@@ -147,6 +148,7 @@ template:
 | `show_labels` | `true` | Show Outdoor/Supply/Extract/Exhaust labels |
 | `show_badges` | `true` | Show optional state badges |
 | `show_temperatures` | `true` | Show temperature values in the diagram |
+| `invert_heat_recovery` | `false` | Show heat recovery as `100 - heat_recovery`. Useful for systems such as Nilan/Genvex where the reported efficiency is reversed |
 | `compact` | `false` | Slightly smaller padding/card size |
 
 ## Development

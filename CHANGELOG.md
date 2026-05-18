@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.2.1 - Nilan/Genvex Integration
+## v2.2.2 - Nilan/Genvex Integration
 
 ### Added
 
@@ -9,6 +9,7 @@
 - Filter-days warning state: values at `0` or below turn red and fade/blink in a 2 second loop.
 - Optional alarm indicator shown as a small red warning triangle when an alarm entity reports an active alarm.
 - Alarm entities treat `No Alarm`, `No alarm`, `Ingen`, `0`, `none`, `ok`, `clear`, and `off` as no active alarm.
+- Optional setting to invert displayed heat recovery efficiency as `100 - heat_recovery`.
 
 ### Changed
 
