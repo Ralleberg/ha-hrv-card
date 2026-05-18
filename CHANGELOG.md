@@ -14,6 +14,7 @@
 
 - Extends entity auto-detection for Nilan/Genvex-style names, including CO2, filter days, alarm, Nilan temperatures, humidity, efficiency, fan level, and fan speed entities.
 - Keeps the new Nilan/Genvex fields optional so existing Dantherm and generic card configurations keep their current layout unless the new entities are configured.
+- Dynamically centers the CO2, bypass, and filter status circles based on which optional entities are configured.
 - Documents Nilan/Genvex example entities in the README configuration block.
 
 ## v2.0.0 - Theme Surface and Airflow Visibility

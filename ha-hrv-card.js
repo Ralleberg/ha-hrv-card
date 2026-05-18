@@ -488,6 +488,31 @@ class HRVCard extends HTMLElement {
     `;
   }
 
+  _bypassStatusCircle(x) {
+    return `
+            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(${x} 254)">
+              <circle class="status-circle" cx="0" cy="0" r="30"></circle>
+              <text x="0" y="-5" text-anchor="middle" class="status-label">${this._t("bypass")}</text>
+              <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
+            </g>
+    `;
+  }
+
+  _auxStatusCircles() {
+    const items = [
+      this._entityId("co2") ? (x) => this._statusCircle("co2", this._t("co2"), this._formatCo2(), x) : undefined,
+      (x) => this._bypassStatusCircle(x),
+      this._entityId("filter_days") ? (x) => this._statusCircle("filter_days", this._t("filter_days"), this._formatFilterDays(), x, this._isFilterDue() ? "danger blink-fade" : "") : undefined
+    ].filter(Boolean);
+    const positions = {
+      1: [310],
+      2: [270, 350],
+      3: [232, 310, 388]
+    }[items.length] || [310];
+
+    return items.map((renderItem, index) => renderItem(positions[index])).join("");
+  }
+
   _alarmIndicator() {
     if (!this._entityId("alarm") || !this._isAlarmActive()) return "";
     return `
@@ -959,13 +984,7 @@ class HRVCard extends HTMLElement {
               </g>
             `}
 
-            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(310 254)">
-              <circle class="status-circle" cx="0" cy="0" r="30"></circle>
-              <text x="0" y="-5" text-anchor="middle" class="status-label">${this._t("bypass")}</text>
-              <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
-            </g>
-            ${this._statusCircle("co2", this._t("co2"), this._formatCo2(), 232)}
-            ${this._statusCircle("filter_days", this._t("filter_days"), this._formatFilterDays(), 388, this._isFilterDue() ? "danger blink-fade" : "")}
+            ${this._auxStatusCircles()}
             ${this._alarmIndicator()}
           </svg>
 
