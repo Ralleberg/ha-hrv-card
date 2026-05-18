@@ -226,7 +226,7 @@ class HRVCard extends HTMLElement {
     const normalized = value.toString().trim().toLowerCase();
     const numeric = Number.parseFloat(normalized);
     if (Number.isFinite(numeric)) return numeric > 0;
-    return normalized !== "no alarm" && normalized !== "no_alarm" && normalized !== "none" && normalized !== "ok" && normalized !== "0";
+    return normalized !== "no alarm" && normalized !== "no_alarm" && normalized !== "Ingen" && normalized !== "ingen" && normalized !== "none" && normalized !== "ok" && normalized !== "0";
   }
 
   _language() {

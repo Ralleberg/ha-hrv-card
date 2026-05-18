@@ -8,7 +8,7 @@
 - Optional remaining filter-days status circle shown to the right of the bypass status.
 - Filter-days warning state: values at `0` or below turn red and fade/blink in a 2 second loop.
 - Optional alarm indicator shown as a small red warning triangle when an alarm entity reports an active alarm.
-- Alarm entities treat `No Alarm`, `No alarm`, `0`, `none`, and `ok` as no active alarm.
+- Alarm entities treat `No Alarm`, `No alarm`, `Ingen`, `0`, `none`, and `ok` as no active alarm.
 
 ### Changed
 
