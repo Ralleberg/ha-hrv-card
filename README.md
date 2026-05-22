@@ -21,20 +21,21 @@ HRV Card is a custom Lovelace card for Home Assistant dashboards. It is designed
 
 It can be used as a Home Assistant ventilation card, Lovelace HRV card, ERV dashboard card, fan speed card, airflow dashboard, or custom ventilation control card.
 
-Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat recovery ventilation, ERV card, airflow dashboard, fan speed card, bypass ventilation, Dantherm, Nilan, Genvex, Zehnder ComfoAir, Brink.
+Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat recovery ventilation, ERV card, airflow dashboard, fan speed card, bypass ventilation, Dantherm, Nilan, Genvex, Danfoss Air, Zehnder ComfoAir, Brink.
 
 ## Compatible ventilation systems
 
 The card is vendor-neutral and should work with any Home Assistant entities that expose relevant ventilation data.
 
-Examples of systems it can be used with:
+The following systems have been tested with the card:
 
-- Dantherm
-- Zehnder / ComfoAir
-- Nilan
-- Genvex
-- Brink
-- Other HRV or ERV units connected to Home Assistant
+| System | Tested | Status |
+| --- | --- | --- |
+| Dantherm | Yes | Fully functional |
+| Nilan / Genvex | Yes | Fully functional |
+| Danfoss Air | Yes | Fully functional |
+
+Other HRV or ERV units should also work when the relevant Home Assistant entities are configured manually.
 
 ## Recommended GitHub topics
 
@@ -142,11 +143,11 @@ template:
         unique_id: dantherm_heat_recovery_efficiency
         unit_of_measurement: "%"
         state: >
-          {% set bypass = states('cover.dantherm_bypass_spjaeld') %}
+          {% set bypass = states('cover.dantherm_bypass_spjaeld') | lower %}
           {% set outdoor = states('sensor.dantherm_udeluftstemperatur') | float(none) %}
           {% set supply = states('sensor.dantherm_indblaesningstemperatur') | float(none) %}
           {% set extract = states('sensor.dantherm_udsugningstemperatur') | float(none) %}
-          {% if bypass is not none and bypass == 'closed' %}
+          {% if bypass in ['closed', 'off'] %}
             0
           {% elif outdoor is not none and supply is not none and extract is not none and (extract - outdoor) | abs > 0.1 %}
             {% set efficiency = (((supply - outdoor) / (extract - outdoor)) * 100) %}
