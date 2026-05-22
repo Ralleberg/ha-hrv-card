@@ -1256,9 +1256,10 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    if (!this._schemaCache || this._schemaCacheLanguage !== language) {
+    const schemaCacheKey = `${language}:2.2.2`;
+    if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
-      this._schemaCacheLanguage = language;
+      this._schemaCacheKey = schemaCacheKey;
     }
     form.schema = this._schemaCache;
     form.hass = this._hass;

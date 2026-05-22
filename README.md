@@ -1,6 +1,8 @@
-# HRV Card
+# HRV Card for Home Assistant
 
 Animated Home Assistant Lovelace card for heat recovery ventilation systems.
+
+HRV Card is a custom Home Assistant dashboard card for visualizing and controlling HRV/ERV ventilation systems directly from Lovelace. It shows airflow, temperatures, heat recovery efficiency, bypass state, humidity, fan level, operation mode, alarms, filter status, and optional fan RPM values.
 
 The card is intentionally vendor-neutral. You choose the entities you have, regardless of whether the system is Dantherm, Zehnder/ComfoAir, Nilan, Genvex, Brink, or another HRV/ERV unit.
 
@@ -8,10 +10,53 @@ The Dantherm defaults and writable mode/fan-level controls are developed based o
 
 ![Version](https://img.shields.io/badge/version-v2.2.2-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
+![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Lovelace-blue)
+![Custom Card](https://img.shields.io/badge/custom%20card-HRV%20ventilation-blue)
 
 ![HRV Card preview](assets/hrv-card-preview.png)
 
+## What is HRV Card?
+
+HRV Card is a custom Lovelace card for Home Assistant dashboards. It is designed for heat recovery ventilation and energy recovery ventilation systems where you want a clear visual overview of airflow, indoor/outdoor temperatures, bypass state, fan speed, and heat recovery performance.
+
+It can be used as a Home Assistant ventilation card, Lovelace HRV card, ERV dashboard card, fan speed card, airflow dashboard, or custom ventilation control card.
+
 Related search terms: Home Assistant ventilation card, Lovelace HRV card, heat recovery ventilation, ERV card, airflow dashboard, fan speed card, bypass ventilation, Dantherm, Nilan, Genvex, Zehnder ComfoAir, Brink.
+
+## Compatible ventilation systems
+
+The card is vendor-neutral and should work with any Home Assistant entities that expose relevant ventilation data.
+
+Examples of systems it can be used with:
+
+- Dantherm
+- Zehnder / ComfoAir
+- Nilan
+- Genvex
+- Brink
+- Other HRV or ERV units connected to Home Assistant
+
+## Recommended GitHub topics
+
+For better discoverability on GitHub and search engines, this repository is best described with topics such as:
+
+```text
+home-assistant
+home-assistant-card
+lovelace
+lovelace-card
+custom-card
+hrv
+erv
+ventilation
+heat-recovery
+dashboard
+dantherm
+nilan
+genvex
+zehnder
+brink
+```
 
 ## Features
 
