@@ -32,8 +32,10 @@ The following systems have been tested with the card:
 | System | Tested | Status |
 | --- | --- | --- |
 | Dantherm | Yes | Fully functional |
-| Nilan / Genvex | Yes | Fully functional |
+| Genvex | Yes | Fully functional |
+| Nilan | Yes | Fully functional |
 | Danfoss Air | Yes | Fully functional |
+| Itho Daalderup HRU | Yes | Fully functional |
 
 Other HRV or ERV units should also work when the relevant Home Assistant entities are configured manually.
 
