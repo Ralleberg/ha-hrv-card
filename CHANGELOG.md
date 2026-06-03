@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.3.0 - Custom Temperature Labels
+
+### Added
+
+- Adds optional custom labels for the four temperature positions: outdoor, supply, extract, and exhaust.
+- Adds a Temperature labels section to the visual editor so the displayed airflow labels can be changed without editing YAML manually.
+
+### Changed
+
+- Keeps localized Danish/English temperature labels as the default when no custom label is configured.
+
 ## v2.2.2 - Nilan/Genvex Integration
 
 ### Added

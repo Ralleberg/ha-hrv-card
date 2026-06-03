@@ -64,6 +64,9 @@ class HRVCard extends HTMLElement {
       entities: {
         ...(config.entities || {})
       },
+      labels: {
+        ...(config.labels || {})
+      },
       appearance: {
         animation: true,
         show_labels: true,
@@ -116,6 +119,7 @@ class HRVCard extends HTMLElement {
     ];
     const appearance = this._config?.appearance || {};
     const entities = this._config?.entities || {};
+    const labels = this._config?.labels || {};
     const stateParts = entityKeys.map((key) => {
       const entityId = entities[key] || "";
       const entity = entityId && this._hass ? this._hass.states[entityId] : undefined;
@@ -130,6 +134,7 @@ class HRVCard extends HTMLElement {
 
     return JSON.stringify({
       appearance,
+      labels,
       states: stateParts
     });
   }
@@ -168,6 +173,12 @@ class HRVCard extends HTMLElement {
     const value = this._number(key);
     if (value === undefined) return "—";
     return `${value.toFixed(1)}${this._unit(key, "°C")}`;
+  }
+
+  _temperatureLabel(key, fallbackKey) {
+    const configuredLabel = this._config?.labels?.[key];
+    const label = typeof configuredLabel === "string" ? configuredLabel.trim() : "";
+    return this._escapeHtml(label || this._t(fallbackKey));
   }
 
   _formatState(key, suffix = "") {
@@ -584,9 +595,9 @@ class HRVCard extends HTMLElement {
       ? "M586 184 H34"
       : "M586 92 H448 C382 92 368 138 310 138 C252 138 238 184 172 184 H34";
     const rightTopKey = bypassOpen ? "supply_temperature" : "extract_temperature";
-    const rightTopLabel = bypassOpen ? this._t("supply") : this._t("extract");
+    const rightTopLabel = this._temperatureLabel(rightTopKey, bypassOpen ? "supply" : "extract");
     const rightBottomKey = bypassOpen ? "extract_temperature" : "supply_temperature";
-    const rightBottomLabel = bypassOpen ? this._t("extract") : this._t("supply");
+    const rightBottomLabel = this._temperatureLabel(rightBottomKey, bypassOpen ? "extract" : "supply");
     const supplyFlowMarkup = summerMode ? "" : `
               <path class="duct-bg" d="${outdoorSupplyPath}"></path>
               <path class="flow-glow" stroke="url(#${bypassOpen ? gOutdoorSupplyBypass : gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
@@ -973,7 +984,7 @@ class HRVCard extends HTMLElement {
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
               <rect x="18" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="26" text-anchor="middle" class="label">${this._t("outdoor")}</text>` : ""}
+              ${hasLabels ? `<text x="68" y="26" text-anchor="middle" class="label">${this._temperatureLabel("outdoor_temperature", "outdoor")}</text>` : ""}
               ${hasTemps ? `<text x="68" y="56" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightTopKey)} tabindex="0">
@@ -988,7 +999,7 @@ class HRVCard extends HTMLElement {
             </g>
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
               <rect x="18" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._t("exhaust")}</text>` : ""}
+              ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
               ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
             </g>
 
@@ -1053,12 +1064,17 @@ class HRVCardEditor extends HTMLElement {
 
   _formData() {
     const entities = this._config?.entities || {};
+    const labels = this._config?.labels || {};
     const appearance = this._config?.appearance || {};
     return {
       outdoor_temperature: entities.outdoor_temperature,
       supply_temperature: entities.supply_temperature,
       extract_temperature: entities.extract_temperature,
       exhaust_temperature: entities.exhaust_temperature,
+      label_outdoor_temperature: labels.outdoor_temperature,
+      label_supply_temperature: labels.supply_temperature,
+      label_extract_temperature: labels.extract_temperature,
+      label_exhaust_temperature: labels.exhaust_temperature,
       heat_recovery: entities.heat_recovery,
       humidity: entities.humidity,
       bypass: entities.bypass,
@@ -1087,12 +1103,17 @@ class HRVCardEditor extends HTMLElement {
     const translations = {
       en: {
         temperatures: "Temperatures",
+        temperature_labels: "Temperature labels",
         optional_entities: "Optional entities",
         appearance: "Appearance",
         outdoor_temperature: "Outdoor temperature",
         supply_temperature: "Supply temperature",
         extract_temperature: "Extract temperature",
         exhaust_temperature: "Exhaust temperature",
+        label_outdoor_temperature: "Outdoor label",
+        label_supply_temperature: "Supply label",
+        label_extract_temperature: "Extract label",
+        label_exhaust_temperature: "Exhaust label",
         heat_recovery: "Heat recovery",
         invert_heat_recovery: "Invert heat recovery",
         humidity: "Humidity",
@@ -1112,12 +1133,17 @@ class HRVCardEditor extends HTMLElement {
       },
       da: {
         temperatures: "Temperaturer",
+        temperature_labels: "Temperaturlabels",
         optional_entities: "Valgfri enheder",
         appearance: "Udseende",
         outdoor_temperature: "Udetemperatur",
         supply_temperature: "Indblæsningstemperatur",
         extract_temperature: "Udsugningstemperatur",
         exhaust_temperature: "Udblæsningstemperatur",
+        label_outdoor_temperature: "Ude label",
+        label_supply_temperature: "Indblæsning label",
+        label_extract_temperature: "Udsugning label",
+        label_exhaust_temperature: "Udblæs label",
         heat_recovery: "Varmegenvinding",
         invert_heat_recovery: "Omvend varmegenvinding",
         humidity: "Fugt",
@@ -1152,6 +1178,19 @@ class HRVCardEditor extends HTMLElement {
           { name: "supply_temperature", selector: { entity: { domain: "sensor" } } },
           { name: "extract_temperature", selector: { entity: { domain: "sensor" } } },
           { name: "exhaust_temperature", selector: { entity: { domain: "sensor" } } }
+        ]
+      },
+      {
+        type: "expandable",
+        name: "temperature_labels",
+        title: this._t("temperature_labels"),
+        flatten: true,
+        icon: "mdi:label-outline",
+        schema: [
+          { name: "label_outdoor_temperature", selector: { text: {} } },
+          { name: "label_supply_temperature", selector: { text: {} } },
+          { name: "label_extract_temperature", selector: { text: {} } },
+          { name: "label_exhaust_temperature", selector: { text: {} } }
         ]
       },
       {
@@ -1216,6 +1255,13 @@ class HRVCardEditor extends HTMLElement {
       fan1_rpm: value.fan1_rpm || undefined,
       fan2_rpm: value.fan2_rpm || undefined
     };
+    next.labels = {
+      ...(next.labels || {}),
+      outdoor_temperature: value.label_outdoor_temperature?.trim() || undefined,
+      supply_temperature: value.label_supply_temperature?.trim() || undefined,
+      extract_temperature: value.label_extract_temperature?.trim() || undefined,
+      exhaust_temperature: value.label_exhaust_temperature?.trim() || undefined
+    };
     next.appearance = {
       ...(next.appearance || {}),
       animation: value.animation !== false,
@@ -1228,6 +1274,10 @@ class HRVCardEditor extends HTMLElement {
     Object.keys(next.entities).forEach((key) => {
       if (next.entities[key] === undefined) delete next.entities[key];
     });
+    Object.keys(next.labels).forEach((key) => {
+      if (next.labels[key] === undefined) delete next.labels[key];
+    });
+    if (Object.keys(next.labels).length === 0) delete next.labels;
     Object.keys(next.appearance).forEach((key) => {
       if (next.appearance[key] === undefined) delete next.appearance[key];
     });
@@ -1256,7 +1306,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.2.2`;
+    const schemaCacheKey = `${language}:2.3.0`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1284,5 +1334,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.2.2";
-console.info("%c HRV Card %c loaded v2.2.2 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.0";
+console.info("%c HRV Card %c loaded v2.3.0 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

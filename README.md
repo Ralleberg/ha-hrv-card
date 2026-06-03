@@ -8,7 +8,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.2.2-blue)
+![Version](https://img.shields.io/badge/version-v2.3.0-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Lovelace-blue)
 ![Custom Card](https://img.shields.io/badge/custom%20card-HRV%20ventilation-blue)
@@ -115,6 +115,12 @@ brink
    # co2: sensor.remote_lscontrol_co2_sensor
    # filter_days: sensor.dantherm_filterrestlevetid
    # alarm: sensor.remote_lscontrol_active_alarms
+ labels:
+   # Optional. Leave out to use Danish/English defaults from Home Assistant language.
+   outdoor_temperature: Outdoor
+   supply_temperature: Supply
+   extract_temperature: Extract
+   exhaust_temperature: Exhaust
  appearance:
    animation: true
    show_labels: true
@@ -165,6 +171,7 @@ template:
 | --- | --- | --- | --- |
 | `type` | string | yes | Must be `custom:hrv-card` |
 | `entities` | object | no | Entity mapping |
+| `labels` | object | no | Optional custom labels for the four temperature positions |
 | `appearance` | object | no | Visual options |
 
 ### Entities
@@ -185,6 +192,17 @@ template:
 | `alarm` | Optional alarm entity. `No Alarm`, `No alarm`, `Ingen`, `0`, `none`, `ok`, `clear`, or `off` are treated as no alarm; other text or numbers above `0` show a red blinking warning triangle |
 | `fan1_rpm` | Fan RPM/speed sensor shown as small italic text beside the upper flow. Dantherm defaults map this to fan 2 speed |
 | `fan2_rpm` | Fan RPM/speed sensor shown as small italic text beside the lower flow. Dantherm defaults map this to fan 1 speed |
+
+### Temperature labels
+
+These values are optional. If a label is not configured, the card uses the built-in Danish or English default based on the Home Assistant language.
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `outdoor_temperature` | Outdoor/Ude | Label for outdoor/fresh air |
+| `supply_temperature` | Supply/Indblæsning | Label for supply air |
+| `extract_temperature` | Extract/Udsugning | Label for extract air |
+| `exhaust_temperature` | Exhaust/Udblæs | Label for exhaust air |
 
 ### Appearance
 
