@@ -698,6 +698,18 @@ class HRVCard extends HTMLElement {
               <path d="${bypassOpen ? "M544 178 H521 V171 L506 184 L521 197 V190 H544 Z" : "M114 178 H91 V171 L76 184 L91 197 V190 H114 Z"}"></path>
               <path d="${bypassOpen ? "M114 178 H91 V171 L76 184 L91 197 V190 H114 Z" : "M506 178 H529 V171 L544 184 L529 197 V190 H506 Z"}"></path>
     `;
+    const fan1RpmMarkup = this._entityId("fan1_rpm") ? `
+            <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
+              <rect x="118" y="35" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="48" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+            </g>
+    ` : "";
+    const fan2RpmMarkup = this._entityId("fan2_rpm") ? `
+            <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
+              <rect x="118" y="219" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="232" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+            </g>
+    ` : "";
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -1050,14 +1062,8 @@ class HRVCard extends HTMLElement {
               ${arrowsMarkup}
             </g>
 
-            <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
-              <rect x="118" y="35" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="48" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
-            </g>
-            <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="118" y="219" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="232" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
-            </g>
+            ${fan1RpmMarkup}
+            ${fan2RpmMarkup}
 
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
               <rect x="18" y="6" width="100" height="56" rx="10" fill="transparent"></rect>

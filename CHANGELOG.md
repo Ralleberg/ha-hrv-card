@@ -7,6 +7,10 @@
 - Uses Home Assistant's localized entity state formatter for mode and level badges, so translated select states such as `week_program` are shown as their friendly UI labels.
 - Adds a fallback display formatter for older Home Assistant versions or integrations without state translations.
 
+### Fixed
+
+- Hides fan RPM placeholders when no RPM entities are configured.
+
 ## v2.3.0 - Custom Temperature Labels
 
 ### Added
