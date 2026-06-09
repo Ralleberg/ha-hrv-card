@@ -135,6 +135,7 @@ class HRVCard extends HTMLElement {
     return JSON.stringify({
       appearance,
       labels,
+      language: this._language(),
       states: stateParts
     });
   }
@@ -187,13 +188,89 @@ class HRVCard extends HTMLElement {
     return `${value}${suffix}`;
   }
 
-  _formatSelectState(key) {
-    const value = this._state(key);
-    if (value === undefined) return "—";
-    const options = this._entity(key)?.attributes?.options;
-    if (!Array.isArray(options)) return value;
+  _formatDisplayState(key, suffix = "") {
+    const entity = this._entity(key);
+    if (!entity || entity.state === "unknown" || entity.state === "unavailable") return "—";
 
-    return options.find((option) => option.toString().toLowerCase() === value.toString().toLowerCase()) || value;
+    let formatted;
+    if (typeof this._hass?.formatEntityState === "function") {
+      try {
+        formatted = this._hass.formatEntityState(entity);
+      } catch (_error) {
+        formatted = undefined;
+      }
+    }
+
+    const display = formatted && formatted !== entity.state
+      ? formatted
+      : this._fallbackDisplayState(key, entity.state);
+    return `${display}${suffix}`;
+  }
+
+  _fallbackDisplayState(key, value) {
+    const raw = value?.toString() || "";
+    const normalized = raw.trim().toLowerCase().replace(/[\s-]+/g, "_");
+    const modeLabels = {
+      en: {
+        standby: "Standby",
+        automatic: "Automatic",
+        auto: "Automatic",
+        manual: "Manual",
+        week_program: "Week Program",
+        away: "Away Mode",
+        away_mode: "Away Mode",
+        travel: "Away Mode",
+        travel_mode: "Away Mode",
+        summer: "Summer Mode",
+        summer_mode: "Summer Mode",
+        fireplace: "Fireplace Mode",
+        fireplace_mode: "Fireplace Mode",
+        night: "Night Mode",
+        night_mode: "Night Mode"
+      },
+      da: {
+        standby: "Standby",
+        automatic: "Automatisk",
+        auto: "Automatisk",
+        manual: "Manuel",
+        week_program: "Ugeprogram",
+        away: "Rejsetilstand",
+        away_mode: "Rejsetilstand",
+        travel: "Rejsetilstand",
+        travel_mode: "Rejsetilstand",
+        summer: "Sommertilstand",
+        summer_mode: "Sommertilstand",
+        fireplace: "Brændeovnstilstand",
+        fireplace_mode: "Brændeovnstilstand",
+        night: "Nattilstand",
+        night_mode: "Nattilstand"
+      }
+    };
+
+    if (key === "mode" && modeLabels[this._language()]?.[normalized]) {
+      return modeLabels[this._language()][normalized];
+    }
+
+    const options = this._entity(key)?.attributes?.options;
+    const matchedOption = Array.isArray(options)
+      ? options.find((option) => option.toString().toLowerCase() === raw.toLowerCase())
+      : undefined;
+    return this._humanizeState(matchedOption || raw);
+  }
+
+  _humanizeState(value) {
+    const text = value?.toString().trim();
+    if (!text) return "—";
+    if (/^-?\d+(\.\d+)?$/.test(text)) return text;
+    return text
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase(this._language() === "da" ? "da-DK" : "en-US"));
+  }
+
+  _formatSelectState(key) {
+    return this._formatDisplayState(key);
   }
 
   _escapeHtml(value) {
@@ -1306,7 +1383,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.0`;
+    const schemaCacheKey = `${language}:2.3.1`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1334,5 +1411,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.0";
-console.info("%c HRV Card %c loaded v2.3.0 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.1";
+console.info("%c HRV Card %c loaded v2.3.1 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
