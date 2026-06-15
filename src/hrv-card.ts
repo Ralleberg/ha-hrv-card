@@ -251,6 +251,49 @@ class HRVCard extends HTMLElement {
       return modeLabels[this._language()][normalized];
     }
 
+    const bypassLabels = {
+      en: {
+        open: "Open",
+        opening: "Opening",
+        closed: "Closed",
+        closing: "Closing",
+        on: "Open",
+        off: "Closed",
+        true: "Open",
+        false: "Closed",
+        yes: "Open",
+        no: "Closed",
+        "1": "Open",
+        "0": "Closed",
+        "255": "Open"
+      },
+      da: {
+        open: "Åben",
+        aaben: "Åben",
+        "åben": "Åben",
+        opening: "Åbner",
+        closed: "Lukket",
+        close: "Lukket",
+        lukket: "Lukket",
+        closing: "Lukker",
+        on: "Åben",
+        off: "Lukket",
+        true: "Åben",
+        false: "Lukket",
+        yes: "Åben",
+        ja: "Åben",
+        no: "Lukket",
+        nej: "Lukket",
+        "1": "Åben",
+        "0": "Lukket",
+        "255": "Åben"
+      }
+    };
+
+    if (key === "bypass" && bypassLabels[this._language()]?.[normalized]) {
+      return bypassLabels[this._language()][normalized];
+    }
+
     const options = this._entity(key)?.attributes?.options;
     const matchedOption = Array.isArray(options)
       ? options.find((option) => option.toString().toLowerCase() === raw.toLowerCase())
@@ -425,16 +468,7 @@ class HRVCard extends HTMLElement {
   }
 
   _formatBypassState() {
-    const value = this._state("bypass");
-    if (value === undefined) return "—";
-    const normalized = value.toString().trim().toLowerCase();
-    if (["open", "åben", "aaben", "on", "true", "1", "yes", "ja", "255"].includes(normalized)) {
-      return this._t("state_open");
-    }
-    if (["closed", "lukket", "close", "off", "false", "0", "no", "nej"].includes(normalized)) {
-      return this._t("state_closed");
-    }
-    return value.toString().trim();
+    return this._formatDisplayState("bypass");
   }
 
   _temperatureColor(value) {
@@ -1389,7 +1423,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.1`;
+    const schemaCacheKey = `${language}:2.3.2`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1417,5 +1451,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.1";
-console.info("%c HRV Card %c loaded v2.3.1 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.2";
+console.info("%c HRV Card %c loaded v2.3.2 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

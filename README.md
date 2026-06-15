@@ -8,7 +8,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.3.1-blue)
+![Version](https://img.shields.io/badge/version-v2.3.2-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Lovelace-blue)
 ![Custom Card](https://img.shields.io/badge/custom%20card-HRV%20ventilation-blue)

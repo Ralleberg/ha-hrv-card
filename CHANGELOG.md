@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.2 - Localized Bypass Display
+
+### Changed
+
+- Uses Home Assistant's localized entity state formatter for the bypass status circle, so states such as `opening` and `open` are shown as their local UI labels.
+- Adds localized bypass fallback labels for `open`, `opening`, `closed`, `closing`, `on`, and `off` style states.
+
 ## v2.3.1 - Localized Mode Display
 
 ### Changed
