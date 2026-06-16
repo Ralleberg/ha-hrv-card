@@ -39,28 +39,6 @@ The following systems have been tested with the card:
 
 Other HRV or ERV units should also work when the relevant Home Assistant entities are configured manually.
 
-## Recommended GitHub topics
-
-For better discoverability on GitHub and search engines, this repository is best described with topics such as:
-
-```text
-home-assistant
-home-assistant-card
-lovelace
-lovelace-card
-custom-card
-hrv
-erv
-ventilation
-heat-recovery
-dashboard
-dantherm
-nilan
-genvex
-zehnder
-brink
-```
-
 ## Features
 
 - Animated airflow diagram
