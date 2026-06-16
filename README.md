@@ -216,10 +216,6 @@ ha-hrv-card.js
 
 ## Roadmap
 
-- Better visual editor using Home Assistant entity pickers
-- More layout variants
-- Optional airflow direction labels
-- Optional internal heat recovery calculation if all temperature entities are available
 - Theming with CSS variables
 - Translations
 
