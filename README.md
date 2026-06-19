@@ -45,7 +45,7 @@ Other HRV or ERV units should also work when the relevant Home Assistant entitie
 - Temperature-based airflow gradients
 - Optional heat recovery and fan RPM display
 - Optional mode, bypass, humidity, and fan state badges
-- Works with partial configs: missing entities show as `—`
+- Works with partial configs: missing entities are hidden
 - HACS-ready repository layout
 - No runtime dependencies in `ha-hrv-card.js`
 
