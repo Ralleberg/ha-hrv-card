@@ -8,7 +8,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.3.2-blue)
+![Version](https://img.shields.io/badge/version-v2.3.3-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Lovelace-blue)
 ![Custom Card](https://img.shields.io/badge/custom%20card-HRV%20ventilation-blue)
@@ -101,6 +101,14 @@ Other HRV or ERV units should also work when the relevant Home Assistant entitie
    supply_temperature: Supply
    extract_temperature: Extract
    exhaust_temperature: Exhaust
+ temperature_thresholds:
+   # Optional airflow color thresholds in °C.
+   white: -10
+   blue: 5
+   green: 16
+   yellow: 22
+   orange: 27
+   red: 32
  appearance:
    animation: true
    show_labels: true
@@ -152,6 +160,7 @@ template:
 | `type` | string | yes | Must be `custom:hrv-card` |
 | `entities` | object | no | Entity mapping |
 | `labels` | object | no | Optional custom labels for the four temperature positions |
+| `temperature_thresholds` | object | no | Optional airflow color thresholds in °C |
 | `appearance` | object | no | Visual options |
 
 ### Entities
@@ -183,6 +192,19 @@ These values are optional. If a label is not configured, the card uses the built
 | `supply_temperature` | Supply/Indblæsning | Label for supply air |
 | `extract_temperature` | Extract/Udsugning | Label for extract air |
 | `exhaust_temperature` | Exhaust/Udblæs | Label for exhaust air |
+
+### Temperature thresholds
+
+These values control the airflow gradient colors. The card interpolates between the configured points from coldest to warmest.
+
+| Key | Default | Color |
+| --- | --- | --- |
+| `white` | `-10` | White |
+| `blue` | `5` | Blue |
+| `green` | `16` | Green |
+| `yellow` | `22` | Yellow |
+| `orange` | `27` | Orange |
+| `red` | `32` | Red |
 
 ### Appearance
 

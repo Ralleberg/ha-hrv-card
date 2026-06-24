@@ -29,6 +29,14 @@ class HRVCard extends HTMLElement {
         show_temperatures: true,
         invert_heat_recovery: false,
         compact: false
+      },
+      temperature_thresholds: {
+        white: -10,
+        blue: 5,
+        green: 16,
+        yellow: 22,
+        orange: 27,
+        red: 32
       }
     };
   }
@@ -66,6 +74,15 @@ class HRVCard extends HTMLElement {
       },
       labels: {
         ...(config.labels || {})
+      },
+      temperature_thresholds: {
+        white: -10,
+        blue: 5,
+        green: 16,
+        yellow: 22,
+        orange: 27,
+        red: 32,
+        ...(config.temperature_thresholds || {})
       },
       appearance: {
         animation: true,
@@ -120,6 +137,7 @@ class HRVCard extends HTMLElement {
     const appearance = this._config?.appearance || {};
     const entities = this._config?.entities || {};
     const labels = this._config?.labels || {};
+    const temperatureThresholds = this._config?.temperature_thresholds || {};
     const stateParts = entityKeys.map((key) => {
       const entityId = entities[key] || "";
       const entity = entityId && this._hass ? this._hass.states[entityId] : undefined;
@@ -136,6 +154,7 @@ class HRVCard extends HTMLElement {
       appearance,
       labels,
       language: this._language(),
+      temperatureThresholds,
       states: stateParts
     });
   }
@@ -473,10 +492,50 @@ class HRVCard extends HTMLElement {
 
   _temperatureColor(value) {
     if (!Number.isFinite(value)) return "var(--secondary-text-color, currentColor)";
-    const clamped = Math.max(-10, Math.min(35, value));
-    const ratio = (clamped + 10) / 45;
-    const hue = 215 - ratio * 205;
-    return `hsl(${hue}, 78%, 56%)`;
+    const thresholds = this._temperatureThresholds();
+    const stops = [
+      { value: thresholds.white, color: [248, 252, 255] },
+      { value: thresholds.blue, color: [47, 128, 237] },
+      { value: thresholds.green, color: [67, 160, 71] },
+      { value: thresholds.yellow, color: [244, 208, 63] },
+      { value: thresholds.orange, color: [242, 153, 74] },
+      { value: thresholds.red, color: [219, 68, 55] }
+    ].sort((a, b) => a.value - b.value);
+
+    if (value <= stops[0].value) return this._rgb(stops[0].color);
+    if (value >= stops[stops.length - 1].value) return this._rgb(stops[stops.length - 1].color);
+
+    for (let index = 0; index < stops.length - 1; index += 1) {
+      const from = stops[index];
+      const to = stops[index + 1];
+      if (value >= from.value && value <= to.value) {
+        const span = Math.max(.1, to.value - from.value);
+        const ratio = (value - from.value) / span;
+        return this._rgb(from.color.map((channel, channelIndex) => Math.round(channel + (to.color[channelIndex] - channel) * ratio)));
+      }
+    }
+
+    return this._rgb(stops[2].color);
+  }
+
+  _temperatureThresholds() {
+    const configured = this._config?.temperature_thresholds || {};
+    const defaults = {
+      white: -10,
+      blue: 5,
+      green: 16,
+      yellow: 22,
+      orange: 27,
+      red: 32
+    };
+    return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) => {
+      const value = Number.parseFloat(configured[key]);
+      return [key, Number.isFinite(value) ? value : fallback];
+    }));
+  }
+
+  _rgb(channels) {
+    return `rgb(${channels.join(", ")})`;
   }
 
   _fanLevel() {
@@ -615,11 +674,11 @@ class HRVCard extends HTMLElement {
     return entityId ? `class="${className}" data-entity="${entityId}"` : (extraClass ? `class="${extraClass}"` : "");
   }
 
-  _statusCircle(entityKey, label, value, x, valueClass = "") {
+  _statusCircle(entityKey, label, value, x, y = 254, valueClass = "") {
     if (!this._entityId(entityKey)) return "";
     const textClass = ["status-value", valueClass].filter(Boolean).join(" ");
     return `
-            <g ${this._svgEntityAttrs(entityKey)} tabindex="0" transform="translate(${x} 254)">
+            <g ${this._svgEntityAttrs(entityKey)} tabindex="0" transform="translate(${x} ${y})">
               <circle class="status-circle" cx="0" cy="0" r="28"></circle>
               <text x="0" y="-5" text-anchor="middle" class="status-label">${this._escapeHtml(label)}</text>
               <text x="0" y="11" text-anchor="middle" class="${textClass}">${this._escapeHtml(value)}</text>
@@ -627,9 +686,9 @@ class HRVCard extends HTMLElement {
     `;
   }
 
-  _bypassStatusCircle(x) {
+  _bypassStatusCircle(x, y = 254) {
     return `
-            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(${x} 254)">
+            <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(${x} ${y})">
               <circle class="status-circle" cx="0" cy="0" r="30"></circle>
               <text x="0" y="-5" text-anchor="middle" class="status-label">${this._t("bypass")}</text>
               <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
@@ -637,11 +696,11 @@ class HRVCard extends HTMLElement {
     `;
   }
 
-  _auxStatusCircles() {
+  _auxStatusCircles(y = 254) {
     const items = [
-      this._entityId("co2") ? (x) => this._statusCircle("co2", this._t("co2"), this._formatCo2(), x) : undefined,
-      (x) => this._bypassStatusCircle(x),
-      this._entityId("filter_days") ? (x) => this._statusCircle("filter_days", this._t("filter_days"), this._formatFilterDays(), x, this._isFilterDue() ? "danger blink-fade" : "") : undefined
+      this._entityId("co2") ? (x) => this._statusCircle("co2", this._t("co2"), this._formatCo2(), x, y) : undefined,
+      (x) => this._bypassStatusCircle(x, y),
+      this._entityId("filter_days") ? (x) => this._statusCircle("filter_days", this._t("filter_days"), this._formatFilterDays(), x, y, this._isFilterDue() ? "danger blink-fade" : "") : undefined
     ].filter(Boolean);
     const positions = {
       1: [310],
@@ -695,13 +754,14 @@ class HRVCard extends HTMLElement {
     const gExtractExhaustBypass = `${this._id}-extract-exhaust-bypass`;
     const gFlowFade = `${this._id}-flow-fade`;
     const flowMask = `${this._id}-flow-mask`;
+    const statusCircleY = summerMode ? 228 : 254;
     const outdoorSupplyPath = summerMode
       ? ""
       : bypassOpen
       ? "M34 100 H586"
       : "M34 92 H172 C238 92 252 138 310 138 C368 138 382 184 448 184 H586";
     const extractExhaustPath = summerMode
-      ? "M586 128 H448 C382 128 368 184 310 184 C252 184 238 184 172 184 H34"
+      ? "M586 146 H34"
       : bypassOpen
       ? "M586 184 H34"
       : "M586 92 H448 C382 92 368 138 310 138 C252 138 238 184 172 184 H34";
@@ -724,8 +784,8 @@ class HRVCard extends HTMLElement {
               ${this._particles(extractExhaustPath, flowDuration, flowDuration === "0s")}
     `;
     const arrowsMarkup = summerMode ? `
-              <path d="M524 122 H501 V115 L486 128 L501 141 V134 H524 Z"></path>
-              <path d="M114 178 H91 V171 L76 184 L91 197 V190 H114 Z"></path>
+              <path d="M544 140 H521 V133 L506 146 L521 159 V152 H544 Z"></path>
+              <path d="M114 140 H91 V133 L76 146 L91 159 V152 H114 Z"></path>
     ` : `
               <path d="${bypassOpen ? "M76 94 H99 V87 L114 100 L99 113 V106 H76 Z" : "M76 86 H99 V79 L114 92 L99 105 V98 H76 Z"}"></path>
               <path d="${bypassOpen ? "M506 94 H529 V87 L544 100 L529 113 V106 H506 Z" : "M544 86 H521 V79 L506 92 L521 105 V98 H544 Z"}"></path>
@@ -734,16 +794,49 @@ class HRVCard extends HTMLElement {
     `;
     const fan1RpmMarkup = this._entityId("fan1_rpm") ? `
             <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
-              <rect x="118" y="35" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="48" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+              <rect x="118" y="${summerMode ? 105 : 35}" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="${summerMode ? 118 : 48}" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
             </g>
     ` : "";
     const fan2RpmMarkup = this._entityId("fan2_rpm") ? `
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
-              <rect x="118" y="219" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="232" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <rect x="118" y="${summerMode ? 168 : 219}" width="98" height="20" rx="8" fill="transparent"></rect>
+              <text x="167" y="${summerMode ? 181 : 232}" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
             </g>
     ` : "";
+    const temperatureMarkup = summerMode ? `
+            <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
+              <rect x="18" y="42" width="118" height="62" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="74" y="64" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
+              ${hasTemps ? `<text x="74" y="96" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs("extract_temperature")} tabindex="0">
+              <rect x="484" y="42" width="118" height="62" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="546" y="64" text-anchor="middle" class="label">${this._temperatureLabel("extract_temperature", "extract")}</text>` : ""}
+              ${hasTemps ? `<text x="546" y="96" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
+            </g>
+    ` : `
+            <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
+              <rect x="18" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="26" text-anchor="middle" class="label">${this._temperatureLabel("outdoor_temperature", "outdoor")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="56" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs(rightTopKey)} tabindex="0">
+              <rect x="502" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="26" text-anchor="middle" class="label">${rightTopLabel}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="56" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
+              <rect x="502" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="552" y="234" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="260" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
+            </g>
+            <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
+              <rect x="18" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
+              ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+            </g>
+    `;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -1099,26 +1192,7 @@ class HRVCard extends HTMLElement {
             ${fan1RpmMarkup}
             ${fan2RpmMarkup}
 
-            <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
-              <rect x="18" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="26" text-anchor="middle" class="label">${this._temperatureLabel("outdoor_temperature", "outdoor")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="56" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
-            </g>
-            <g ${this._svgEntityAttrs(rightTopKey)} tabindex="0">
-              <rect x="502" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="552" y="26" text-anchor="middle" class="label">${rightTopLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="56" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
-            </g>
-            <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
-              <rect x="502" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="552" y="234" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="260" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
-            </g>
-            <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
-              <rect x="18" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
-              ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
-            </g>
+            ${temperatureMarkup}
 
             ${bypassOpen || summerMode ? "" : `
               <g ${this._svgEntityAttrs("heat_recovery")} tabindex="0" transform="translate(310 46)">
@@ -1129,7 +1203,7 @@ class HRVCard extends HTMLElement {
               </g>
             `}
 
-            ${this._auxStatusCircles()}
+            ${this._auxStatusCircles(statusCircleY)}
             ${this._alarmIndicator()}
           </svg>
 
@@ -1183,6 +1257,7 @@ class HRVCardEditor extends HTMLElement {
     const entities = this._config?.entities || {};
     const labels = this._config?.labels || {};
     const appearance = this._config?.appearance || {};
+    const thresholds = this._config?.temperature_thresholds || {};
     return {
       outdoor_temperature: entities.outdoor_temperature,
       supply_temperature: entities.supply_temperature,
@@ -1207,7 +1282,13 @@ class HRVCardEditor extends HTMLElement {
       show_badges: appearance.show_badges !== false,
       show_temperatures: appearance.show_temperatures !== false,
       invert_heat_recovery: appearance.invert_heat_recovery === true,
-      compact: appearance.compact === true
+      compact: appearance.compact === true,
+      threshold_white: thresholds.white ?? -10,
+      threshold_blue: thresholds.blue ?? 5,
+      threshold_green: thresholds.green ?? 16,
+      threshold_yellow: thresholds.yellow ?? 22,
+      threshold_orange: thresholds.orange ?? 27,
+      threshold_red: thresholds.red ?? 32
     };
   }
 
@@ -1221,6 +1302,7 @@ class HRVCardEditor extends HTMLElement {
       en: {
         temperatures: "Temperatures",
         temperature_labels: "Temperature labels",
+        temperature_colors: "Temperature colors",
         optional_entities: "Optional entities",
         appearance: "Appearance",
         outdoor_temperature: "Outdoor temperature",
@@ -1231,6 +1313,12 @@ class HRVCardEditor extends HTMLElement {
         label_supply_temperature: "Supply label",
         label_extract_temperature: "Extract label",
         label_exhaust_temperature: "Exhaust label",
+        threshold_white: "White from",
+        threshold_blue: "Blue from",
+        threshold_green: "Green from",
+        threshold_yellow: "Yellow from",
+        threshold_orange: "Orange from",
+        threshold_red: "Red from",
         heat_recovery: "Heat recovery",
         invert_heat_recovery: "Invert heat recovery",
         humidity: "Humidity",
@@ -1251,6 +1339,7 @@ class HRVCardEditor extends HTMLElement {
       da: {
         temperatures: "Temperaturer",
         temperature_labels: "Temperaturlabels",
+        temperature_colors: "Temperaturfarver",
         optional_entities: "Valgfri enheder",
         appearance: "Udseende",
         outdoor_temperature: "Udetemperatur",
@@ -1261,6 +1350,12 @@ class HRVCardEditor extends HTMLElement {
         label_supply_temperature: "Indblæsning label",
         label_extract_temperature: "Udsugning label",
         label_exhaust_temperature: "Udblæs label",
+        threshold_white: "Hvid fra",
+        threshold_blue: "Blå fra",
+        threshold_green: "Grøn fra",
+        threshold_yellow: "Gul fra",
+        threshold_orange: "Orange fra",
+        threshold_red: "Rød fra",
         heat_recovery: "Varmegenvinding",
         invert_heat_recovery: "Omvend varmegenvinding",
         humidity: "Fugt",
@@ -1312,6 +1407,21 @@ class HRVCardEditor extends HTMLElement {
       },
       {
         type: "expandable",
+        name: "temperature_colors",
+        title: this._t("temperature_colors"),
+        flatten: true,
+        icon: "mdi:palette-outline",
+        schema: [
+          { name: "threshold_white", selector: { number: { min: -40, max: 60, step: 0.5, mode: "box", unit_of_measurement: "°C" } } },
+          { name: "threshold_blue", selector: { number: { min: -40, max: 60, step: 0.5, mode: "box", unit_of_measurement: "°C" } } },
+          { name: "threshold_green", selector: { number: { min: -40, max: 60, step: 0.5, mode: "box", unit_of_measurement: "°C" } } },
+          { name: "threshold_yellow", selector: { number: { min: -40, max: 60, step: 0.5, mode: "box", unit_of_measurement: "°C" } } },
+          { name: "threshold_orange", selector: { number: { min: -40, max: 60, step: 0.5, mode: "box", unit_of_measurement: "°C" } } },
+          { name: "threshold_red", selector: { number: { min: -40, max: 60, step: 0.5, mode: "box", unit_of_measurement: "°C" } } }
+        ]
+      },
+      {
+        type: "expandable",
         name: "optional_entities",
         title: this._t("optional_entities"),
         flatten: true,
@@ -1354,6 +1464,10 @@ class HRVCardEditor extends HTMLElement {
   _valueChanged(event) {
     event.stopPropagation();
     const value = event.detail.value || {};
+    const thresholdValue = (key, fallback) => {
+      const parsed = Number.parseFloat(value[key]);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    };
     const next = structuredClone(this._config || {});
     next.entities = {
       ...(next.entities || {}),
@@ -1378,6 +1492,15 @@ class HRVCardEditor extends HTMLElement {
       supply_temperature: value.label_supply_temperature?.trim() || undefined,
       extract_temperature: value.label_extract_temperature?.trim() || undefined,
       exhaust_temperature: value.label_exhaust_temperature?.trim() || undefined
+    };
+    next.temperature_thresholds = {
+      ...(next.temperature_thresholds || {}),
+      white: thresholdValue("threshold_white", -10),
+      blue: thresholdValue("threshold_blue", 5),
+      green: thresholdValue("threshold_green", 16),
+      yellow: thresholdValue("threshold_yellow", 22),
+      orange: thresholdValue("threshold_orange", 27),
+      red: thresholdValue("threshold_red", 32)
     };
     next.appearance = {
       ...(next.appearance || {}),
@@ -1423,7 +1546,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.2`;
+    const schemaCacheKey = `${language}:2.3.3`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1451,5 +1574,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.2";
-console.info("%c HRV Card %c loaded v2.3.2 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.3";
+console.info("%c HRV Card %c loaded v2.3.3 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.3.3 - Summer Layout and Temperature Colors
+
+### Added
+
+- Adds configurable temperature color thresholds for the airflow gradient: white, blue, green, yellow, orange, and red.
+
+### Changed
+
+- Centers summer mode around a single extract-to-exhaust airflow path.
+- Hides outdoor and supply temperature positions while summer mode is active.
+
 ## v2.3.2 - Localized Bypass Display
 
 ### Changed
