@@ -769,6 +769,7 @@ class HRVCard extends HTMLElement {
     const rightTopLabel = this._temperatureLabel(rightTopKey, bypassOpen ? "supply" : "extract");
     const rightBottomKey = bypassOpen ? "extract_temperature" : "supply_temperature";
     const rightBottomLabel = this._temperatureLabel(rightBottomKey, bypassOpen ? "extract" : "supply");
+    const extractGradient = summerMode || !bypassOpen ? gExtractExhaust : gExtractExhaustBypass;
     const supplyFlowMarkup = summerMode ? "" : `
               <path class="duct-bg" d="${outdoorSupplyPath}"></path>
               <path class="flow-glow" stroke="url(#${bypassOpen ? gOutdoorSupplyBypass : gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
@@ -778,8 +779,8 @@ class HRVCard extends HTMLElement {
     `;
     const extractFlowMarkup = `
               <path class="duct-bg" d="${extractExhaustPath}"></path>
-              <path class="flow-glow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
-              <path class="flow" stroke="url(#${bypassOpen ? gExtractExhaustBypass : gExtractExhaust})" d="${extractExhaustPath}"></path>
+              <path class="flow-glow" stroke="url(#${extractGradient})" d="${extractExhaustPath}"></path>
+              <path class="flow" stroke="url(#${extractGradient})" d="${extractExhaustPath}"></path>
               ${this._airLines(extractExhaustPath, flowDuration, flowDuration === "0s")}
               ${this._particles(extractExhaustPath, flowDuration, flowDuration === "0s")}
     `;
@@ -1168,7 +1169,7 @@ class HRVCard extends HTMLElement {
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
               ${this._gradient(gOutdoorSupplyBypass, outdoor, supply, "34", "100", "586", "100", "userSpaceOnUse")}
-              ${this._gradient(gExtractExhaustBypass, exhaust, extract, "34", "184", "586", "184", "userSpaceOnUse")}
+              ${this._gradient(gExtractExhaustBypass, exhaust, extract, "34", summerMode ? "146" : "184", "586", summerMode ? "146" : "184", "userSpaceOnUse")}
               <linearGradient id="${gFlowFade}" x1="18" y1="0" x2="602" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stop-color="black"></stop>
                 <stop offset="4%" stop-color="white"></stop>

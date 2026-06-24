@@ -11,6 +11,10 @@
 - Centers summer mode around a single extract-to-exhaust airflow path.
 - Hides outdoor and supply temperature positions while summer mode is active.
 
+### Fixed
+
+- Keeps the temperature-colored airflow gradient visible in summer mode when bypass is open.
+
 ## v2.3.2 - Localized Bypass Display
 
 ### Changed
