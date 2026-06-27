@@ -362,6 +362,13 @@ class HRVCard extends HTMLElement {
     return `${Math.max(0, Math.min(100, value)).toFixed(0)}%`;
   }
 
+  _isCoolingRecovery() {
+    const outdoor = this._number("outdoor_temperature");
+    const supply = this._number("supply_temperature");
+    const extract = this._number("extract_temperature");
+    return Number.isFinite(outdoor) && Number.isFinite(supply) && Number.isFinite(extract) && outdoor > extract && supply < outdoor;
+  }
+
   _formatRpm(key) {
     const value = this._number(key);
     if (value === undefined) return "—";
@@ -739,6 +746,7 @@ class HRVCard extends HTMLElement {
     const exhaust = this._number("exhaust_temperature");
     const heatRecovery = this._heatRecoveryValue();
     const recoveryProgress = Number.isFinite(heatRecovery) ? Math.max(0, Math.min(100, heatRecovery)) : 0;
+    const coolingRecovery = this._isCoolingRecovery();
     const flowDuration = this._flowDuration();
     const bypassOpen = this._isBypassOpen();
     const summerMode = this._isSummerMode();
@@ -1010,6 +1018,10 @@ class HRVCard extends HTMLElement {
           stroke-linecap: round;
         }
 
+        .recovery-ring.cooling {
+          stroke: color-mix(in srgb, var(--info-color, #4aa3ff) 82%, var(--hrv-text) 18%);
+        }
+
         .recovery-value {
           font-size: 17px;
           font-weight: 700;
@@ -1199,7 +1211,7 @@ class HRVCard extends HTMLElement {
               <g ${this._svgEntityAttrs("heat_recovery")} tabindex="0" transform="translate(310 46)">
                 <circle class="recovery-circle" cx="0" cy="0" r="32"></circle>
                 <circle class="recovery-ring-bg" cx="0" cy="0" r="26"></circle>
-                <circle class="recovery-ring" cx="0" cy="0" r="26" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 0 0)"></circle>
+                <circle class="recovery-ring ${coolingRecovery ? "cooling" : ""}" cx="0" cy="0" r="26" pathLength="100" stroke-dasharray="${recoveryProgress} 100" transform="rotate(-90 0 0)"></circle>
                 <text x="0" y="6" text-anchor="middle" class="recovery-value">${this._formatHeatRecovery()}</text>
               </g>
             `}
@@ -1547,7 +1559,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.3`;
+    const schemaCacheKey = `${language}:2.3.4`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1575,5 +1587,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.3";
-console.info("%c HRV Card %c loaded v2.3.3 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.4";
+console.info("%c HRV Card %c loaded v2.3.4 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

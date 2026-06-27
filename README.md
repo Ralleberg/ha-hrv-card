@@ -8,7 +8,7 @@ The card is intentionally vendor-neutral. You choose the entities you have, rega
 
 The Dantherm defaults and writable mode/fan-level controls are developed based on the Home Assistant integration from [Tvalley71/dantherm](https://github.com/Tvalley71/dantherm).
 
-![Version](https://img.shields.io/badge/version-v2.3.3-blue)
+![Version](https://img.shields.io/badge/version-v2.3.4-blue)
 ![HACS](https://img.shields.io/badge/HACS-custom-blue)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-Lovelace-blue)
 ![Custom Card](https://img.shields.io/badge/custom%20card-HRV%20ventilation-blue)
@@ -126,7 +126,7 @@ The `heat_recovery` entity should be a percentage sensor. A common way to calcul
 ((supply_temperature - outdoor_temperature) / (extract_temperature - outdoor_temperature)) * 100
 ```
 
-This compares how much the supply air has been warmed up relative to the available temperature difference between extract air and outdoor air. The template below clamps the result between `0` and `100`, rounds it to one decimal, and returns `NONE` when the calculation cannot be made.
+This compares how much the supply air has moved toward the extract air temperature relative to the available temperature difference between extract air and outdoor air. It works for both heat recovery in cold weather and cooling recovery when outdoor air is warmer than indoor air. The template below clamps the result between `0` and `100`, rounds it to one decimal, and returns `NONE` when the calculation cannot be made.
 
 Example Home Assistant template sensor:
 
@@ -141,7 +141,7 @@ template:
           {% set outdoor = states('sensor.dantherm_udeluftstemperatur') | float(none) %}
           {% set supply = states('sensor.dantherm_indblaesningstemperatur') | float(none) %}
           {% set extract = states('sensor.dantherm_udsugningstemperatur') | float(none) %}
-          {% if bypass in ['closed', 'off'] %}
+          {% if bypass in ['open', 'opening', 'on', 'true', '1', 'yes', 'ja', 'åben', 'aaben'] %}
             0
           {% elif outdoor is not none and supply is not none and extract is not none and (extract - outdoor) | abs > 0.1 %}
             {% set efficiency = (((supply - outdoor) / (extract - outdoor)) * 100) %}

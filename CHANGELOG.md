@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.3.4 - Cooling Recovery Indicator
+
+### Changed
+
+- Shows the heat recovery ring in blue when the unit is recovering cooling from cooler indoor air.
+
 ## v2.3.3 - Summer Layout and Temperature Colors
 
 ### Added
@@ -14,6 +20,7 @@
 ### Fixed
 
 - Keeps the temperature-colored airflow gradient visible in summer mode when bypass is open.
+- Corrects the README heat recovery template so bypass-open states return `0`, while closed bypass can calculate heat or cooling recovery.
 
 ## v2.3.2 - Localized Bypass Display
 
