@@ -856,26 +856,15 @@ class HRVCard extends HTMLElement {
           --hrv-text: var(--hrv-card-text-color, var(--primary-text-color, var(--text-primary-color, currentColor)));
           --hrv-muted: var(--hrv-card-secondary-text-color, var(--secondary-text-color, var(--hrv-text)));
           --hrv-flow-detail: var(--hrv-card-flow-detail-color, rgba(255, 255, 255, .96));
-          --hrv-radius: var(--ha-card-border-radius, 12px);
         }
 
         ha-card {
-          display: block;
           overflow: hidden;
-          border-radius: var(--hrv-radius);
-          background: var(--hrv-background) !important;
-          box-shadow: var(--ha-card-box-shadow, none);
-          border: 0;
+          position: relative;
         }
 
         .card {
           padding: ${compact ? "4px 3px 6px" : "8px 5px 10px"};
-          border-radius: var(--hrv-radius);
-          background:
-            radial-gradient(circle at 16% 28%, color-mix(in srgb, #25a8ff 18%, transparent), transparent 34%),
-            radial-gradient(circle at 84% 32%, color-mix(in srgb, #ff5a4f 16%, transparent), transparent 34%),
-            transparent;
-          box-shadow: none;
           color: var(--hrv-text) !important;
         }
 
@@ -1559,7 +1548,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.4`;
+    const schemaCacheKey = `${language}:2.3.5`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1587,5 +1576,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.4";
-console.info("%c HRV Card %c loaded v2.3.4 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.5";
+console.info("%c HRV Card %c loaded v2.3.5 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

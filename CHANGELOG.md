@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.5 - Theme Card Background
+
+### Changed
+
+- Lets Home Assistant control the card background, radius, and shadow like standard Lovelace cards.
+- Removes the extra decorative card-surface background so the card matches other themed cards.
+
 ## v2.3.4 - Cooling Recovery Indicator
 
 ### Changed
