@@ -106,14 +106,14 @@ class HRVCard extends HTMLElement {
   }
 
   getCardSize() {
-    return this._config?.appearance?.compact ? 4 : 5;
+    return this._config?.appearance?.compact ? 5 : 6;
   }
 
   getGridOptions() {
     return {
-      rows: this._config?.appearance?.compact ? 4 : 5,
+      rows: this._config?.appearance?.compact ? 5 : 6,
       columns: 12,
-      min_rows: 4
+      min_rows: 5
     };
   }
 
@@ -851,6 +851,7 @@ class HRVCard extends HTMLElement {
       <style>
         :host {
           display: block;
+          box-sizing: border-box;
           --hrv-flow-width: 46;
           --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, var(--paper-card-background-color, var(--primary-background-color, #1c1c1c)))));
           --hrv-text: var(--hrv-card-text-color, var(--primary-text-color, var(--text-primary-color, currentColor)));
@@ -859,11 +860,14 @@ class HRVCard extends HTMLElement {
         }
 
         ha-card {
+          display: block;
+          box-sizing: border-box;
           overflow: hidden;
           position: relative;
         }
 
         .card {
+          box-sizing: border-box;
           padding: ${compact ? "4px 3px 6px" : "8px 5px 10px"};
           color: var(--hrv-text) !important;
         }
@@ -1548,7 +1552,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.5`;
+    const schemaCacheKey = `${language}:2.3.6`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1576,5 +1580,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.5";
-console.info("%c HRV Card %c loaded v2.3.5 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.6";
+console.info("%c HRV Card %c loaded v2.3.6 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

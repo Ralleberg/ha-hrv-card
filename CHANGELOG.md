@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.3.6 - Lovelace Card Height
+
+### Fixed
+
+- Reports a larger Lovelace card/grid height so the editor outline and following cards no longer overlap the HRV card.
+- Makes the host, `ha-card`, and inner card use an explicit border-box model after the theme-background update.
+
 ## v2.3.5 - Theme Card Background
 
 ### Changed
