@@ -106,14 +106,16 @@ class HRVCard extends HTMLElement {
   }
 
   getCardSize() {
+    const card = this.shadowRoot?.querySelector("ha-card");
+    const height = card?.getBoundingClientRect?.().height || 0;
+    if (height > 0) return Math.max(1, Math.ceil(height / 50));
     return this._config?.appearance?.compact ? 5 : 6;
   }
 
   getGridOptions() {
     return {
-      rows: this._config?.appearance?.compact ? 5 : 6,
       columns: 12,
-      min_rows: 5
+      min_columns: 6
     };
   }
 

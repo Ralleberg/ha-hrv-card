@@ -4,7 +4,8 @@
 
 ### Fixed
 
-- Reports a larger Lovelace card/grid height so the editor outline and following cards no longer overlap the HRV card.
+- Removes the forced sections-view row height from `getGridOptions()` so Home Assistant can size the card from its actual rendered height.
+- Makes `getCardSize()` use the measured `ha-card` height when available, with a conservative fallback for first render.
 - Makes the host, `ha-card`, and inner card use an explicit border-box model after the theme-background update.
 
 ## v2.3.5 - Theme Card Background
