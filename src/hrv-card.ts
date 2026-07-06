@@ -52,6 +52,26 @@ class HRVCard extends HTMLElement {
     this._hass = undefined;
     this._id = `hrv-${Math.random().toString(36).slice(2, 10)}`;
     this._lastRenderSignature = "";
+    this._lastGridRows = 0;
+    this._layoutRebuildTimer = undefined;
+    this._resizeObserver = undefined;
+    this._observedCard = undefined;
+  }
+
+  connectedCallback() {
+    this._observeCardSize();
+  }
+
+  disconnectedCallback() {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
+      this._observedCard = undefined;
+    }
+    if (this._layoutRebuildTimer) {
+      clearTimeout(this._layoutRebuildTimer);
+      this._layoutRebuildTimer = undefined;
+    }
   }
 
   setConfig(config) {
@@ -106,18 +126,89 @@ class HRVCard extends HTMLElement {
   }
 
   getCardSize() {
-    const card = this.shadowRoot?.querySelector("ha-card");
-    const height = card?.getBoundingClientRect?.().height || this.getBoundingClientRect?.().height || 0;
-    if (height > 0) return Math.max(1, Math.ceil(height / 50));
-    return this._config?.appearance?.compact ? 5 : 6;
+    return Math.max(1, Math.ceil(this._cardHeightForWidth(this._currentCardWidth()) / 50));
   }
 
   getGridOptions() {
-    // Omitting rows lets Home Assistant sections view size the card from its real DOM height.
+    const rows = this._gridRowsForWidth(this._currentCardWidth());
+    this._lastGridRows = rows;
     return {
+      rows,
       columns: 12,
+      min_rows: this._config?.appearance?.compact ? 4 : 5,
       min_columns: 6
     };
+  }
+
+  _currentCardWidth() {
+    const card = this.shadowRoot?.querySelector("ha-card");
+    return (
+      this.getBoundingClientRect?.().width ||
+      card?.getBoundingClientRect?.().width ||
+      this.parentElement?.getBoundingClientRect?.().width ||
+      0
+    );
+  }
+
+  _gridRowsForWidth(width) {
+    const compact = this._config?.appearance?.compact === true;
+
+    // Home Assistant sections rows are 56px high with an 8px gap between rows.
+    return Math.max(compact ? 4 : 5, Math.ceil((this._cardHeightForWidth(width) + 8) / 64));
+  }
+
+  _cardHeightForWidth(width) {
+    const compact = this._config?.appearance?.compact === true;
+    const showBadges = this._config?.appearance?.show_badges !== false;
+    const measuredWidth = Number.isFinite(width) && width > 0 ? width : compact ? 360 : 500;
+    const horizontalPadding = compact ? 6 : 10;
+    const verticalPadding = compact ? 10 : 18;
+    const svgHeight = Math.max(0, measuredWidth - horizontalPadding) * (292 / 620);
+    const badgesHeight = showBadges ? compact ? 48 : 54 : 0;
+    return verticalPadding + svgHeight + badgesHeight;
+  }
+
+  _observeCardSize() {
+    const card = this.shadowRoot?.querySelector("ha-card");
+    if (!card || this._observedCard === card) return;
+
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
+    }
+
+    this._observedCard = card;
+    this._handleCardWidthChange(this._currentCardWidth());
+
+    if (typeof ResizeObserver !== "undefined") {
+      this._resizeObserver = new ResizeObserver(() => {
+        this._handleCardWidthChange(this._currentCardWidth());
+      });
+      this._resizeObserver.observe(this);
+      this._resizeObserver.observe(card);
+    }
+  }
+
+  _handleCardWidthChange(width) {
+    const rows = this._gridRowsForWidth(width);
+    if (!rows || rows === this._lastGridRows) return;
+    if (!this._lastGridRows) {
+      this._lastGridRows = rows;
+      return;
+    }
+    this._lastGridRows = rows;
+    this._scheduleLayoutRebuild();
+  }
+
+  _scheduleLayoutRebuild() {
+    if (this._layoutRebuildTimer || !this.isConnected) return;
+    this._layoutRebuildTimer = setTimeout(() => {
+      this._layoutRebuildTimer = undefined;
+      this.dispatchEvent(new Event("ll-rebuild", {
+        bubbles: true,
+        composed: true
+      }));
+    }, 0);
   }
 
   _renderSignature() {
@@ -854,6 +945,7 @@ class HRVCard extends HTMLElement {
       <style>
         :host {
           display: block;
+          height: 100%;
           box-sizing: border-box;
           --hrv-flow-width: 46;
           --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, var(--paper-card-background-color, var(--primary-background-color, #1c1c1c)))));
@@ -865,12 +957,17 @@ class HRVCard extends HTMLElement {
         ha-card {
           display: block;
           box-sizing: border-box;
+          height: 100%;
+          width: 100%;
           overflow: hidden;
           position: relative;
         }
 
         .card {
           box-sizing: border-box;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
           padding: ${compact ? "4px 3px 6px" : "8px 5px 10px"};
           color: var(--hrv-text) !important;
         }
@@ -878,6 +975,8 @@ class HRVCard extends HTMLElement {
         svg {
           width: 100%;
           height: auto;
+          flex: 1 1 auto;
+          min-height: 0;
           display: block;
           color: var(--hrv-text) !important;
         }
@@ -1241,6 +1340,7 @@ class HRVCard extends HTMLElement {
         this._setSelectOption(element.dataset.selectEntity, event.target.value);
       });
     });
+    this._observeCardSize();
   }
 }
 
