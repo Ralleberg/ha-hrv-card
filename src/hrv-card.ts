@@ -135,7 +135,7 @@ class HRVCard extends HTMLElement {
     return {
       rows,
       columns: 12,
-      min_rows: this._config?.appearance?.compact ? 4 : 5,
+      min_rows: this._minimumGridRows(),
       min_columns: 6
     };
   }
@@ -151,10 +151,12 @@ class HRVCard extends HTMLElement {
   }
 
   _gridRowsForWidth(width) {
-    const compact = this._config?.appearance?.compact === true;
-
     // Home Assistant sections rows are 56px high with an 8px gap between rows.
-    return Math.max(compact ? 4 : 5, Math.ceil((this._cardHeightForWidth(width) + 8) / 64));
+    return Math.max(this._minimumGridRows(), Math.round((this._cardHeightForWidth(width) + 8) / 64));
+  }
+
+  _minimumGridRows() {
+    return this._config?.appearance?.show_badges === false ? 3 : 4;
   }
 
   _cardHeightForWidth(width) {
@@ -974,8 +976,8 @@ class HRVCard extends HTMLElement {
 
         svg {
           width: 100%;
-          height: auto;
-          flex: 1 1 auto;
+          height: 100%;
+          flex: 1 1 0;
           min-height: 0;
           display: block;
           color: var(--hrv-text) !important;
@@ -1176,6 +1178,7 @@ class HRVCard extends HTMLElement {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
           gap: 6px;
+          flex: 0 0 auto;
           margin-top: 6px;
         }
 
