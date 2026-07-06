@@ -52,26 +52,6 @@ class HRVCard extends HTMLElement {
     this._hass = undefined;
     this._id = `hrv-${Math.random().toString(36).slice(2, 10)}`;
     this._lastRenderSignature = "";
-    this._lastMeasuredCardHeight = 0;
-    this._layoutRebuildTimer = undefined;
-    this._resizeObserver = undefined;
-    this._observedCard = undefined;
-  }
-
-  connectedCallback() {
-    this._observeCardSize();
-  }
-
-  disconnectedCallback() {
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-      this._observedCard = undefined;
-    }
-    if (this._layoutRebuildTimer) {
-      clearTimeout(this._layoutRebuildTimer);
-      this._layoutRebuildTimer = undefined;
-    }
   }
 
   setConfig(config) {
@@ -127,55 +107,17 @@ class HRVCard extends HTMLElement {
 
   getCardSize() {
     const card = this.shadowRoot?.querySelector("ha-card");
-    const height = this._lastMeasuredCardHeight || card?.getBoundingClientRect?.().height || 0;
+    const height = card?.getBoundingClientRect?.().height || this.getBoundingClientRect?.().height || 0;
     if (height > 0) return Math.max(1, Math.ceil(height / 50));
     return this._config?.appearance?.compact ? 5 : 6;
   }
 
   getGridOptions() {
+    // Omitting rows lets Home Assistant sections view size the card from its real DOM height.
     return {
       columns: 12,
       min_columns: 6
     };
-  }
-
-  _observeCardSize() {
-    const card = this.shadowRoot?.querySelector("ha-card");
-    if (!card || this._observedCard === card) return;
-
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-    }
-
-    this._observedCard = card;
-    this._handleMeasuredCardHeight(card.getBoundingClientRect?.().height || 0);
-
-    if (typeof ResizeObserver !== "undefined") {
-      this._resizeObserver = new ResizeObserver((entries) => {
-        const height = entries[0]?.contentRect?.height || card.getBoundingClientRect?.().height || 0;
-        this._handleMeasuredCardHeight(height);
-      });
-      this._resizeObserver.observe(card);
-    }
-  }
-
-  _handleMeasuredCardHeight(height) {
-    const nextHeight = Math.ceil(height || 0);
-    if (!nextHeight || Math.abs(nextHeight - this._lastMeasuredCardHeight) < 2) return;
-    this._lastMeasuredCardHeight = nextHeight;
-    this._scheduleLayoutRebuild();
-  }
-
-  _scheduleLayoutRebuild() {
-    if (this._layoutRebuildTimer || !this.isConnected) return;
-    this._layoutRebuildTimer = setTimeout(() => {
-      this._layoutRebuildTimer = undefined;
-      this.dispatchEvent(new Event("ll-rebuild", {
-        bubbles: true,
-        composed: true
-      }));
-    }, 0);
   }
 
   _renderSignature() {
@@ -1299,7 +1241,6 @@ class HRVCard extends HTMLElement {
         this._setSelectOption(element.dataset.selectEntity, event.target.value);
       });
     });
-    this._observeCardSize();
   }
 }
 

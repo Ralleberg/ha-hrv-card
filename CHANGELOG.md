@@ -4,9 +4,8 @@
 
 ### Fixed
 
-- Removes the forced sections-view row height from `getGridOptions()` so Home Assistant can size the card from its actual rendered height.
-- Makes `getCardSize()` use the measured `ha-card` height when available, with a conservative fallback for first render.
-- Rebuilds the Lovelace layout after the rendered card height is measured, so the editor outline and spacing can update after first render.
+- Stops returning forced `rows`/`min_rows` from `getGridOptions()` so Home Assistant sections view can size the HRV card from its actual rendered height.
+- Keeps `getCardSize()` limited to masonry sizing with a conservative fallback for first render.
 - Makes the host, `ha-card`, and inner card use an explicit border-box model after the theme-background update.
 
 ## v2.3.5 - Theme Card Background
