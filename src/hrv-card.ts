@@ -52,33 +52,13 @@ class HRVCard extends HTMLElement {
     this._hass = undefined;
     this._id = `hrv-${Math.random().toString(36).slice(2, 10)}`;
     this._lastRenderSignature = "";
-    this._lastGridRows = 0;
-    this._layoutRebuildTimer = undefined;
-    this._resizeObserver = undefined;
-    this._observedCard = undefined;
-  }
-
-  connectedCallback() {
-    this._applyGridWrapperSizing();
-    this._observeCardSize();
-  }
-
-  disconnectedCallback() {
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-      this._observedCard = undefined;
-    }
-    if (this._layoutRebuildTimer) {
-      clearTimeout(this._layoutRebuildTimer);
-      this._layoutRebuildTimer = undefined;
-    }
   }
 
   setConfig(config) {
     if (!config) {
       throw new Error("Invalid configuration");
     }
+    this._normalizeGridRows(config);
     this._config = {
       entities: {},
       appearance: {
@@ -127,18 +107,39 @@ class HRVCard extends HTMLElement {
   }
 
   getCardSize() {
-    return Math.max(1, Math.ceil(this._cardHeightForWidth(this._currentCardWidth()) / 50));
+    const card = this.shadowRoot?.querySelector("ha-card");
+    const measuredHeight = card?.getBoundingClientRect?.().height;
+    const height = Number.isFinite(measuredHeight) && measuredHeight > 0
+      ? measuredHeight
+      : this._cardHeightForWidth(this._currentCardWidth());
+    return Math.max(1, Math.ceil(height / 50));
   }
 
   getGridOptions() {
-    const rows = this._gridRowsForWidth(this._currentCardWidth());
-    this._lastGridRows = rows;
     return {
-      rows,
+      rows: "auto",
       columns: 12,
-      min_rows: this._minimumGridRows(),
       min_columns: 6
     };
+  }
+
+  _normalizeGridRows(config) {
+    try {
+      if (config.grid_options?.rows !== undefined && config.grid_options.rows !== "auto") {
+        config.grid_options = {
+          ...config.grid_options,
+          rows: "auto"
+        };
+      }
+      if (config.layout_options?.grid_rows !== undefined && config.layout_options.grid_rows !== "auto") {
+        config.layout_options = {
+          ...config.layout_options,
+          grid_rows: "auto"
+        };
+      }
+    } catch {
+      // Ignore immutable configs; getGridOptions still advertises auto row sizing.
+    }
   }
 
   _currentCardWidth() {
@@ -151,15 +152,6 @@ class HRVCard extends HTMLElement {
     );
   }
 
-  _gridRowsForWidth(width) {
-    // Home Assistant sections rows are 56px high with an 8px gap between rows.
-    return Math.max(this._minimumGridRows(), Math.round((this._cardHeightForWidth(width) + 8) / 64));
-  }
-
-  _minimumGridRows() {
-    return this._config?.appearance?.show_badges === false ? 3 : 4;
-  }
-
   _cardHeightForWidth(width) {
     const compact = this._config?.appearance?.compact === true;
     const showBadges = this._config?.appearance?.show_badges !== false;
@@ -169,58 +161,6 @@ class HRVCard extends HTMLElement {
     const svgHeight = Math.max(0, measuredWidth - horizontalPadding) * (292 / 620);
     const badgesHeight = showBadges ? compact ? 48 : 54 : 0;
     return verticalPadding + svgHeight + badgesHeight;
-  }
-
-  _observeCardSize() {
-    const card = this.shadowRoot?.querySelector("ha-card");
-    if (!card || this._observedCard === card) return;
-
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-    }
-
-    this._observedCard = card;
-    this._handleCardWidthChange(this._currentCardWidth());
-
-    if (typeof ResizeObserver !== "undefined") {
-      this._resizeObserver = new ResizeObserver(() => {
-        this._handleCardWidthChange(this._currentCardWidth());
-      });
-      this._resizeObserver.observe(this);
-      this._resizeObserver.observe(card);
-    }
-  }
-
-  _applyGridWrapperSizing() {
-    if (this.layout !== "grid") return;
-    const wrapper = this.parentElement;
-    if (wrapper?.localName !== "hui-card") return;
-    wrapper.style.display = "block";
-    wrapper.style.height = "100%";
-    wrapper.style.boxSizing = "border-box";
-  }
-
-  _handleCardWidthChange(width) {
-    const rows = this._gridRowsForWidth(width);
-    if (!rows || rows === this._lastGridRows) return;
-    if (!this._lastGridRows) {
-      this._lastGridRows = rows;
-      return;
-    }
-    this._lastGridRows = rows;
-    this._scheduleLayoutRebuild();
-  }
-
-  _scheduleLayoutRebuild() {
-    if (this._layoutRebuildTimer || !this.isConnected) return;
-    this._layoutRebuildTimer = setTimeout(() => {
-      this._layoutRebuildTimer = undefined;
-      this.dispatchEvent(new Event("ll-rebuild", {
-        bubbles: true,
-        composed: true
-      }));
-    }, 0);
   }
 
   _renderSignature() {
@@ -688,12 +628,15 @@ class HRVCard extends HTMLElement {
   }
 
   _gradient(id, from, to, x1 = "0%", y1 = "0%", x2 = "100%", y2 = "0%", gradientUnits = "") {
+    const fromValue = Number.isFinite(Number(from)) ? Number(from) : Number(to);
+    const toValue = Number.isFinite(Number(to)) ? Number(to) : Number(from);
+    const midValue = Number.isFinite(fromValue) && Number.isFinite(toValue) ? (fromValue + toValue) / 2 : undefined;
     const units = gradientUnits ? ` gradientUnits="${gradientUnits}"` : "";
     return `
       <linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${units}>
-        <stop offset="0%" stop-color="${this._temperatureColor(from)}"></stop>
-        <stop offset="52%" stop-color="${this._temperatureColor((Number(from) + Number(to)) / 2)}"></stop>
-        <stop offset="100%" stop-color="${this._temperatureColor(to)}"></stop>
+        <stop offset="0%" stop-color="${this._temperatureColor(fromValue)}"></stop>
+        <stop offset="52%" stop-color="${this._temperatureColor(midValue)}"></stop>
+        <stop offset="100%" stop-color="${this._temperatureColor(toValue)}"></stop>
       </linearGradient>
     `;
   }
@@ -883,7 +826,7 @@ class HRVCard extends HTMLElement {
     const rightTopLabel = this._temperatureLabel(rightTopKey, bypassOpen ? "supply" : "extract");
     const rightBottomKey = bypassOpen ? "extract_temperature" : "supply_temperature";
     const rightBottomLabel = this._temperatureLabel(rightBottomKey, bypassOpen ? "extract" : "supply");
-    const extractGradient = summerMode || !bypassOpen ? gExtractExhaust : gExtractExhaustBypass;
+    const extractGradient = summerMode || bypassOpen ? gExtractExhaustBypass : gExtractExhaust;
     const supplyFlowMarkup = summerMode ? "" : `
               <path class="duct-bg" d="${outdoorSupplyPath}"></path>
               <path class="flow-glow" stroke="url(#${bypassOpen ? gOutdoorSupplyBypass : gOutdoorSupply})" d="${outdoorSupplyPath}"></path>
@@ -957,7 +900,6 @@ class HRVCard extends HTMLElement {
       <style>
         :host {
           display: block;
-          height: 100%;
           box-sizing: border-box;
           --hrv-flow-width: 46;
           --hrv-background: var(--hrv-card-background, var(--ha-card-background, var(--card-background-color, var(--paper-card-background-color, var(--primary-background-color, #1c1c1c)))));
@@ -969,7 +911,6 @@ class HRVCard extends HTMLElement {
         ha-card {
           display: block;
           box-sizing: border-box;
-          height: 100%;
           width: 100%;
           overflow: hidden;
           position: relative;
@@ -977,7 +918,6 @@ class HRVCard extends HTMLElement {
 
         .card {
           box-sizing: border-box;
-          height: 100%;
           display: flex;
           flex-direction: column;
           padding: ${compact ? "4px 3px 6px" : "8px 5px 10px"};
@@ -986,9 +926,8 @@ class HRVCard extends HTMLElement {
 
         svg {
           width: 100%;
-          height: 100%;
-          flex: 1 1 0;
-          min-height: 0;
+          height: auto;
+          aspect-ratio: 620 / 292;
           display: block;
           color: var(--hrv-text) !important;
         }
@@ -1353,8 +1292,6 @@ class HRVCard extends HTMLElement {
         this._setSelectOption(element.dataset.selectEntity, event.target.value);
       });
     });
-    this._applyGridWrapperSizing();
-    this._observeCardSize();
   }
 }
 

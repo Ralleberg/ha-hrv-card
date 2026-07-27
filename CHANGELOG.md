@@ -4,11 +4,10 @@
 
 ### Fixed
 
-- Restores numeric sections-view `rows` and calculates them from the rendered card width, SVG aspect ratio, padding, and optional badge row.
-- Makes the host, `ha-card`, and inner card fill Home Assistant's fixed sections grid height like native Lovelace cards.
-- Makes the surrounding Home Assistant `hui-card` wrapper fill the fixed sections grid height when the card runs in grid layout.
-- Uses nearest-fit row sizing instead of always rounding up, avoiding an extra blank sections row below the card at common column widths.
-- Rebuilds the Lovelace layout only when a width change changes the calculated row count.
+- Uses Home Assistant's `rows: "auto"` sections sizing so the card reserves height from its actual rendered content.
+- Removes fixed-height CSS from the host, `ha-card`, inner card, and SVG so the card no longer stretches inside an oversized grid wrapper.
+- Normalizes stale card-level `grid_options.rows` and legacy `layout_options.grid_rows` values to `auto` at runtime so previous manual row settings cannot leave a large blank area below the card.
+- Keeps the centered summer airflow path colored by using a user-space exhaust/extract gradient for the single horizontal flow.
 
 ## v2.3.5 - Theme Card Background
 
