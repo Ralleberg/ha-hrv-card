@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.3.6 - Lovelace Card Height
+## v2.3.8 - Lovelace Height and Summer Flow
 
 ### Fixed
 
