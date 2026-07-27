@@ -6,6 +6,7 @@
 
 - Restores numeric sections-view `rows` and calculates them from the rendered card width, SVG aspect ratio, padding, and optional badge row.
 - Makes the host, `ha-card`, and inner card fill Home Assistant's fixed sections grid height like native Lovelace cards.
+- Makes the surrounding Home Assistant `hui-card` wrapper fill the fixed sections grid height when the card runs in grid layout.
 - Uses nearest-fit row sizing instead of always rounding up, avoiding an extra blank sections row below the card at common column widths.
 - Rebuilds the Lovelace layout only when a width change changes the calculated row count.
 

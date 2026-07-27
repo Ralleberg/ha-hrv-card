@@ -59,6 +59,7 @@ class HRVCard extends HTMLElement {
   }
 
   connectedCallback() {
+    this._applyGridWrapperSizing();
     this._observeCardSize();
   }
 
@@ -189,6 +190,15 @@ class HRVCard extends HTMLElement {
       this._resizeObserver.observe(this);
       this._resizeObserver.observe(card);
     }
+  }
+
+  _applyGridWrapperSizing() {
+    if (this.layout !== "grid") return;
+    const wrapper = this.parentElement;
+    if (wrapper?.localName !== "hui-card") return;
+    wrapper.style.display = "block";
+    wrapper.style.height = "100%";
+    wrapper.style.boxSizing = "border-box";
   }
 
   _handleCardWidthChange(width) {
@@ -1343,6 +1353,7 @@ class HRVCard extends HTMLElement {
         this._setSelectOption(element.dataset.selectEntity, event.target.value);
       });
     });
+    this._applyGridWrapperSizing();
     this._observeCardSize();
   }
 }
