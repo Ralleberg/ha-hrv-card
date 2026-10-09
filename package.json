@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs"
   },
   "keywords": [
     "home-assistant",

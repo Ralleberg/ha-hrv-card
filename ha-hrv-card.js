@@ -688,7 +688,7 @@ class HRVCard extends HTMLElement {
 
   _badge(label, value, entityKey) {
     const entityId = this._entityId(entityKey);
-    const clickable = entityId ? `data-entity="${entityId}"` : "";
+    const clickable = entityId ? `data-entity="${this._escapeHtml(entityId)}"` : "";
     return `
       <button class="badge" ${clickable}>
         <span>${this._escapeHtml(label)}</span>
@@ -727,7 +727,7 @@ class HRVCard extends HTMLElement {
   _svgEntityAttrs(entityKey, extraClass = "") {
     const entityId = this._entityId(entityKey);
     const className = ["entity-hit", extraClass].filter(Boolean).join(" ");
-    return entityId ? `class="${className}" data-entity="${entityId}"` : (extraClass ? `class="${extraClass}"` : "");
+    return entityId ? `class="${className}" data-entity="${this._escapeHtml(entityId)}"` : (extraClass ? `class="${extraClass}"` : "");
   }
 
   _statusCircle(entityKey, label, value, x, y = 254, valueClass = "") {
@@ -747,7 +747,7 @@ class HRVCard extends HTMLElement {
             <g ${this._svgEntityAttrs("bypass")} tabindex="0" transform="translate(${x} ${y})">
               <circle class="status-circle" cx="0" cy="0" r="30"></circle>
               <text x="0" y="-5" text-anchor="middle" class="status-label">${this._t("bypass")}</text>
-              <text x="0" y="11" text-anchor="middle" class="status-value">${this._formatBypassState()}</text>
+              <text x="0" y="11" text-anchor="middle" class="status-value">${this._escapeHtml(this._formatBypassState())}</text>
             </g>
     `;
   }
@@ -853,46 +853,46 @@ class HRVCard extends HTMLElement {
     const fan1RpmMarkup = this._entityId("fan1_rpm") ? `
             <g ${this._svgEntityAttrs("fan1_rpm")} tabindex="0">
               <rect x="118" y="${summerMode ? 105 : 35}" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="${summerMode ? 118 : 48}" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan1_rpm")}</text>
+              <text x="167" y="${summerMode ? 118 : 48}" text-anchor="middle" class="rpm-inline">${this._escapeHtml(this._formatRpm("fan1_rpm"))}</text>
             </g>
     ` : "";
     const fan2RpmMarkup = this._entityId("fan2_rpm") ? `
             <g ${this._svgEntityAttrs("fan2_rpm")} tabindex="0">
               <rect x="118" y="${summerMode ? 168 : 219}" width="98" height="20" rx="8" fill="transparent"></rect>
-              <text x="167" y="${summerMode ? 181 : 232}" text-anchor="middle" class="rpm-inline">${this._formatRpm("fan2_rpm")}</text>
+              <text x="167" y="${summerMode ? 181 : 232}" text-anchor="middle" class="rpm-inline">${this._escapeHtml(this._formatRpm("fan2_rpm"))}</text>
             </g>
     ` : "";
     const temperatureMarkup = summerMode ? `
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
               <rect x="18" y="42" width="118" height="62" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="74" y="64" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
-              ${hasTemps ? `<text x="74" y="96" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+              ${hasTemps ? `<text x="74" y="96" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("exhaust_temperature"))}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs("extract_temperature")} tabindex="0">
               <rect x="484" y="42" width="118" height="62" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="546" y="64" text-anchor="middle" class="label">${this._temperatureLabel("extract_temperature", "extract")}</text>` : ""}
-              ${hasTemps ? `<text x="546" y="96" text-anchor="middle" class="temperature">${this._formatTemp("extract_temperature")}</text>` : ""}
+              ${hasTemps ? `<text x="546" y="96" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("extract_temperature"))}</text>` : ""}
             </g>
     ` : `
             <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
               <rect x="18" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="68" y="26" text-anchor="middle" class="label">${this._temperatureLabel("outdoor_temperature", "outdoor")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="56" text-anchor="middle" class="temperature">${this._formatTemp("outdoor_temperature")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="56" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("outdoor_temperature"))}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightTopKey)} tabindex="0">
               <rect x="502" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="552" y="26" text-anchor="middle" class="label">${rightTopLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="56" text-anchor="middle" class="temperature">${this._formatTemp(rightTopKey)}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="56" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp(rightTopKey))}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
               <rect x="502" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="552" y="234" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
-              ${hasTemps ? `<text x="552" y="260" text-anchor="middle" class="temperature">${this._formatTemp(rightBottomKey)}</text>` : ""}
+              ${hasTemps ? `<text x="552" y="260" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp(rightBottomKey))}</text>` : ""}
             </g>
             <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
               <rect x="18" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
-              ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._formatTemp("exhaust_temperature")}</text>` : ""}
+              ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("exhaust_temperature"))}</text>` : ""}
             </g>
     `;
 

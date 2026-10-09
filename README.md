@@ -543,3 +543,22 @@ This project is licensed under the **MIT License**.
 
 See the [LICENSE](LICENSE) file for details.
 
+
+
+## Development checks
+
+Use Node.js 22.12 or later, then run:
+
+```sh
+npm ci
+npm test
+npm run build
+```
+
+The regression tests cover partial configurations, escaped display values,
+heat recovery, rendering updates, and Home Assistant event/service payloads.
+They use a minimal host and do not replace testing in a real Home Assistant dashboard.
+GitHub Actions runs the tests and build for pushes and pull requests.
+
+`npm run check` currently reports existing TypeScript typing errors; it is not
+part of the CI checks yet.
