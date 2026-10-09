@@ -195,40 +195,84 @@ A commonly used formula is
 ((Supply - Outdoor) / (Extract - Outdoor)) × 100
 ```
 
-The recommended Home Assistant template clamps the result between **0%** and **100%**, supports both heating and cooling recovery and automatically returns `None` whenever the calculation cannot be performed.
+## Included template blueprint
 
-A complete template sensor example is shown below.## Heat Recovery Efficiency Template Sensor
+[Download the heat recovery blueprint](https://raw.githubusercontent.com/Ralleberg/ha-hrv-card/main/blueprints/template/heat_recovery_efficiency.yaml) · [View source](blueprints/template/heat_recovery_efficiency.yaml)
 
-The following template sensor calculates heat recovery efficiency from the four temperature sensors.
+The included, vendor-neutral blueprint creates a real Home Assistant sensor for
+this card, history, and automations. It uses **three** temperatures: outdoor,
+supply, and extract. Exhaust temperature is not needed for the calculation.
+All three must use the same temperature unit.
 
-It automatically:
+It supports heating and cooling recovery, clamps the result to **0–100%**, and
+returns **0%** for an open bypass. Missing/invalid temperatures, an unknown
+configured bypass state, or an extract/outdoor difference of **0.1 or less**
+make the sensor unavailable. The minimum difference is configurable.
+An open bypass returns 0% even if the temperature sensors are unavailable.
 
-- Returns **0%** when the bypass damper is open.
-- Clamps the result between **0%** and **100%**.
-- Supports both heating and summer cooling recovery.
-- Returns `None` when the calculation cannot be performed.
+### Setup
+
+1. Download the YAML file above (save the file contents, not the GitHub web page).
+2. Create `/config/blueprints/template/Ralleberg/` if needed, then save the file as
+   `heat_recovery_efficiency.yaml` in that folder.
+3. Add the following to `configuration.yaml`, replacing the sensor IDs with yours.
+   If you already have `template:`, add the `- use_blueprint:` item to its existing
+   list instead of creating another `template:` key. With `template: !include`,
+   put the list item in your included file.
 
 ```yaml
 template:
-  - sensor:
-      - name: Dantherm Heat Recovery Efficiency
-        unique_id: dantherm_heat_recovery_efficiency
-        unit_of_measurement: "%"
-        state: >
-          {% set bypass = states('cover.dantherm_bypass_spjaeld') | lower %}
-          {% set outdoor = states('sensor.dantherm_udeluftstemperatur') | float(none) %}
-          {% set supply = states('sensor.dantherm_indblaesningstemperatur') | float(none) %}
-          {% set extract = states('sensor.dantherm_udsugningstemperatur') | float(none) %}
-
-          {% if bypass in ['open', 'opening', 'on', 'true', '1', 'yes', 'ja', 'åben', 'aaben'] %}
-            0
-          {% elif outdoor is not none and supply is not none and extract is not none and (extract - outdoor) | abs > 0.1 %}
-            {% set efficiency = (((supply - outdoor) / (extract - outdoor)) * 100) %}
-            {{ [0, [efficiency, 100] | min] | max | round(1) }}
-          {% else %}
-            {{ none }}
-          {% endif %}
+  - use_blueprint:
+      path: Ralleberg/heat_recovery_efficiency.yaml
+      input:
+        outdoor_temperature: sensor.outdoor_temperature
+        supply_temperature: sensor.supply_temperature
+        extract_temperature: sensor.extract_temperature
+        bypass: cover.bypass_damper
+    name: HRV Heat Recovery Efficiency
+    unique_id: hrv_heat_recovery_efficiency
 ```
+
+4. Check your Home Assistant configuration, then reload **Template entities**
+   from **Developer tools → YAML**. If this is your first `template:`
+   configuration, restart Home Assistant after the configuration check.
+5. Find the created sensor under **Developer tools → States** and choose it as
+   **Heat recovery** in the card editor, or add its entity ID to your card YAML:
+
+```yaml
+entities:
+  # Keep your existing temperature and other entity mappings here.
+  heat_recovery: sensor.hrv_heat_recovery_efficiency
+```
+
+Home Assistant may assign a different entity ID if that name is already in use.
+Use the actual ID from States. For multiple ventilation units, add another
+blueprint instance with a different name, unique ID, and source sensors.
+Keep `appearance.invert_heat_recovery: false` when using this blueprint, since
+it already reports recovery efficiency.
+
+### Optional bypass settings
+
+Omit the `bypass:` input if you have no bypass entity; the sensor will calculate
+using only the temperatures. The blueprint reads the entity's **raw state**,
+not its translated display label. Its defaults recognize common cover,
+binary sensor, and numeric states, including `open`, `on`, `1`, and `255`.
+You can override the lists and minimum difference under `input:`:
+
+```yaml
+bypass_open_states: ["open", "opening"]
+bypass_closed_states: ["closed", "closing"]
+minimum_temperature_difference: 0.5
+```
+
+Choose the states that match your integration. Any configured bypass state
+outside the open/closed lists makes the sensor unavailable.
+
+Installing or updating the HACS dashboard card does **not** install or update
+this template blueprint. Download it separately, and reload Template entities
+when you replace the file. Template blueprints currently use file/YAML setup;
+the automation blueprint import flow is not the setup flow for this sensor.
+See [Home Assistant's template blueprint documentation](https://www.home-assistant.io/integrations/template/#using-blueprints).
 
 ---
 
@@ -558,7 +602,16 @@ npm run build
 The regression tests cover partial configurations, escaped display values,
 heat recovery, rendering updates, and Home Assistant event/service payloads.
 They use a minimal host and do not replace testing in a real Home Assistant dashboard.
-GitHub Actions runs the tests and build for pushes and pull requests.
+For the blueprint calculation tests, use Python 3.12 and install the test dependencies:
+
+```sh
+python -m pip install -r tests/blueprint-requirements.txt
+python -m unittest discover -s tests -p 'test_*.py'
+```
+
+These tests render the shipped YAML/Jinja templates with state helpers. They
+cover the calculation and availability rules; they do not start Home Assistant.
+GitHub Actions runs both test suites and the card build for pushes and pull requests.
 
 `npm run check` currently reports existing TypeScript typing errors; it is not
 part of the CI checks yet.

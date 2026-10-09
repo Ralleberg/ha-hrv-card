@@ -1,0 +1,109 @@
+blueprint:
+  name: HRV Card - Heat recovery efficiency
+  description: >-
+    Creates a percentage sensor for sensible heat recovery, using outdoor,
+    supply and extract temperatures in the same unit. Supports heating and
+    cooling, clamps to 0–100%, and reports 0% when bypass is open.
+    Install under config/blueprints/template/Ralleberg/ and instantiate using
+    template: use_blueprint in configuration.yaml. Bypass is optional.
+  domain: template
+  source_url: https://github.com/Ralleberg/ha-hrv-card/blob/main/blueprints/template/heat_recovery_efficiency.yaml
+  input:
+    outdoor_temperature:
+      name: Outdoor temperature
+      description: Fresh air before the heat exchanger.
+      selector:
+        entity:
+          domain: sensor
+    supply_temperature:
+      name: Supply temperature
+      description: Supply air after the heat exchanger.
+      selector:
+        entity:
+          domain: sensor
+    extract_temperature:
+      name: Extract temperature
+      description: Air extracted from the building before the heat exchanger.
+      selector:
+        entity:
+          domain: sensor
+    bypass:
+      name: Bypass entity (optional)
+      description: Omit to calculate without bypass detection.
+      default: ""
+      selector:
+        entity: {}
+    bypass_open_states:
+      name: Bypass open states
+      description: List of raw states meaning open. Customize for your integration.
+      default: ["open", "opening", "on", "true", "1", "255", "yes", "ja", "åben", "aaben"]
+      selector:
+        object: {}
+    bypass_closed_states:
+      name: Bypass closed states
+      description: List of raw states meaning closed. Other states make the sensor unavailable.
+      default: ["closed", "closing", "close", "off", "false", "0", "no", "nej", "lukket"]
+      selector:
+        object: {}
+    minimum_temperature_difference:
+      name: Minimum extract/outdoor difference
+      description: Avoid unstable percentages when the temperatures are nearly equal; in the same unit as the sensors.
+      default: 0.1
+      selector:
+        number:
+          min: 0.01
+          max: 10
+          step: 0.01
+          mode: box
+
+variables:
+  outdoor_entity: !input outdoor_temperature
+  supply_entity: !input supply_temperature
+  extract_entity: !input extract_temperature
+  bypass_entity: !input bypass
+  open_states: !input bypass_open_states
+  closed_states: !input bypass_closed_states
+  minimum_difference: !input minimum_temperature_difference
+
+sensor:
+  unit_of_measurement: "%"
+  state_class: measurement
+  icon: mdi:heat-exchanger
+  availability: >-
+    {% set bypass_state = (states(bypass_entity) | trim | lower) if bypass_entity else '' %}
+    {% set opened = open_states | map('string') | map('trim') | map('lower') | list %}
+    {% set closed = closed_states | map('string') | map('trim') | map('lower') | list %}
+    {% set outdoor = states(outdoor_entity) %}
+    {% set supply = states(supply_entity) %}
+    {% set extract = states(extract_entity) %}
+    {% if bypass_entity and bypass_state in ['unknown', 'unavailable', ''] %}
+      false
+    {% elif bypass_entity and bypass_state in opened %}
+      true
+    {% elif bypass_entity and bypass_state not in closed %}
+      false
+    {% elif is_number(outdoor) and is_number(supply) and is_number(extract) %}
+      {{ ((extract | float) - (outdoor | float)) | abs > (minimum_difference | float) }}
+    {% else %}
+      false
+    {% endif %}
+  state: >-
+    {% set bypass_state = (states(bypass_entity) | trim | lower) if bypass_entity else '' %}
+    {% set opened = open_states | map('string') | map('trim') | map('lower') | list %}
+    {% set closed = closed_states | map('string') | map('trim') | map('lower') | list %}
+    {% set outdoor = states(outdoor_entity) %}
+    {% set supply = states(supply_entity) %}
+    {% set extract = states(extract_entity) %}
+    {% if bypass_entity and bypass_state not in ['unknown', 'unavailable', ''] and bypass_state in opened %}
+      0
+    {% elif (not bypass_entity or bypass_state in closed) and is_number(outdoor) and is_number(supply) and is_number(extract) %}
+      {% set difference = (extract | float) - (outdoor | float) %}
+      {% if difference | abs > (minimum_difference | float) %}
+        {% set efficiency = (((supply | float) - (outdoor | float)) / difference) * 100 %}
+        {{ [0, [efficiency, 100] | min] | max | round(1) }}
+      {% else %}
+        {{ none }}
+      {% endif %}
+    {% else %}
+      {{ none }}
+    {% endif %}

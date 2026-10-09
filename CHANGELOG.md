@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.3.10 - Safer Display Values and Regression Tests
+## v2.3.10 - Heat Recovery Blueprint and Regression Tests
 
 ### Fixed
 
@@ -8,6 +8,8 @@
 
 ### Added
 
+- A vendor-neutral heat recovery template blueprint with optional bypass detection, configurable raw bypass states, and guarded heating/cooling calculations.
+- Download and installation instructions for connecting the blueprint sensor to the card.
 - Seven regression tests covering partial configurations, escaped display values, heat recovery, rendering updates, and Home Assistant event/service payloads.
 - Automated tests and build checks in GitHub Actions.
 - A dependency lockfile and documented development checks for reproducible installations.
