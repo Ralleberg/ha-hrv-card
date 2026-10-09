@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.3.10 - Safer Display Values and Regression Tests
+
+### Fixed
+
+- Escapes temperature and fan RPM units, localized bypass text, and entity attributes before inserting them into HTML/SVG, so special characters display correctly.
+
+### Added
+
+- Seven regression tests covering partial configurations, escaped display values, heat recovery, rendering updates, and Home Assistant event/service payloads.
+- Automated tests and build checks in GitHub Actions.
+- A dependency lockfile and documented development checks for reproducible installations.
+
 ## v2.3.8 - Lovelace Height and Summer Flow
 
 ### Fixed
