@@ -489,7 +489,7 @@ class HRVCard extends HTMLElement {
       },
       da: {
         airflow_diagram: "HRV luftstrømsdiagram",
-        outdoor: "Ude",
+        outdoor: "Indsugning",
         supply: "Indblæsning",
         extract: "Udsugning",
         exhaust: "Udblæs",
@@ -1409,7 +1409,7 @@ class HRVCardEditor extends HTMLElement {
         supply_temperature: "Indblæsningstemperatur",
         extract_temperature: "Udsugningstemperatur",
         exhaust_temperature: "Udblæsningstemperatur",
-        label_outdoor_temperature: "Ude label",
+        label_outdoor_temperature: "Indsugning label",
         label_supply_temperature: "Indblæsning label",
         label_extract_temperature: "Udsugning label",
         label_exhaust_temperature: "Udblæs label",
