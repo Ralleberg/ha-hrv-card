@@ -702,15 +702,18 @@ class HRVCard extends HTMLElement {
     const entityId = this._entityId(entityKey);
     const options = Array.isArray(entity?.attributes?.options) ? entity.attributes.options : [];
     if (!entityId || this._domain(entityKey) !== "select" || options.length === 0) {
-      return this._badge(label, this._formatState(entityKey), entityKey);
+      return this._badge(label, this._formatSelectState(entityKey), entityKey);
     }
 
+    const available = this._state(entityKey) !== undefined;
+    const hasSelectedOption = options.includes(entity.state);
     return `
       <label class="select-control">
         <span>${this._escapeHtml(label)}</span>
-        <select data-select-entity="${this._escapeHtml(entityId)}">
+        <select data-select-entity="${this._escapeHtml(entityId)}" ${available ? "" : "disabled"}>
+          ${hasSelectedOption ? "" : `<option value="" selected disabled>${this._escapeHtml(this._formatSelectState(entityKey))}</option>`}
           ${options.map((option) => `
-            <option value="${this._escapeHtml(option)}" ${option === entity.state ? "selected" : ""}>${this._escapeHtml(option)}</option>
+            <option value="${this._escapeHtml(option)}" ${option === entity.state ? "selected" : ""}>${this._escapeHtml(this._fallbackDisplayState(entityKey, option))}</option>
           `).join("")}
         </select>
       </label>
@@ -1269,8 +1272,8 @@ class HRVCard extends HTMLElement {
 
           ${hasBadges ? `
             <div class="badges">
-              ${this._badge(this._t("mode"), this._formatSelectState("mode"), "mode")}
-              ${this._badge(this._t("level"), this._formatSelectState("level"), "level")}
+              ${this._selectControl(this._t("mode"), "mode")}
+              ${this._selectControl(this._t("level"), "level")}
               ${this._badge(this._t("humidity"), this._formatNumber("humidity", 0, "%"), "humidity")}
             </div>
           ` : ""}
@@ -1606,7 +1609,7 @@ class HRVCardEditor extends HTMLElement {
     }
 
     const language = this._language();
-    const schemaCacheKey = `${language}:2.3.10`;
+    const schemaCacheKey = `${language}:2.3.11`;
     if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
       this._schemaCache = this._schema();
       this._schemaCacheKey = schemaCacheKey;
@@ -1634,5 +1637,5 @@ window.customCards.push({
   preview: true
 });
 
-window.__HRV_CARD_VERSION__ = "2.3.10";
-console.info("%c HRV Card %c loaded v2.3.10 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.11";
+console.info("%c HRV Card %c loaded v2.3.11 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");

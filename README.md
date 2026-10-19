@@ -4,6 +4,10 @@
 
 <p align="center">
 
+<a href="https://github.com/hacs/default/pull/9826">
+  <img src="https://img.shields.io/badge/HACS-Default-41BDF5?style=for-the-badge" alt="HACS Default">
+</a>
+
 <a href="https://github.com/Ralleberg/ha-hrv-card/releases">
   <img src="https://img.shields.io/github/v/release/Ralleberg/ha-hrv-card?style=for-the-badge" alt="Latest Release">
 </a>
@@ -25,7 +29,7 @@
 <p align="center">
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Ralleberg&repository=ha-hrv-card&category=dashboard">
-  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Add to HACS">
+  <img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open HRV Card in HACS">
 </a>
 
 </p>
@@ -49,7 +53,7 @@ The built-in defaults for Dantherm writable controls are based on the excellent 
 - 🌬️ Animated airflow visualization
 - 🌡️ Temperature-based airflow gradients
 - ♻️ Heat recovery efficiency indicator
-- 💨 Fan level and operation mode controls
+- 💨 Inline fan level and operation mode dropdowns for `select` entities
 - 🚪 Automatic bypass visualization
 - 💧 Humidity indicator
 - 🫧 Optional CO₂ indicator
@@ -86,40 +90,56 @@ Other HRV and ERV systems should work by mapping the available entities manually
 
 ## HACS (Recommended)
 
-Click below to add the repository directly to HACS.
+HRV Card is available in the default [HACS](https://www.hacs.xyz/) catalog.
+**No custom repository is needed.**
+
+1. Open **HACS** in Home Assistant.
+2. Search for **HRV Card**, open it, and select **Download**.
+3. Refresh your browser after installation.
+4. Edit your dashboard, select **Add card**, and search for **HRV Card**.
+5. Select your entities in the visual editor, or use the YAML example below.
+
+You can also open its HACS page directly:
 
 <p align="center">
 
 <a href="https://my.home-assistant.io/redirect/hacs_repository/?owner=Ralleberg&repository=ha-hrv-card&category=dashboard">
-<img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Add to HACS">
+<img src="https://my.home-assistant.io/badges/hacs_repository.svg" alt="Open HRV Card in HACS">
 </a>
 
 </p>
 
-After adding the repository:
+If you previously installed HRV Card as a custom repository, keep your existing
+card configuration and update through HACS as usual. There is no need to
+uninstall the card or create a second resource entry.
 
-1. Open **HACS**
-2. Install **HRV Card**
-3. Refresh your browser
-4. Add the card to your dashboard
+### Updating
+
+Download updates from the HRV Card page in HACS, then refresh the browser.
+If an older version remains visible, reload without cache. The browser console
+shows the loaded card version.
+
+### Mode and fan level controls
+
+With `select` entities configured for `mode` or `level`, the card displays inline
+dropdowns using the options supplied by your integration. Changing an option
+calls Home Assistant's `select.select_option` action. Unavailable selects are
+disabled. With other entity types, or selects without options, a badge opens
+Home Assistant's more-info dialog instead. Controls are hidden along with the
+badge row when `appearance.show_badges` is `false`.
 
 ---
 
 ## Manual Installation
 
-Copy
+Download `ha-hrv-card.js` from the
+[latest release](https://github.com/Ralleberg/ha-hrv-card/releases/latest).
+If the release has no attached JavaScript file, use the file in its source
+archive. Copy it to `/config/www/community/ha-hrv-card/`.
 
-```
-ha-hrv-card.js
-```
-
-to
-
-```
-/config/www/community/ha-hrv-card/
-```
-
-Then add the resource:
+In **Settings → Dashboards → Resources** (Advanced mode may be required), add
+`/local/community/ha-hrv-card/ha-hrv-card.js` as a **JavaScript module**.
+For YAML-managed resources, use:
 
 ```yaml
 url: /local/community/ha-hrv-card/ha-hrv-card.js

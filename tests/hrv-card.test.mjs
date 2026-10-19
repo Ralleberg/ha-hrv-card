@@ -96,3 +96,71 @@ test('select controls preserve the service payload', () => {
   assert.equal(payload[2].entity_id, 'select.mode');
   assert.equal(payload[2].option, 'automatic');
 });
+
+test('mode and level select entities render inline controls with selected options', () => {
+  const card = cardWith({ mode: 'select.mode', level: 'select.level' }, {
+    'select.mode': state('automatic', { options: ['automatic', 'manual'] }),
+    'select.level': state('2', { options: ['1', '2', '3'] }),
+  });
+  assert.match(card.shadowRoot.innerHTML, /<select data-select-entity="select.mode"/);
+  assert.match(card.shadowRoot.innerHTML, /<select data-select-entity="select.level"/);
+  assert.match(card.shadowRoot.innerHTML, /value="automatic" selected>Automatic/);
+  assert.match(card.shadowRoot.innerHTML, /value="2" selected>2/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<button[^>]*data-entity="select.mode"/);
+  card.setConfig({ entities: card._config.entities, appearance: { show_badges: false } });
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<select /);
+});
+
+test('read-only entities and selects without options retain localized badges', () => {
+  const card = cardWith({ mode: 'sensor.mode', level: 'select.level' }, {
+    'sensor.mode': state('automatic'), 'select.level': state('low'),
+  });
+  card.hass = { ...card._hass, language: 'da' };
+  assert.match(card.shadowRoot.innerHTML, /<button[^>]*data-entity="sensor.mode"/);
+  assert.match(card.shadowRoot.innerHTML, /<strong>Automatisk<\/strong>/);
+  assert.match(card.shadowRoot.innerHTML, /<button[^>]*data-entity="select.level"/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /<select /);
+});
+
+test('unavailable selects are disabled and unmatched states do not select the first option', () => {
+  for (const currentState of ['unknown', 'unavailable', 'custom']) {
+    const card = cardWith({ mode: 'select.mode' }, {
+      'select.mode': state(currentState, { options: ['automatic', 'manual'] }),
+    });
+    assert.match(card.shadowRoot.innerHTML, /<option value="" selected disabled>/);
+    assert.doesNotMatch(card.shadowRoot.innerHTML, /value="automatic" selected/);
+    if (currentState !== 'custom') {
+      assert.match(card.shadowRoot.innerHTML, /<select[^>]* disabled>/);
+    }
+  }
+});
+
+test('rendered select values and labels escape special characters', () => {
+  const option = 'a"<tag>&';
+  const card = cardWith({ mode: 'select.mode' }, {
+    'select.mode': state(option, { options: [option] }),
+  });
+  assert.match(card.shadowRoot.innerHTML, /value="a&quot;&lt;tag&gt;&amp;" selected/);
+  assert.ok(!card.shadowRoot.innerHTML.includes('<tag>'));
+});
+
+test('render attaches change handlers that send the selected option to Home Assistant', () => {
+  const card = cardWith({ mode: 'select.mode' }, {
+    'select.mode': state('automatic', { options: ['automatic', 'manual'] }),
+  });
+  let change;
+  const element = {
+    dataset: { selectEntity: 'select.mode' },
+    addEventListener: (type, callback) => { if (type === 'change') change = callback; },
+  };
+  card.shadowRoot.querySelectorAll = (selector) => selector === '[data-select-entity]' ? [element] : [];
+  let payload;
+  card.hass = { ...card._hass, language: 'da', callService: (...args) => { payload = args; } };
+  assert.equal(typeof change, 'function');
+  change({ target: { value: 'manual' } });
+  assert.equal(payload[0], 'select');
+  assert.equal(payload[1], 'select_option');
+  assert.equal(payload[2].entity_id, 'select.mode');
+  assert.equal(payload[2].option, 'manual');
+  assert.match(card.shadowRoot.innerHTML, /value="automatic" selected>Automatisk/);
+});

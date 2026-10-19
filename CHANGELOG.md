@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.3.11 - Inline Controls and HACS Installation
+
+### Fixed
+
+- Connects the mode and fan level dropdowns to the rendered card for `select` entities, addressing Frenck's HACS review.
+- Preserves localized more-info badges for other entity types and selects without options.
+- Disables unavailable selects and avoids displaying the first option as the current state when no option matches.
+
+### Changed
+
+- Updates installation instructions for the HACS default catalog, with search, direct-link, update, and card-picker guidance.
+- Documents inline control behavior and keeps manual installation as an alternative.
+
+### Added
+
+- Regression coverage for rendered mode/level controls, option escaping, unavailable states, and change-event service calls.
+
 ## v2.3.10 - Heat Recovery Blueprint and Regression Tests
 
 ### Fixed
