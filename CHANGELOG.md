@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.3.12 - Integrated Controls
+
+### Fixed
+
+- Restores the integrated appearance of mode and fan level controls while keeping inline selection.
+
 ## v2.3.11 - Inline Controls and HACS Installation
 
 ### Fixed

@@ -1204,11 +1204,15 @@ var HRVCard = class extends HTMLElement {
         .select-control {
           display: block;
           min-width: 0;
+          border: 0;
+          text-align: center;
+          font: inherit;
+          cursor: pointer;
           border-radius: 8px;
           background: color-mix(in srgb, var(--hrv-background) 82%, transparent);
           color: var(--hrv-text) !important;
           padding: 6px 8px;
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 10%, transparent);
+          box-shadow: none;
         }
 
         .select-control span {
@@ -1222,19 +1226,41 @@ var HRVCard = class extends HTMLElement {
         }
 
         .select-control select {
+          appearance: none;
+          -webkit-appearance: none;
+          display: block;
+          box-sizing: border-box;
           width: 100%;
-          margin-top: 2px;
+          margin: 2px 0 0;
           border: 0;
-          border-radius: 6px;
-          background: color-mix(in srgb, var(--hrv-background) 94%, var(--hrv-text) 6%);
+          border-radius: 0;
+          background: transparent;
           color: var(--hrv-text) !important;
           font: inherit;
           font-size: 12px;
           font-weight: 700;
           line-height: 1.2;
-          min-height: 22px;
-          padding: 2px 4px;
-          box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hrv-text) 12%, transparent);
+          min-height: 0;
+          padding: 0;
+          text-align: center;
+          text-align-last: center;
+          cursor: pointer;
+          box-shadow: none;
+        }
+
+        .select-control:focus-within {
+          outline: 2px solid var(--hrv-text);
+          outline-offset: 2px;
+        }
+
+        .select-control select:focus {
+          outline: none;
+        }
+
+        .select-control select:disabled {
+          cursor: default;
+          opacity: 1;
+          -webkit-text-fill-color: var(--hrv-text);
         }
 
         .select-control select option {
@@ -1740,7 +1766,7 @@ var HRVCardEditor = class extends HTMLElement {
 			form.computeLabel = (schema) => this._computeLabel(schema);
 			form.addEventListener("value-changed", (event) => this._valueChanged(event));
 		}
-		const schemaCacheKey = `${this._language()}:2.3.11`;
+		const schemaCacheKey = `${this._language()}:2.3.12`;
 		if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
 			this._schemaCache = this._schema();
 			this._schemaCacheKey = schemaCacheKey;
@@ -1759,6 +1785,6 @@ window.customCards.push({
 	description: "Animated heat recovery ventilation card with temperature gradients",
 	preview: true
 });
-window.__HRV_CARD_VERSION__ = "2.3.11";
-console.info("%c HRV Card %c loaded v2.3.11 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.12";
+console.info("%c HRV Card %c loaded v2.3.12 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
 //#endregion
