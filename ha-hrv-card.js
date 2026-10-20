@@ -735,31 +735,6 @@ var HRVCard = class extends HTMLElement {
       </button>
     `;
 	}
-	_selectControl(label, entityKey) {
-		const entity = this._entity(entityKey);
-		const entityId = this._entityId(entityKey);
-		const options = Array.isArray(entity?.attributes?.options) ? entity.attributes.options : [];
-		if (!entityId || this._domain(entityKey) !== "select" || options.length === 0) return this._badge(label, this._formatSelectState(entityKey), entityKey);
-		const available = this._state(entityKey) !== void 0;
-		const hasSelectedOption = options.includes(entity.state);
-		return `
-      <label class="select-control">
-        <span>${this._escapeHtml(label)}</span>
-        <select data-select-entity="${this._escapeHtml(entityId)}" ${available ? "" : "disabled"}>
-          ${hasSelectedOption ? "" : `<option value="" selected disabled>${this._escapeHtml(this._formatSelectState(entityKey))}</option>`}
-          ${options.map((option) => `
-            <option value="${this._escapeHtml(option)}" ${option === entity.state ? "selected" : ""}>${this._escapeHtml(this._fallbackDisplayState(entityKey, option))}</option>
-          `).join("")}
-        </select>
-      </label>
-    `;
-	}
-	_setSelectOption(entityId, option) {
-		this._hass?.callService("select", "select_option", {
-			entity_id: entityId,
-			option
-		});
-	}
 	_svgEntityAttrs(entityKey, extraClass = "") {
 		const entityId = this._entityId(entityKey);
 		const className = ["entity-hit", extraClass].filter(Boolean).join(" ");
@@ -1201,72 +1176,6 @@ var HRVCard = class extends HTMLElement {
           text-overflow: ellipsis;
         }
 
-        .select-control {
-          display: block;
-          min-width: 0;
-          border: 0;
-          text-align: center;
-          font: inherit;
-          cursor: pointer;
-          border-radius: 8px;
-          background: color-mix(in srgb, var(--hrv-background) 82%, transparent);
-          color: var(--hrv-text) !important;
-          padding: 6px 8px;
-          box-shadow: none;
-        }
-
-        .select-control span {
-          display: block;
-          color: var(--hrv-muted) !important;
-          font-size: 10px;
-          line-height: 1.2;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .select-control select {
-          appearance: none;
-          -webkit-appearance: none;
-          display: block;
-          box-sizing: border-box;
-          width: 100%;
-          margin: 2px 0 0;
-          border: 0;
-          border-radius: 0;
-          background: transparent;
-          color: var(--hrv-text) !important;
-          font: inherit;
-          font-size: 12px;
-          font-weight: 700;
-          line-height: 1.2;
-          min-height: 0;
-          padding: 0;
-          text-align: center;
-          text-align-last: center;
-          cursor: pointer;
-          box-shadow: none;
-        }
-
-        .select-control:focus-within {
-          outline: 2px solid var(--hrv-text);
-          outline-offset: 2px;
-        }
-
-        .select-control select:focus {
-          outline: none;
-        }
-
-        .select-control select:disabled {
-          cursor: default;
-          opacity: 1;
-          -webkit-text-fill-color: var(--hrv-text);
-        }
-
-        .select-control select option {
-          background: var(--hrv-background);
-          color: var(--hrv-text);
-        }
       </style>
 
       <ha-card>
@@ -1317,8 +1226,8 @@ var HRVCard = class extends HTMLElement {
 
           ${hasBadges ? `
             <div class="badges">
-              ${this._selectControl(this._t("mode"), "mode")}
-              ${this._selectControl(this._t("level"), "level")}
+              ${this._badge(this._t("mode"), this._formatSelectState("mode"), "mode")}
+              ${this._badge(this._t("level"), this._formatSelectState("level"), "level")}
               ${this._badge(this._t("humidity"), this._formatNumber("humidity", 0, "%"), "humidity")}
             </div>
           ` : ""}
@@ -1332,11 +1241,6 @@ var HRVCard = class extends HTMLElement {
 					event.preventDefault();
 					this._fireMoreInfo(element.dataset.entity);
 				}
-			});
-		});
-		this.shadowRoot.querySelectorAll("[data-select-entity]").forEach((element) => {
-			element.addEventListener("change", (event) => {
-				this._setSelectOption(element.dataset.selectEntity, event.target.value);
 			});
 		});
 	}
@@ -1766,7 +1670,7 @@ var HRVCardEditor = class extends HTMLElement {
 			form.computeLabel = (schema) => this._computeLabel(schema);
 			form.addEventListener("value-changed", (event) => this._valueChanged(event));
 		}
-		const schemaCacheKey = `${this._language()}:2.3.12`;
+		const schemaCacheKey = `${this._language()}:2.3.13`;
 		if (!this._schemaCache || this._schemaCacheKey !== schemaCacheKey) {
 			this._schemaCache = this._schema();
 			this._schemaCacheKey = schemaCacheKey;
@@ -1785,6 +1689,6 @@ window.customCards.push({
 	description: "Animated heat recovery ventilation card with temperature gradients",
 	preview: true
 });
-window.__HRV_CARD_VERSION__ = "2.3.12";
-console.info("%c HRV Card %c loaded v2.3.12 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
+window.__HRV_CARD_VERSION__ = "2.3.13";
+console.info("%c HRV Card %c loaded v2.3.13 ", "color: white; background: #1976d2; font-weight: 700; padding: 2px 4px; border-radius: 3px 0 0 3px;", "color: white; background: #43a047; font-weight: 700; padding: 2px 4px; border-radius: 0 3px 3px 0;");
 //#endregion

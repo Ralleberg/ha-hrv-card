@@ -53,7 +53,7 @@ The built-in defaults for Dantherm writable controls are based on the excellent 
 - 🌬️ Animated airflow visualization
 - 🌡️ Temperature-based airflow gradients
 - ♻️ Heat recovery efficiency indicator
-- 💨 Inline fan level and operation mode dropdowns for `select` entities
+- 💨 Mode and fan level badges with access to Home Assistant’s more-info dialog
 - 🚪 Automatic bypass visualization
 - 💧 Humidity indicator
 - 🫧 Optional CO₂ indicator
@@ -121,12 +121,12 @@ shows the loaded card version.
 
 ### Mode and fan level controls
 
-With `select` entities configured for `mode` or `level`, the card displays inline
-dropdowns using the options supplied by your integration. Changing an option
-calls Home Assistant's `select.select_option` action. Unavailable selects are
-disabled. With other entity types, or selects without options, a badge opens
-Home Assistant's more-info dialog instead. Controls are hidden along with the
-badge row when `appearance.show_badges` is `false`.
+Mode and fan level appear as integrated, clickable badges. Tap a badge to open
+Home Assistant's more-info dialog. For writable entities such as `select`,
+you can change the value there using the controls provided by Home Assistant.
+Other entity types show the details and controls their integration supports.
+There are no inline dropdowns in the card. The badge row can be hidden with
+`appearance.show_badges: false`.
 
 ---
 

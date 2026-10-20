@@ -1,6 +1,13 @@
 # Changelog
 
-## v2.3.12 - Integrated Controls
+## v2.3.13 - Restore Original Controls
+
+### Fixed
+
+- Restores the original mode and fan level badges, with changes made through Home Assistant's more-info dialog.
+- Removes inline dropdowns and updates the README to match.
+
+## v2.3.12 - Integrated Controls (withdrawn)
 
 ### Fixed
 
