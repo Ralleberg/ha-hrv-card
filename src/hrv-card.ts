@@ -52,6 +52,31 @@ class HRVCard extends HTMLElement {
     this._hass = undefined;
     this._id = `hrv-${Math.random().toString(36).slice(2, 10)}`;
     this._lastRenderSignature = "";
+    this._narrow = false;
+  }
+
+  connectedCallback() {
+    if (typeof ResizeObserver === "undefined" || this._resizeObserver) return;
+    this._resizeObserver = new ResizeObserver((entries) => this._updateNarrow(entries[0]?.contentRect?.width));
+    this._resizeObserver.observe(this);
+  }
+
+  disconnectedCallback() {
+    this._resizeObserver?.disconnect();
+    this._resizeObserver = undefined;
+  }
+
+  // On narrow cards (phones, one dashboard column) the SVG is scaled down so far that its text becomes unreadable.
+  _isNarrowWidth(width) {
+    return Number.isFinite(width) && width > 0 && width < 460;
+  }
+
+  _updateNarrow(width) {
+    if (!Number.isFinite(width) || width <= 0) return;
+    const narrow = this._isNarrowWidth(width);
+    if (narrow === this._narrow) return;
+    this._narrow = narrow;
+    this._render();
   }
 
   setConfig(config) {
@@ -158,7 +183,7 @@ class HRVCard extends HTMLElement {
     const measuredWidth = Number.isFinite(width) && width > 0 ? width : compact ? 360 : 500;
     const horizontalPadding = compact ? 6 : 10;
     const verticalPadding = compact ? 10 : 18;
-    const svgHeight = Math.max(0, measuredWidth - horizontalPadding) * (292 / 620);
+    const svgHeight = Math.max(0, measuredWidth - horizontalPadding) * ((this._isNarrowWidth(width) ? 340 : 292) / 620);
     const badgesHeight = showBadges ? compact ? 48 : 54 : 0;
     return verticalPadding + svgHeight + badgesHeight;
   }
@@ -198,6 +223,7 @@ class HRVCard extends HTMLElement {
 
     return JSON.stringify({
       appearance,
+      narrow: this._narrow === true,
       labels,
       language: this._language(),
       temperatureThresholds,
@@ -777,6 +803,8 @@ class HRVCard extends HTMLElement {
     const hasLabels = this._config.appearance.show_labels !== false;
     const hasTemps = this._config.appearance.show_temperatures !== false;
     const compact = this._config.appearance.compact === true;
+    // The narrow layout adds room above and below the ducts for larger labels and temperatures.
+    const narrow = this._narrow === true;
 
     const gOutdoorSupply = `${this._id}-outdoor-supply`;
     const gExtractExhaust = `${this._id}-extract-exhaust`;
@@ -847,22 +875,22 @@ class HRVCard extends HTMLElement {
               ${hasTemps ? `<text x="546" y="96" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("extract_temperature"))}</text>` : ""}
             </g>
     ` : `
-            <g ${this._svgEntityAttrs("outdoor_temperature")} tabindex="0">
+            <g ${this._svgEntityAttrs("outdoor_temperature", "temp-top")} tabindex="0">
               <rect x="18" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="68" y="26" text-anchor="middle" class="label">${this._temperatureLabel("outdoor_temperature", "outdoor")}</text>` : ""}
               ${hasTemps ? `<text x="68" y="56" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("outdoor_temperature"))}</text>` : ""}
             </g>
-            <g ${this._svgEntityAttrs(rightTopKey)} tabindex="0">
+            <g ${this._svgEntityAttrs(rightTopKey, "temp-top")} tabindex="0">
               <rect x="502" y="6" width="100" height="56" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="552" y="26" text-anchor="middle" class="label">${rightTopLabel}</text>` : ""}
               ${hasTemps ? `<text x="552" y="56" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp(rightTopKey))}</text>` : ""}
             </g>
-            <g ${this._svgEntityAttrs(rightBottomKey)} tabindex="0">
+            <g ${this._svgEntityAttrs(rightBottomKey, "temp-bottom")} tabindex="0">
               <rect x="502" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="552" y="234" text-anchor="middle" class="label">${rightBottomLabel}</text>` : ""}
               ${hasTemps ? `<text x="552" y="260" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp(rightBottomKey))}</text>` : ""}
             </g>
-            <g ${this._svgEntityAttrs("exhaust_temperature")} tabindex="0">
+            <g ${this._svgEntityAttrs("exhaust_temperature", "temp-bottom")} tabindex="0">
               <rect x="18" y="214" width="100" height="52" rx="10" fill="transparent"></rect>
               ${hasLabels ? `<text x="68" y="234" text-anchor="middle" class="label">${this._temperatureLabel("exhaust_temperature", "exhaust")}</text>` : ""}
               ${hasTemps ? `<text x="68" y="260" text-anchor="middle" class="temperature">${this._escapeHtml(this._formatTemp("exhaust_temperature"))}</text>` : ""}
@@ -900,7 +928,7 @@ class HRVCard extends HTMLElement {
         svg {
           width: 100%;
           height: auto;
-          aspect-ratio: 620 / 292;
+          aspect-ratio: ${narrow ? "620 / 340" : "620 / 292"};
           display: block;
           color: var(--hrv-text) !important;
         }
@@ -1096,6 +1124,44 @@ class HRVCard extends HTMLElement {
           50% { opacity: .25; }
         }
 
+        /* Narrow cards: larger SVG text; top labels move up, bottom temperatures down into the added room. */
+        .narrow .label {
+          font-size: 22px;
+        }
+
+        .narrow .temperature {
+          font-size: 32px;
+        }
+
+        .narrow .side-value,
+        .narrow .rpm-inline {
+          font-size: 19px;
+        }
+
+        .narrow .recovery-value {
+          font-size: 21px;
+        }
+
+        .narrow .status-label {
+          font-size: 12px;
+        }
+
+        .narrow .status-value {
+          font-size: 18px;
+        }
+
+        .narrow .temp-top .label {
+          transform: translateY(-18px);
+        }
+
+        .narrow .temp-bottom .label {
+          transform: translateY(6px);
+        }
+
+        .narrow .temp-bottom .temperature {
+          transform: translateY(20px);
+        }
+
         .badges {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
@@ -1155,8 +1221,8 @@ class HRVCard extends HTMLElement {
       </style>
 
       <ha-card>
-        <div class="card ${animationOff ? "no-animation" : ""}">
-          <svg viewBox="0 0 620 292" role="img" aria-label="${this._t("airflow_diagram")}">
+        <div class="card ${[animationOff ? "no-animation" : "", narrow ? "narrow" : ""].filter(Boolean).join(" ")}">
+          <svg viewBox="${narrow ? "0 -24 620 340" : "0 0 620 292"}" role="img" aria-label="${this._t("airflow_diagram")}">
             <defs>
               ${this._gradient(gOutdoorSupply, outdoor, supply)}
               ${this._gradient(gExtractExhaust, exhaust, extract)}
