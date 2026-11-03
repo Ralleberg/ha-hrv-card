@@ -74,6 +74,18 @@ test('heat recovery retains clamping and inversion', () => {
   assert.equal(cardWith(entities, { 'sensor.recovery': state('30') }, { invert_heat_recovery: true })._formatHeatRecovery(), '70%');
 });
 
+test('percentage fan levels scale the airflow speed instead of saturating at level 4', () => {
+  const entities = { level: 'sensor.fan_speed' };
+  const percent = (value) => cardWith(entities, { 'sensor.fan_speed': state(value, { unit_of_measurement: '%' }) });
+  assert.equal(percent('100')._fanLevel(), 4);
+  assert.equal(percent('50')._fanLevel(), 2);
+  assert.equal(percent('0')._flowDuration(), '0s');
+  assert.ok(Math.abs(Number.parseFloat(percent('100')._flowDuration()) - 1.6) < 1e-9);
+  assert.ok(Number.parseFloat(percent('50')._flowDuration()) > 3);
+  assert.equal(cardWith(entities, { 'sensor.fan_speed': state('3') })._fanLevel(), 3);
+  assert.equal(cardWith(entities, { 'sensor.fan_speed': state('79') })._fanLevel(), 4);
+});
+
 test('unrelated state updates do not rebuild the card, relevant updates do', () => {
   const card = cardWith({ outdoor_temperature: 'sensor.outdoor' }, { 'sensor.outdoor': state('10') });
   const render = card._render.bind(card);
