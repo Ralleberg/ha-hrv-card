@@ -60,7 +60,7 @@ The built-in defaults for Dantherm writable controls are based on the excellent 
 - ⚠️ Alarm indicator
 - 🧹 Filter lifetime indicator
 - 🔄 Optional fan RPM display
-- 🎨 Automatic Danish / English translations
+- 🎨 Automatic Danish / English / German translations
 - 📱 Responsive layout
 - ⚙️ Vendor-neutral configuration
 - 🧩 Works with partial configurations (missing entities are automatically hidden)
@@ -572,6 +572,7 @@ Currently supported languages:
 
 - 🇬🇧 English
 - 🇩🇰 Danish
+- 🇩🇪 German
 
 Community translations are very welcome.
 

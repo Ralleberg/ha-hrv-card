@@ -309,6 +309,23 @@ class HRVCard extends HTMLElement {
         fireplace_mode: "Brændeovnstilstand",
         night: "Nattilstand",
         night_mode: "Nattilstand"
+      },
+      de: {
+        standby: "Standby",
+        automatic: "Automatik",
+        auto: "Automatik",
+        manual: "Manuell",
+        week_program: "Wochenprogramm",
+        away: "Abwesend",
+        away_mode: "Abwesend",
+        travel: "Abwesend",
+        travel_mode: "Abwesend",
+        summer: "Sommerbetrieb",
+        summer_mode: "Sommerbetrieb",
+        fireplace: "Kaminbetrieb",
+        fireplace_mode: "Kaminbetrieb",
+        night: "Nachtbetrieb",
+        night_mode: "Nachtbetrieb"
       }
     };
 
@@ -352,6 +369,26 @@ class HRVCard extends HTMLElement {
         "1": "Åben",
         "0": "Lukket",
         "255": "Åben"
+      },
+      de: {
+        open: "Offen",
+        offen: "Offen",
+        opening: "Öffnet",
+        closed: "Geschlossen",
+        close: "Geschlossen",
+        geschlossen: "Geschlossen",
+        closing: "Schließt",
+        on: "Offen",
+        off: "Geschlossen",
+        true: "Offen",
+        false: "Geschlossen",
+        yes: "Offen",
+        ja: "Offen",
+        no: "Geschlossen",
+        nein: "Geschlossen",
+        "1": "Offen",
+        "0": "Geschlossen",
+        "255": "Offen"
       }
     };
 
@@ -374,7 +411,7 @@ class HRVCard extends HTMLElement {
       .replace(/[_-]+/g, " ")
       .replace(/\s+/g, " ")
       .trim()
-      .replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase(this._language() === "da" ? "da-DK" : "en-US"));
+      .replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase({ da: "da-DK", de: "de-DE" }[this._language()] || "en-US"));
   }
 
   _formatSelectState(key) {
@@ -448,8 +485,10 @@ class HRVCard extends HTMLElement {
   }
 
   _language() {
-    const language = this._hass?.locale?.language || this._hass?.language || "en";
-    return language.toString().toLowerCase().startsWith("da") ? "da" : "en";
+    const language = (this._hass?.locale?.language || this._hass?.language || "en").toString().toLowerCase();
+    if (language.startsWith("da")) return "da";
+    if (language.startsWith("de")) return "de";
+    return "en";
   }
 
   _t(key) {
@@ -519,6 +558,39 @@ class HRVCard extends HTMLElement {
         compact: "Kompakt",
         state_open: "Åben",
         state_closed: "Lukket"
+      },
+      de: {
+        airflow_diagram: "Luftstromdiagramm der Lüftungsanlage",
+        outdoor: "Außenluft",
+        supply: "Zuluft",
+        extract: "Abluft",
+        exhaust: "Fortluft",
+        bypass: "Bypass",
+        mode: "Modus",
+        level: "Stufe",
+        humidity: "Feuchte",
+        co2: "CO2",
+        filter_days: "Filter",
+        alarm: "Alarm",
+        days_short: "T",
+        temperatures: "Temperaturen",
+        optional_entities: "Optionale Entitäten",
+        appearance: "Darstellung",
+        outdoor_temperature: "Außenlufttemperatur",
+        supply_temperature: "Zulufttemperatur",
+        extract_temperature: "Ablufttemperatur",
+        exhaust_temperature: "Fortlufttemperatur",
+        heat_recovery: "Wärmerückgewinnung",
+        invert_heat_recovery: "Wärmerückgewinnung umkehren",
+        fan1_rpm: "Lüfter 1 Drehzahl",
+        fan2_rpm: "Lüfter 2 Drehzahl",
+        animation: "Animation",
+        show_labels: "Beschriftungen anzeigen",
+        show_badges: "Badges anzeigen",
+        show_temperatures: "Temperaturen anzeigen",
+        compact: "Kompakt",
+        state_open: "Offen",
+        state_closed: "Geschlossen"
       }
     };
     return translations[this._language()]?.[key] || translations.en[key] || key;
@@ -1282,8 +1354,10 @@ class HRVCardEditor extends HTMLElement {
   }
 
   _language() {
-    const language = this._hass?.locale?.language || this._hass?.language || "en";
-    return language.toString().toLowerCase().startsWith("da") ? "da" : "en";
+    const language = (this._hass?.locale?.language || this._hass?.language || "en").toString().toLowerCase();
+    if (language.startsWith("da")) return "da";
+    if (language.startsWith("de")) return "de";
+    return "en";
   }
 
   _t(key) {
@@ -1360,6 +1434,43 @@ class HRVCardEditor extends HTMLElement {
         show_labels: "Vis labels",
         show_badges: "Vis badges",
         show_temperatures: "Vis temperaturer",
+        compact: "Kompakt"
+      },
+      de: {
+        temperatures: "Temperaturen",
+        temperature_labels: "Temperaturbeschriftungen",
+        temperature_colors: "Temperaturfarben",
+        optional_entities: "Optionale Entitäten",
+        appearance: "Darstellung",
+        outdoor_temperature: "Außenlufttemperatur",
+        supply_temperature: "Zulufttemperatur",
+        extract_temperature: "Ablufttemperatur",
+        exhaust_temperature: "Fortlufttemperatur",
+        label_outdoor_temperature: "Beschriftung Außenluft",
+        label_supply_temperature: "Beschriftung Zuluft",
+        label_extract_temperature: "Beschriftung Abluft",
+        label_exhaust_temperature: "Beschriftung Fortluft",
+        threshold_white: "Weiß ab",
+        threshold_blue: "Blau ab",
+        threshold_green: "Grün ab",
+        threshold_yellow: "Gelb ab",
+        threshold_orange: "Orange ab",
+        threshold_red: "Rot ab",
+        heat_recovery: "Wärmerückgewinnung",
+        invert_heat_recovery: "Wärmerückgewinnung umkehren",
+        humidity: "Feuchte",
+        co2: "CO2-Wert",
+        filter_days: "Filter-Restlaufzeit in Tagen",
+        alarm: "Alarm",
+        bypass: "Bypass",
+        mode: "Modus",
+        level: "Stufe",
+        fan1_rpm: "Lüfter 1 Drehzahl",
+        fan2_rpm: "Lüfter 2 Drehzahl",
+        animation: "Animation",
+        show_labels: "Beschriftungen anzeigen",
+        show_badges: "Badges anzeigen",
+        show_temperatures: "Temperaturen anzeigen",
         compact: "Kompakt"
       }
     };
