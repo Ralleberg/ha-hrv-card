@@ -327,7 +327,7 @@ Every other entity is optional and automatically hidden if omitted.
 | `co2` | Indoor CO₂ sensor |
 | `bypass` | Bypass cover or sensor |
 | `mode` | Operating mode (`sensor` or `select`) |
-| `level` | Fan level (`sensor` or `select`) |
+| `level` | Fan level (`sensor` or `select`): steps 0–4, or a fan speed in `%` |
 | `alarm` | Alarm entity |
 | `filter_days` | Remaining filter lifetime |
 | `fan1_rpm` | Supply fan RPM |

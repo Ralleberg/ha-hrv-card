@@ -595,6 +595,8 @@ class HRVCard extends HTMLElement {
     const rawLevel = this._state("level");
     if (rawLevel === undefined) return undefined;
     const numericLevel = Number.parseFloat(rawLevel);
+    // Percentage fan speeds (0-100 %) map onto the 0-4 level scale.
+    if (Number.isFinite(numericLevel) && this._unit("level") === "%") return Math.max(0, Math.min(100, numericLevel)) / 25;
     if (Number.isFinite(numericLevel)) return Math.max(0, Math.min(4, numericLevel));
 
     const normalized = rawLevel.toString().trim().toLowerCase();
