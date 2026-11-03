@@ -100,6 +100,22 @@ test('mode and level remain localized badges even for writable select entities',
   assert.doesNotMatch(card.shadowRoot.innerHTML, /<button/);
 });
 
+test('German language renders German labels and fallback states', () => {
+  const card = cardWith({
+    outdoor_temperature: 'sensor.outdoor', mode: 'sensor.mode', bypass: 'sensor.bypass',
+  }, {
+    'sensor.outdoor': state('9.7'), 'sensor.mode': state('week_program'), 'sensor.bypass': state('off'),
+  });
+  card.hass = { ...card._hass, locale: { language: 'de-DE' } };
+  assert.equal(card._language(), 'de');
+  assert.equal(card._t('outdoor'), 'Außenluft');
+  assert.equal(card._t('humidity'), 'Feuchte');
+  assert.equal(card._fallbackDisplayState('mode', 'week_program'), 'Wochenprogramm');
+  assert.equal(card._fallbackDisplayState('bypass', 'off'), 'Geschlossen');
+  assert.match(card.shadowRoot.innerHTML, /Außenluft/);
+  assert.match(card.shadowRoot.innerHTML, /<strong>Wochenprogramm<\/strong>/);
+});
+
 test('mode badge click and keyboard activation open more-info without service calls', () => {
   const card = cardWith({ mode: 'select.mode' }, {
     'select.mode': state('manual', { options: ['automatic', 'manual'] }),
