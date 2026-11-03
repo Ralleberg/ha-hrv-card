@@ -74,6 +74,25 @@ test('heat recovery retains clamping and inversion', () => {
   assert.equal(cardWith(entities, { 'sensor.recovery': state('30') }, { invert_heat_recovery: true })._formatHeatRecovery(), '70%');
 });
 
+test('narrow cards switch to the taller layout with larger text and back', () => {
+  const card = cardWith({ outdoor_temperature: 'sensor.outdoor', exhaust_temperature: 'sensor.exhaust' }, {
+    'sensor.outdoor': state('9.7'), 'sensor.exhaust': state('11'),
+  });
+  assert.match(card.shadowRoot.innerHTML, /viewBox="0 0 620 292"/);
+  assert.doesNotMatch(card.shadowRoot.innerHTML, /class="card[^"]*narrow/);
+  card._updateNarrow(360);
+  assert.match(card.shadowRoot.innerHTML, /class="card[^"]*narrow/);
+  assert.match(card.shadowRoot.innerHTML, /viewBox="0 -24 620 340"/);
+  assert.match(card.shadowRoot.innerHTML, /class="temp-top"/);
+  assert.match(card.shadowRoot.innerHTML, /class="temp-bottom"/);
+  assert.ok(Math.abs(card._cardHeightForWidth(360) - (18 + 350 * (340 / 620) + 54)) < 1e-9);
+  assert.ok(Math.abs(card._cardHeightForWidth(600) - (18 + 590 * (292 / 620) + 54)) < 1e-9);
+  card._updateNarrow(600);
+  assert.match(card.shadowRoot.innerHTML, /viewBox="0 0 620 292"/);
+  card._updateNarrow(0);
+  assert.match(card.shadowRoot.innerHTML, /viewBox="0 0 620 292"/);
+});
+
 test('unrelated state updates do not rebuild the card, relevant updates do', () => {
   const card = cardWith({ outdoor_temperature: 'sensor.outdoor' }, { 'sensor.outdoor': state('10') });
   const render = card._render.bind(card);
